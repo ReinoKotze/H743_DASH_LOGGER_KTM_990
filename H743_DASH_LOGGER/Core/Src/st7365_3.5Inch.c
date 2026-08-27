@@ -6,37 +6,38 @@
  */
 #include "st7365_3.5Inch.h"
 
-#include "cmsis_os2.h"
+
 #include "main.h"
+#include "freertos.h"
+#include "cmsis_os2.h"
 
+//int TEFLAG=0;
 
-int TEFLAG=0;
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  /* Prevent unused argument(s) compilation warning */
-  if(GPIO_Pin == TE_LCD_Pin)
-  {
-	  TEFLAG=1;
-  }
-
-  /* NOTE: This function Should not be modified, when the callback is needed,
-           the HAL_GPIO_EXTI_Callback could be implemented in the user file
-   */
-}
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
+//  /* Prevent unused argument(s) compilation warning */
+//  if(GPIO_Pin == TE_LCD_Pin)
+//  {
+//	  TEFLAG=1;
+//  }
+//
+//  /* NOTE: This function Should not be modified, when the callback is needed,
+//           the HAL_GPIO_EXTI_Callback could be implemented in the user file
+//   */
+//}
 
 
 
 void TE_wait(void)
 {
 
-	TEFLAG=0;
-	int32_t timeout = HAL_GetTick() ;   // 50 ms timeout
-
-	    while(TEFLAG == 0)
-	    {
-	        if(HAL_GetTick() > timeout) break;   // safety
-	    }
+//	TEFLAG=0;
+//	int32_t timeout = HAL_GetTick() ;   // 50 ms timeout
+//
+//	    while(TEFLAG == 0)
+//	    {
+//	        if(HAL_GetTick() > timeout) break;   // safety
+//	    }
 
 
 }
@@ -47,8 +48,8 @@ void TE_wait(void)
 void delay(uint32_t time)
 {
 
-//HAL_Delay(time);
-	osDelay(time);
+HAL_Delay(time);
+	//osDelay(time);
 
 }
 

@@ -26,11 +26,19 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+
+#include "w25q128.h"
 #include "st7365_3.5Inch.h"
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
+
+
 
 /* USER CODE END PTD */
 
@@ -48,10 +56,17 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for init */
+osThreadId_t initHandle;
+const osThreadAttr_t init_attributes = {
+  .name = "init",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityHigh7,
+};
+/* Definitions for testing */
+osThreadId_t testingHandle;
+const osThreadAttr_t testing_attributes = {
+  .name = "testing",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -61,7 +76,8 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void Init_Functions(void *argument);
+void Task_Testing(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -92,8 +108,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of init */
+  initHandle = osThreadNew(Init_Functions, NULL, &init_attributes);
+
+  /* creation of testing */
+  testingHandle = osThreadNew(Task_Testing, NULL, &testing_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -105,24 +124,53 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_Init_Functions */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the init thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_Init_Functions */
+void Init_Functions(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
-	void TaskOne();
-	 osDelay(2);
+  /* USER CODE BEGIN Init_Functions */
   /* Infinite loop */
   for(;;)
   {
+
+
+    osDelay(1);
+
+
+  }
+  /* USER CODE END Init_Functions */
+}
+
+/* USER CODE BEGIN Header_Task_Testing */
+/**
+* @brief Function implementing the testing thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Task_Testing */
+void Task_Testing(void *argument)
+{
+  /* USER CODE BEGIN Task_Testing */
+  /* Infinite loop */
+  for(;;)
+  {
+
+	HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
+
+	Fill(WHITE);
+	osDelay(200);
+	Fill(BLACK);
+    osDelay(200);
+
+
     osDelay(1);
   }
-  /* USER CODE END StartDefaultTask */
+  /* USER CODE END Task_Testing */
 }
 
 /* Private application code --------------------------------------------------*/
