@@ -49,6 +49,8 @@ MEMORY
   RAM_D2 (xrw)   : ORIGIN = 0x30000000, LENGTH = 288K
   RAM_D3 (xrw)   : ORIGIN = 0x38000000, LENGTH = 64K
   ITCMRAM (xrw)  : ORIGIN = 0x00000000, LENGTH = 64K
+  W25Q128_FLASH (rx)     : ORIGIN = 0x90000000, LENGTH = 16M
+  W9825_SDRAM (xrw)      : ORIGIN = 0xc0000000, LENGTH = 32M
 }
 
 /* Define output sections */
@@ -173,6 +175,23 @@ SECTIONS
     libm.a ( * )
     libgcc.a ( * )
   }
+  
+  
+  .extFlash :
+{
+*(.extFlash)
+} > W25Q128_FLASH 
+
+.sdram_buf (NOLOAD) :
+{
+  . = ALIGN(32);
+  *(.sdram_buf)
+  . = ALIGN(32);
+} >W9825_SDRAM
+  
+  
+  
+  
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
