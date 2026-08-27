@@ -32,7 +32,10 @@
 
 #include "w25q128.h"
 #include "st7365_3.5Inch.h"
-
+#include "bsp_sdram.h"
+#include "stdio.h"
+#include <stdbool.h>
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -127,10 +130,11 @@ int main(void)
   MX_CRC_Init();
   MX_DMA2D_Init();
   /* USER CODE BEGIN 2 */
-  LCD_Init();
-	CSP_QUADSPI_Init();
-  CSP_QSPI_EnableMemoryMappedMode();
 
+  LCD_Init();
+  CSP_QUADSPI_Init();
+  CSP_QSPI_EnableMemoryMappedMode();
+  SDRAM_InitSequence();
 
   /* USER CODE END 2 */
 
@@ -251,6 +255,17 @@ void MPU_Config(void)
   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
   MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+  /** Initializes and configures the Region and the memory to be protected
+  */
+  MPU_InitStruct.Number = MPU_REGION_NUMBER2;
+  MPU_InitStruct.BaseAddress = 0xc0000000;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
