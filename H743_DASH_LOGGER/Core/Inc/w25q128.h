@@ -21,9 +21,8 @@ uint8_t CSP_QSPI_EnableMemoryMappedMode(void);
 uint8_t CSP_QSPI_Erase_Chip (void);
 uint8_t QSPI_AutoPollingMemReady(uint32_t timeout_ms);
 uint8_t CSP_QSPI_Read(uint8_t* pData, uint32_t ReadAddr, uint32_t Size);
-uint8_t QSPI_AutoPollingMemReady(uint32_t timeout_ms);
 uint8_t CSP_QSPI_ReadStatusRegister(uint8_t command, uint8_t *status);
-
+uint8_t CSP_QSPI_DisableMemoryMappedMode(void);
 
 /*W25Q128 memory parameters*/
 #define MEMORY_FLASH_SIZE				0x1000000  /* 128Mbit =>16Mbyte */

@@ -10,7 +10,7 @@
 #include "main.h"
 
 
-
+#define LCD_MDMA_MAX_BYTES  (65534U) /* Even number: RGB565 pixels */
 #define FMC_BANK1_REG  *(volatile uint16_t *)((uint32_t)0x60000000)  // Register Address for A0
 #define FMC_BANK1_DATA *(volatile uint16_t *)((uint32_t)0x60000002) // Data Address for A0 -> A0<<1 -> 0010
 
@@ -18,7 +18,7 @@
 
 //functions
 //void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
-void TE_wait(void);
+void LCD_WaitForTE(uint32_t timeout_ms);
 void delay(uint32_t time);
 void LCD_IO_WriteReg(uint16_t Reg);
 void LCD_IO_WriteData(uint16_t RegValue);
@@ -28,9 +28,10 @@ void LCD_SetWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 void LCD_DrawPixel(uint16_t x, uint16_t y, uint16_t color);
 void LCD_DrawRecFill(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
 void Fill(uint16_t color);
-
-
-
+void LCD_DrawBitmap(uint16_t x,uint16_t y, const uint16_t *pbmp);
+void LCD_WriteBitmap(uint16_t x0, uint16_t y0,uint16_t x1, uint16_t y1, const uint16_t *pixels);
+HAL_StatusTypeDef LCD_WriteBitmapDMA(uint16_t x0, uint16_t y0,uint16_t x1, uint16_t y1,const uint16_t *pixels);
+void LCD_CleanDCacheForMDMA(const void *address, uint32_t size);
 
 
 //command list
@@ -57,7 +58,10 @@ void Fill(uint16_t color);
 #define columnAddressSet 0x2a
 #define rowAddressSet 0x2b
 #define memoryWrite 0x2c
-
+#define tearingEffect 0x35
+#define DispNormModeOn 0x13
+#define LCD_WIDTH   320U
+#define LCD_HEIGHT  480U
 
 #define BLACK       0x0000
 #define WHITE       0xFFFF

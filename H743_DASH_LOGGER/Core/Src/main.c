@@ -21,7 +21,7 @@
 #include "FreeRTOS.h"
 #include "cmsis_os2.h"
 #include "crc.h"
-#include "dma2d.h"
+#include "mdma.h"
 #include "quadspi.h"
 #include "usart.h"
 #include "gpio.h"
@@ -29,23 +29,39 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
 #include "w25q128.h"
 #include "st7365_3.5Inch.h"
 #include "bsp_sdram.h"
 #include "stdio.h"
 #include <stdbool.h>
 #include <string.h>
-
+#include "LVGL_LCD_LINK.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+volatile uint8_t qspi_test_value;
+
+volatile uint32_t sdram_fail_address;
+volatile uint32_t sdram_expected;
+volatile uint32_t sdram_actual;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+
+//SDRAM address list
+#define LVGL_HEAP_ADD 0xc0000000U // define not used here, seprate define used in lv_conf. 5mb for lvgl heap
+#define lvgl_buf1_ADD 0xC0500000U // LV_HEAP_ADD+(320*480*2)  2 bytes per pixel
+#define lvgl_buf2_ADD 0xC054B000U // LVGL_BUF1_ADDRESS +(320*480*2)  2 bytes per pixel
+#define SDRAM_ADD4    (0xC054B000U+(320*480*2)) // end address (SDRAM_ADD4+data_size_bits)
+
+
+
+
+
 
 /* USER CODE END PD */
 
@@ -65,18 +81,50 @@ void SystemClock_Config(void);
 static void MPU_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
-//#ifdef __GNUC__
-//#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-//#else
-//#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-//#endif
-//PUTCHAR_PROTOTYPE
+
+
+
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif
+PUTCHAR_PROTOTYPE
+{
+    HAL_UART_Transmit(&huart1 , (uint8_t *)&ch, 1, 0xFFFF);
+    return ch;
+}
+
+
+//static void SDRAM_TestLVGLHeap(void)
 //{
-//    HAL_UART_Transmit(&huart1 , (uint8_t *)&ch, 1, 0xFFFF);
-//    return ch;
+//    volatile uint32_t *p = (volatile uint32_t *)0xC0000000U;
+//    const uint32_t size = 5U * 1024U * 1024U;
+//
+//    for (uint32_t offset = 0; offset < size; offset += 0x1000U) {
+//        uint32_t expected = 0xA5A50000U ^ offset;
+//
+//        p[offset / 4U] = expected;
+//        __DSB();
+//
+//        uint32_t actual = p[offset / 4U];  /* Read exactly once */
+//
+//        if (actual != expected) {
+//            sdram_fail_address = 0xC0000000U + offset;
+//            sdram_expected = expected;
+//            sdram_actual = actual;
+//            Error_Handler();
+//        }
+//    }
 //}
 
+static void ReadFlashData(void)
+{
+	 const volatile uint8_t *flash =
+	        (const volatile uint8_t *)0x90000000U;
 
+	    qspi_test_value = flash[0x100U];
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -112,6 +160,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  /* Debug only: make buffered-write BusFaults precise. */
 
   /* USER CODE END Init */
 
@@ -124,17 +173,28 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_QUADSPI_Init();
+  MX_MDMA_Init();
   MX_USART1_UART_Init();
   MX_FMC_Init();
   MX_CRC_Init();
-  MX_DMA2D_Init();
+  MX_QUADSPI_Init();
   /* USER CODE BEGIN 2 */
 
-  LCD_Init();
-  CSP_QUADSPI_Init();
-  CSP_QSPI_EnableMemoryMappedMode();
+
+  if (CSP_QUADSPI_Init() != HAL_OK) {
+      Error_Handler();
+  }
+
+  /* Enter read-only memory-mapped mode at 0x90000000. */
+  if (CSP_QSPI_EnableMemoryMappedMode() != HAL_OK) {
+      Error_Handler();
+  }
+
+  ReadFlashData();
+
   SDRAM_InitSequence();
+
+  LCD_Init();
 
   /* USER CODE END 2 */
 
@@ -188,7 +248,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLM = 4;
   RCC_OscInitStruct.PLL.PLLN = 60;
   RCC_OscInitStruct.PLL.PLLP = 2;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLQ = 8;
   RCC_OscInitStruct.PLL.PLLR = 2;
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
@@ -239,10 +299,10 @@ void MPU_Config(void)
   MPU_InitStruct.SubRegionDisable = 0;
   MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
   MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
   MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
@@ -252,9 +312,9 @@ void MPU_Config(void)
   MPU_InitStruct.BaseAddress = 0x90000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_16MB;
   MPU_InitStruct.SubRegionDisable = 0x0;
-  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
   MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
@@ -263,14 +323,16 @@ void MPU_Config(void)
   MPU_InitStruct.Number = MPU_REGION_NUMBER2;
   MPU_InitStruct.BaseAddress = 0xc0000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
-  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
-  MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_InitStruct.SubRegionDisable = 0x00;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
   /** Initializes and configures the Region and the memory to be protected
   */
+  MPU_InitStruct.SubRegionDisable = 0x0;
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);

@@ -16,31 +16,26 @@ uint8_t QSPI_AutoPollingMemReady(uint32_t timeout_ms);
 uint8_t CSP_QSPI_ReadStatusRegister(uint8_t command, uint8_t *status);
 
 
-
+//volatile uint32_t qspi_init_step;
+//volatile uint32_t qspi_init_status;
+//volatile uint32_t qspi_hal_error;
+//volatile uint32_t qspi_hal_state;
+//uint8_t qspi_status_reg1;
 
 
 uint8_t CSP_QUADSPI_Init(void) {
 
-	//prepare QSPI peripheral for ST-Link Utility operations
-    hqspi.Instance = QUADSPI;
 
-    if (HAL_QSPI_DeInit(&hqspi) != HAL_OK)
-    {
+    if (QSPI_ResetChip() != HAL_OK) {
         return HAL_ERROR;
     }
 
-    MX_QUADSPI_Init();
-
-    if (QSPI_ResetChip() != HAL_OK)
-    {
+    /* Do not send the SR2/QE command until reset has completed. */
+    if (QSPI_AutoPollingMemReady(W25Q128_READY_TIMEOUT_MS) != HAL_OK) {
         return HAL_ERROR;
     }
 
-    if (QSPI_AutoPollingMemReady(W25Q128_READY_TIMEOUT_MS) != HAL_OK)
-    {
-        return HAL_ERROR;
-    }
-
+    /* Read SR2 and set QE only when it is not already enabled. */
     return QSPI_Configuration();
 
 }
@@ -115,9 +110,10 @@ static uint8_t QSPI_WriteEnable(void) {
 
 static uint8_t QSPI_Configuration(void)
 {
+    uint8_t status_reg2;
+    uint8_t new_status_reg2;
 	QSPI_CommandTypeDef sCommand = {0};
-	    uint8_t status_reg2;
-	    uint8_t new_status_reg2;
+	//new_status_reg2 = status_reg2 | 0x02U;
 
 	    /* Read Status Register-2. */
 	    sCommand.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
@@ -125,8 +121,8 @@ static uint8_t QSPI_Configuration(void)
 	    sCommand.AddressMode       = QSPI_ADDRESS_NONE;
 	    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
 	    sCommand.DataMode          = QSPI_DATA_1_LINE;
-	    sCommand.NbData            = 1;
-	    sCommand.DummyCycles       = 0;
+	    sCommand.NbData            = 1U;
+	    sCommand.DummyCycles       = 0U;
 	    sCommand.DdrMode           = QSPI_DDR_MODE_DISABLE;
 	    sCommand.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
 	    sCommand.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
@@ -151,7 +147,7 @@ static uint8_t QSPI_Configuration(void)
 	     * This changes it to 0x02.
 	     */
 	    new_status_reg2 = status_reg2 | 0x02U;
-	    new_status_reg2 &= ~0x40U;
+	    //new_status_reg2 &= ~0x40U;
 
 	    if (new_status_reg2 == status_reg2)
 	    {
@@ -344,31 +340,39 @@ uint8_t CSP_QSPI_WriteMemory(uint8_t *buffer, uint32_t address,
     return HAL_OK;
 }
 
+uint8_t CSP_QSPI_DisableMemoryMappedMode(void)
+{
+    return (HAL_QSPI_Abort(&hqspi) == HAL_OK) ? HAL_OK : HAL_ERROR;
+}
 
 uint8_t CSP_QSPI_EnableMemoryMappedMode(void)
 {
     QSPI_CommandTypeDef sCommand = {0};
     QSPI_MemoryMappedTypeDef sMemMappedCfg = {0};
 
+
+    if (QSPI_AutoPollingMemReady(W25Q128_READY_TIMEOUT_MS) != HAL_OK) {
+          return HAL_ERROR;
+      }
     /*
      * 0x6B: Quad Output Fast Read
      * Instruction: 1 line, address: 1 line, data: 4 lines, 8 dummy clocks.
      */
-    sCommand.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
+        sCommand.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
         sCommand.Instruction       = QUAD_OUT_FAST_READ_CMD; /* 0x6B */
         sCommand.AddressMode       = QSPI_ADDRESS_1_LINE;
         sCommand.AddressSize       = QSPI_ADDRESS_24_BITS;
-        sCommand.Address           = 0;
+        sCommand.Address           = 0U;
         sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
         sCommand.DataMode          = QSPI_DATA_4_LINES;
-        sCommand.NbData            = 0;
+        sCommand.NbData            = 0U;
         sCommand.DummyCycles       = DUMMY_CLOCK_CYCLES_READ_QUAD; /* 8 */
         sCommand.DdrMode           = QSPI_DDR_MODE_DISABLE;
         sCommand.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
         sCommand.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
 
     sMemMappedCfg.TimeOutActivation = QSPI_TIMEOUT_COUNTER_DISABLE;
-    sMemMappedCfg.TimeOutPeriod     = 0;
+    sMemMappedCfg.TimeOutPeriod     = 0U;
 
     if (HAL_QSPI_MemoryMapped(&hqspi, &sCommand, &sMemMappedCfg) != HAL_OK)
     {
@@ -383,33 +387,29 @@ static uint8_t QSPI_ResetChip(void)
     QSPI_CommandTypeDef sCommand = {0};
 
     sCommand.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
-    sCommand.Instruction       = RESET_ENABLE_CMD; /* 0x66 */
     sCommand.AddressMode       = QSPI_ADDRESS_NONE;
     sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
     sCommand.DataMode          = QSPI_DATA_NONE;
-    sCommand.DummyCycles       = 0;
+    sCommand.DummyCycles       = 0U;
     sCommand.DdrMode           = QSPI_DDR_MODE_DISABLE;
     sCommand.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
     sCommand.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
 
+    sCommand.Instruction = RESET_ENABLE_CMD;  /* 0x66 */
+
     if (HAL_QSPI_Command(&hqspi, &sCommand,
-                         HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-    {
+                         HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
         return HAL_ERROR;
     }
 
     sCommand.Instruction = RESET_EXECUTE_CMD; /* 0x99 */
 
     if (HAL_QSPI_Command(&hqspi, &sCommand,
-                         HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-    {
+                         HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
         return HAL_ERROR;
     }
 
-    __NOP();
-    __NOP();
-    __NOP();
-
+    HAL_Delay(1U);  /* Allow flash reset recovery */
     return HAL_OK;
 }
 
