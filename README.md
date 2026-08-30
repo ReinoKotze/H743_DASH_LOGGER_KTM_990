@@ -1,8 +1,6 @@
 # H743_DASH_LOGGER_KTM_990
 This is a seprate physical display to compliment the trailtech voyger on my ktm 990 with the added ability to data log. 
 
-NOTE: I am not getting any senor data from the ecu's canbus (KWP2000 SEA ISO 2014230-2 protocol), I am reading voltages directly and calculating the variables in the controllers. I will be datalogging every 10ms and I can guarantee the log rate and sensor data. Basically I know nothing about the ktm 990's keihin ecu's canbus and I can find very little information on the pid's for each value I am interested in. 
-
 The controller is a STM32H743IIT6 sold online pictured below. The board has w9825g6kh SDRAM IC and an w25q128 QSPI flash IC onboard. The board also had a SD card slot and a LDTC FPC connector that is not used for this project. The display is a 3.5inch transflective LCD with a st7365p controller IC. the display is a viewe PN: UEED035HV-RX40-L001A pictured below. 
 
 <img width="239" height="563" alt="image" src="https://github.com/user-attachments/assets/3c01f878-6cef-4ef4-bb6d-9ba9415695f1" /> <img width="555" height="369" alt="image" src="https://github.com/user-attachments/assets/bf8d4a20-dfb0-416f-af32-e9a2a94ba7d2" />
