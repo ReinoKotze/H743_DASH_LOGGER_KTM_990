@@ -24,6 +24,7 @@
 #include "dma.h"
 #include "mdma.h"
 #include "quadspi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 #include "fmc.h"
@@ -180,9 +181,10 @@ int main(void)
   MX_FMC_Init();
   MX_CRC_Init();
   MX_QUADSPI_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_Delay(100U);
+  HAL_Delay(5U);
 
   if (CSP_QUADSPI_Init() != HAL_OK) {
       Error_Handler();
@@ -197,7 +199,9 @@ int main(void)
   if (SDRAM_InitSequence() != HAL_OK) {
       Error_Handler();
   }
-  SDRAM_TestLVGLHeap();
+
+
+  //SDRAM_TestLVGLHeap();
   LCD_Init();
 
   /* USER CODE END 2 */

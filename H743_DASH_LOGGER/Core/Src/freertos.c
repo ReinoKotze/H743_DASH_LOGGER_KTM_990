@@ -40,7 +40,6 @@
 
 
 
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -61,14 +60,14 @@
 osThreadId_t initHandle;
 const osThreadAttr_t init_attributes = {
   .name = "init",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityHigh7,
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
 };
 /* Definitions for testing */
 osThreadId_t testingHandle;
 const osThreadAttr_t testing_attributes = {
   .name = "testing",
-  .stack_size = 128 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for LVGL_Timer */
@@ -76,14 +75,14 @@ osThreadId_t LVGL_TimerHandle;
 const osThreadAttr_t LVGL_Timer_attributes = {
   .name = "LVGL_Timer",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal7,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for LVGL_Tick */
 osThreadId_t LVGL_TickHandle;
 const osThreadAttr_t LVGL_Tick_attributes = {
   .name = "LVGL_Tick",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal7,
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -159,15 +158,6 @@ void Init_Functions(void *argument)
 {
   /* USER CODE BEGIN Init_Functions */
 
-//    lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
-//
-//    /*Create a white label, set its text and align it to the center*/
-//    lv_obj_t * label = lv_label_create(lv_screen_active());
-//    lv_label_set_text(label, "Hello world");
-//    lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
-//    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-
-
 
 	  (void)argument;
 
@@ -196,9 +186,16 @@ void Init_Functions(void *argument)
 
 	  /* Create the UI once, then permanently end this task. */
 	  osThreadExit();
+
+
+
+  osDelay(200);
+
+
+
+
 	  for(;;)
 	  {
-
 //		  lv_obj_t *screen = lv_screen_active();
 //
 //		  lv_obj_set_style_bg_color(screen,
@@ -223,8 +220,7 @@ void Init_Functions(void *argument)
 //		  lv_obj_invalidate(screen);
 
 
-
-	    osDelay(1000);
+          osDelay(500);
 	  }
   /* USER CODE END Init_Functions */
 }
@@ -243,18 +239,9 @@ void Task_Testing(void *argument)
   for(;;)
   {
 
-	HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
 
-//	Fill(WHITE);
-//	osDelay(200);
-//	Fill(BLACK);
-//    osDelay(200);
-
-	// Change the active screen's background color
-
-
-
-    osDelay(200);
+      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+      osDelay(200U);
   }
   /* USER CODE END Task_Testing */
 }
@@ -272,6 +259,7 @@ void LVGLTimer(void *argument)
   /* Infinite loop */
   for(;;)
   {
+
 	  lv_timer_handler();
 	     osDelay(10);
 
@@ -292,7 +280,7 @@ void LVGLTick(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  lv_tick_inc(10);
+	  lv_tick_inc(10);// this actually renders the display
 	    osDelay(10);
   }
   /* USER CODE END LVGLTick */

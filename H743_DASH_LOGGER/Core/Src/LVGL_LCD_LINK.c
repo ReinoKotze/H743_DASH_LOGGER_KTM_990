@@ -121,7 +121,7 @@ static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t 
 
 
     	if (!te_wait_done) {
-    		 LCD_WaitForTE(25U);
+    		 LCD_WaitForTE(10U);
     	            te_wait_done = true;
     	        }
 
