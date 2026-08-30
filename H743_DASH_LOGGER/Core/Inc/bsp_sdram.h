@@ -68,7 +68,7 @@
 void  SDRAM_Init(void);
 void  SDRAM_WriteBuffer(uint32_t* pBuffer, uint32_t uwWriteAddress, uint32_t uwBufferSize);
 void  SDRAM_ReadBuffer(uint32_t* pBuffer, uint32_t uwReadAddress, uint32_t uwBufferSize);
-void  SDRAM_InitSequence(void);
+HAL_StatusTypeDef SDRAM_InitSequence(void);
 void  SDRAM_Test(void);
 
 

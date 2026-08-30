@@ -18,17 +18,15 @@
  *      DEFINES
  *********************/
 
-#define MY_DISP_HOR_RES    320
-#define MY_DISP_VER_RES    480
+#define MY_DISP_HOR_RES       320U
+#define MY_DISP_VER_RES       480U
+#define BYTES_PER_PIXEL       2U
 
+#define LVGL_FULL_BUFFER_SIZE \
+    (MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTES_PER_PIXEL)
 
-#define BYTES_PER_PIXEL  2
-#define LVGL_BUFFER_SIZE  ( MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTES_PER_PIXEL)
-
-#define LVGL_BUF1_ADDRESS   0xC0500000U // LV_HEAP_ADD+(320*480*2)  2 bytes per pixel
-#define LVGL_BUF2_ADDRESS   (LVGL_BUF1_ADDRESS + LVGL_BUFFER_SIZE) // LVGL_BUF1_ADDRESS +(320*480*2)  2 bytes per pixel
-
-#define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+#define LVGL_BUF1_ADDRESS     0xC0500000U
+#define LVGL_BUF2_ADDRESS     (LVGL_BUF1_ADDRESS + LVGL_FULL_BUFFER_SIZE)
 
 
 static bool te_wait_done = false;
@@ -60,22 +58,25 @@ static void disp_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px
 
 void lv_port_disp_init(void)
 {
-	  disp_init();
 
-	    lv_display_t *disp =lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
-
-	    lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
-	    lv_display_set_flush_cb(disp, disp_flush);
-
-	    /*
-	     * PARTIAL mode matches LCD_WriteBitmapDMA(): px_map contains
-	     * a contiguous buffer holding only the area being flushed.
-	     */
-
-	    static uint8_t * const buf1 = (uint8_t *)LVGL_BUF1_ADDRESS;
+	static uint8_t * const buf1 = (uint8_t *)LVGL_BUF1_ADDRESS;
 	    static uint8_t * const buf2 = (uint8_t *)LVGL_BUF2_ADDRESS;
 
-	    lv_display_set_buffers(disp, buf1, buf2, LVGL_BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
+	    lv_display_t *disp;
+
+	    disp_init();
+
+	    disp = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
+
+	    lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
+
+	    lv_display_set_flush_cb(disp, disp_flush);
+
+	    lv_display_set_buffers(disp,
+	                           buf1,
+	                           buf2,
+	                           LVGL_FULL_BUFFER_SIZE,
+	                           LV_DISPLAY_RENDER_MODE_FULL);
 
 
 }
@@ -113,22 +114,30 @@ void disp_disable_update(void)
  *'lv_display_flush_ready()' has to be called when it's finished.*/
 static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t * px_map)
 {
+	HAL_StatusTypeDef status = HAL_OK;
     if(disp_flush_enabled) {
         /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
 
 
 
     	if (!te_wait_done) {
-    	            (void)LCD_WaitForTE(25U);
+    		 LCD_WaitForTE(25U);
     	            te_wait_done = true;
     	        }
 
 
 
-    	LCD_WriteBitmapDMA((uint16_t)area->x1,(uint16_t)area->y1,(uint16_t)area->x2,(uint16_t)area->y2,(const uint16_t *)px_map);
+    	//LCD_WriteBitmapDMA((uint16_t)area->x1,(uint16_t)area->y1,(uint16_t)area->x2,(uint16_t)area->y2,(const uint16_t *)px_map);
+    	//LCD_WriteBitmap((uint16_t)area->x1,(uint16_t)area->y1,(uint16_t)area->x2,(uint16_t)area->y2,(const uint16_t *)px_map);
+    	LCD_WriteBitmapDMA2((uint16_t)area->x1,(uint16_t)area->y1,(uint16_t)area->x2,(uint16_t)area->y2,(const uint16_t *)px_map);
 
-
-
+    	if (status != HAL_OK) {
+    	            LCD_WriteBitmap((uint16_t)area->x1,
+    	                            (uint16_t)area->y1,
+    	                            (uint16_t)area->x2,
+    	                            (uint16_t)area->y2,
+    	                            (const uint16_t *)px_map);
+    	  }
     }
 
 

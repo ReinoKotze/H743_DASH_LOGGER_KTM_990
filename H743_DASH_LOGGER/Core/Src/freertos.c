@@ -76,14 +76,14 @@ osThreadId_t LVGL_TimerHandle;
 const osThreadAttr_t LVGL_Timer_attributes = {
   .name = "LVGL_Timer",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityAboveNormal7,
 };
 /* Definitions for LVGL_Tick */
 osThreadId_t LVGL_TickHandle;
 const osThreadAttr_t LVGL_Tick_attributes = {
   .name = "LVGL_Tick",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityBelowNormal7,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -168,49 +168,64 @@ void Init_Functions(void *argument)
 //    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
 
+
+	  (void)argument;
+
+	  lv_obj_t *screen = lv_screen_active();
+
+	  lv_obj_set_style_bg_color(screen,
+	                            lv_color_hex(0x003A57),
+	                            LV_PART_MAIN);
+
+	  lv_obj_set_style_bg_opa(screen,
+	                          LV_OPA_COVER,
+	                          LV_PART_MAIN);
+
+	  lv_obj_t *label = lv_label_create(screen);
+
+	  lv_label_set_text(label, "Hello world");
+
+	  lv_obj_set_style_text_color(label,
+	                               lv_color_hex(0xFFFFFF),
+	                               LV_PART_MAIN);
+
+	  lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
+	  /* Force LVGL to redraw the screen on its next lv_timer_handler() call. */
+	  lv_obj_invalidate(screen);
+
+	  /* Create the UI once, then permanently end this task. */
+	  osThreadExit();
+	  for(;;)
+	  {
+
+//		  lv_obj_t *screen = lv_screen_active();
 //
-//	  (void)argument;
+//		  lv_obj_set_style_bg_color(screen,
+//		                            lv_color_hex(0x003A57),
+//		                            LV_PART_MAIN);
 //
-//	  lv_obj_t *screen = lv_screen_active();
+//		  lv_obj_set_style_bg_opa(screen,
+//		                          LV_OPA_COVER,
+//		                          LV_PART_MAIN);
 //
-//	  lv_obj_set_style_bg_color(screen,
-//	                            lv_color_hex(0x003A57),
-//	                            LV_PART_MAIN);
+//		  lv_obj_t *label = lv_label_create(screen);
 //
-//	  lv_obj_set_style_bg_opa(screen,
-//	                          LV_OPA_COVER,
-//	                          LV_PART_MAIN);
+//		  lv_label_set_text(label, "Hello world");
 //
-//	  lv_obj_t *label = lv_label_create(screen);
+//		  lv_obj_set_style_text_color(label,
+//		                               lv_color_hex(0xFFFFFF),
+//		                               LV_PART_MAIN);
 //
-//	  lv_label_set_text(label, "Hello world");
+//		  lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 //
-//	  lv_obj_set_style_text_color(label,
-//	                               lv_color_hex(0xFFFFFF),
-//	                               LV_PART_MAIN);
-//
-//	  lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-//
-//	  /* Force LVGL to redraw the screen on its next lv_timer_handler() call. */
-//	  lv_obj_invalidate(screen);
-//
-//	  /* Create the UI once, then permanently end this task. */
-//	  osThreadExit();
-//
-//	  /* USER CODE END Init_Functions */
+//		  /* Force LVGL to redraw the screen on its next lv_timer_handler() call. */
+//		  lv_obj_invalidate(screen);
 
 
 
-
-  /* Infinite loop */
-  for(;;)
-  {
-
-
-    osDelay(1);
-
-
-  }
+	    osDelay(1000);
+	  }
   /* USER CODE END Init_Functions */
 }
 
@@ -258,7 +273,7 @@ void LVGLTimer(void *argument)
   for(;;)
   {
 	  lv_timer_handler();
-	     osDelay(20);
+	     osDelay(10);
 
   }
   /* USER CODE END LVGLTimer */

@@ -21,6 +21,7 @@
 #include "FreeRTOS.h"
 #include "cmsis_os2.h"
 #include "crc.h"
+#include "dma.h"
 #include "mdma.h"
 #include "quadspi.h"
 #include "usart.h"
@@ -96,27 +97,27 @@ PUTCHAR_PROTOTYPE
 }
 
 
-//static void SDRAM_TestLVGLHeap(void)
-//{
-//    volatile uint32_t *p = (volatile uint32_t *)0xC0000000U;
-//    const uint32_t size = 5U * 1024U * 1024U;
-//
-//    for (uint32_t offset = 0; offset < size; offset += 0x1000U) {
-//        uint32_t expected = 0xA5A50000U ^ offset;
-//
-//        p[offset / 4U] = expected;
-//        __DSB();
-//
-//        uint32_t actual = p[offset / 4U];  /* Read exactly once */
-//
-//        if (actual != expected) {
-//            sdram_fail_address = 0xC0000000U + offset;
-//            sdram_expected = expected;
-//            sdram_actual = actual;
-//            Error_Handler();
-//        }
-//    }
-//}
+static void SDRAM_TestLVGLHeap(void)
+{
+    volatile uint32_t *p = (volatile uint32_t *)0xC0000000U;
+    const uint32_t size = 5U * 1024U * 1024U;
+
+    for (uint32_t offset = 0; offset < size; offset += 0x1000U) {
+        uint32_t expected = 0xA5A50000U ^ offset;
+
+        p[offset / 4U] = expected;
+        __DSB();
+
+        uint32_t actual = p[offset / 4U];  /* Read exactly once */
+
+        if (actual != expected) {
+            sdram_fail_address = 0xC0000000U + offset;
+            sdram_expected = expected;
+            sdram_actual = actual;
+            Error_Handler();
+        }
+    }
+}
 
 static void ReadFlashData(void)
 {
@@ -174,12 +175,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_MDMA_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_FMC_Init();
   MX_CRC_Init();
   MX_QUADSPI_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_Delay(100U);
 
   if (CSP_QUADSPI_Init() != HAL_OK) {
       Error_Handler();
@@ -190,10 +193,11 @@ int main(void)
       Error_Handler();
   }
 
-  ReadFlashData();
-
-  SDRAM_InitSequence();
-
+  __NOP();
+  if (SDRAM_InitSequence() != HAL_OK) {
+      Error_Handler();
+  }
+  SDRAM_TestLVGLHeap();
   LCD_Init();
 
   /* USER CODE END 2 */
@@ -295,12 +299,12 @@ void MPU_Config(void)
   MPU_InitStruct.Enable = MPU_REGION_ENABLE;
   MPU_InitStruct.Number = MPU_REGION_NUMBER0;
   MPU_InitStruct.BaseAddress = 0x60000000;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_32B;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_512KB;
   MPU_InitStruct.SubRegionDisable = 0;
   MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
   MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-  MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
   MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
@@ -312,7 +316,6 @@ void MPU_Config(void)
   MPU_InitStruct.BaseAddress = 0x90000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_16MB;
   MPU_InitStruct.SubRegionDisable = 0x0;
-  MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
   MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
@@ -328,11 +331,6 @@ void MPU_Config(void)
   MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
   MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
-  HAL_MPU_ConfigRegion(&MPU_InitStruct);
-
-  /** Initializes and configures the Region and the memory to be protected
-  */
-  MPU_InitStruct.SubRegionDisable = 0x0;
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);

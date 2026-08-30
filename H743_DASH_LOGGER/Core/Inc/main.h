@@ -63,6 +63,7 @@ void Error_Handler(void);
 #define LCD_RST_GPIO_Port GPIOD
 #define TE_LCD_Pin GPIO_PIN_3
 #define TE_LCD_GPIO_Port GPIOD
+#define TE_LCD_EXTI_IRQn EXTI3_IRQn
 
 /* USER CODE BEGIN Private defines */
 
