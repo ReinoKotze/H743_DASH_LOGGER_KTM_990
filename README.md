@@ -5,11 +5,11 @@ NOTE: I am not getting any senor data from the ecu's canbus (KWP2000 SEA ISO 201
 
 The controller is a STM32H743IIT6 sold online pictured below. The board has w9825g6kh SDRAM IC and an w25q128 QSPI flash IC onboard. The board also had a SD card slot and a LDTC FPC connector that is not used for this project. 
 
-<img width="800" height="800" alt="image" src="https://github.com/user-attachments/assets/0376ca0c-f9fb-41ce-ad42-d74cee1f4d40" />
+<img width="555" height="369" alt="image" src="https://github.com/user-attachments/assets/bf8d4a20-dfb0-416f-af32-e9a2a94ba7d2" />
 
 the display is a 3.5inch transflective LCD with a st7365p controller IC. the display is a viewe PN: UEED035HV-RX40-L001A pictured below 
 
-<img width="768" height="648" alt="image" src="https://github.com/user-attachments/assets/5fb465dd-2ef4-4d7b-9d3a-f7f5a3b2a06c" />
+<img width="239" height="563" alt="image" src="https://github.com/user-attachments/assets/fa836f70-17af-4c1d-a318-96910db39e2f" />
 
 The whole idea is this stm32 controller will be attached on the dash next to a traitech voyger as a complementary information screen, this controller will be connected to an additional controller referred to as a "sensor hub" via CAN or FDCAN.
 
