@@ -321,9 +321,11 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
      * Required only if the SDRAM source region is cacheable.
      * Safe to leave in place with your current non-cacheable SDRAM MPU region.
      */
-    //LCD_CleanDCacheForMDMA(pixels,pixels_remaining * sizeof(uint16_t));
+
+
+
     if (!te_wait_done) {
-        		 LCD_WaitForTE(10U);
+        		 LCD_WaitForTE(3U);
         	            te_wait_done = true;
         	        }
 
