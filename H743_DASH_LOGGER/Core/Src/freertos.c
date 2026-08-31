@@ -28,10 +28,10 @@
 /* USER CODE BEGIN Includes */
 
 
-#include "w25q128.h"
-#include "st7365_3.5Inch.h"
+#include "User_Libs/w25q128.h"
+#include "User_Libs/st7365_3.5Inch.h"
 #include "lvgl.h"
-#include "LVGL_LCD_LINK.h"
+#include "User_Libs/LVGL_LCD_LINK.h"
 
 /* USER CODE END Includes */
 

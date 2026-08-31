@@ -4,7 +4,7 @@
  *  Created on: 26 Aug 2026
  *      Author: reino
  */
-#include "w25q128.h"
+#include "User_Libs/w25q128.h"
 #include "quadspi.h"
 #include "main.h"
 

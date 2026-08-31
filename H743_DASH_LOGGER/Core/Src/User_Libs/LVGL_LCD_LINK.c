@@ -9,10 +9,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "LVGL_LCD_LINK.h"
+#include "User_Libs/LVGL_LCD_LINK.h"
 #include <stdbool.h>
 #include "main.h"
-#include "st7365_3.5Inch.h"
+#include "User_Libs/st7365_3.5Inch.h"
 #include <string.h>
 /*********************
  *      DEFINES

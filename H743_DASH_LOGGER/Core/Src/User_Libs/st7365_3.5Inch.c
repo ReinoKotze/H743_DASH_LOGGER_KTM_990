@@ -4,7 +4,7 @@
  *  Created on: 26 Aug 2026
  *      Author: reino
  */
-#include "st7365_3.5Inch.h"
+#include "User_Libs/st7365_3.5Inch.h"
 
 
 #include "main.h"
@@ -325,7 +325,7 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
 
 
     if (!te_wait_done) {
-        		 LCD_WaitForTE(3U);
+        		 LCD_WaitForTE(4U);
         	            te_wait_done = true;
         	        }
 
