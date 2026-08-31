@@ -359,6 +359,8 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
            }
 
            __DSB();
+
            te_wait_done = false;
+
            return HAL_OK;
 }
