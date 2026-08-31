@@ -182,12 +182,37 @@ SECTIONS
 *(.extFlash)
 } > W25Q128_FLASH 
 
-.sdram_buf (NOLOAD) :
+
+
+/* LVGL heap: 5 MiB, matching LV_MEM_SIZE and LV_MEM_ADR. */
+.lvgl_heap 0xC0000000 (NOLOAD) :
+{
+  __lvgl_heap_start__ = .;
+  . += 5 * 1024 * 1024;
+  __lvgl_heap_end__ = .;
+} >W9825_SDRAM
+
+/* Framebuffer 1: 320 x 480 x 2 = 307200 bytes. */
+.lvgl_fb1 0xC0500000 (NOLOAD) :
 {
   . = ALIGN(32);
-  *(.sdram_buf)
+  KEEP(*(.lvgl_fb1))
   . = ALIGN(32);
 } >W9825_SDRAM
+
+/* Framebuffer 2: immediately after framebuffer 1. */
+.lvgl_fb2 0xC054B000 (NOLOAD) :
+{
+  . = ALIGN(32);
+  KEEP(*(.lvgl_fb2))
+  . = ALIGN(32);
+} >W9825_SDRAM
+
+ASSERT(SIZEOF(.lvgl_fb1) == 307200,
+       "Framebuffer 1 size does not match SDRAM layout")
+
+ASSERT(SIZEOF(.lvgl_fb2) == 307200,
+       "Framebuffer 2 size does not match SDRAM layout")
   
   
   

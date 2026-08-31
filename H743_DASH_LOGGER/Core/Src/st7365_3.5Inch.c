@@ -11,10 +11,11 @@
 #include "freertos.h"
 #include "cmsis_os2.h"
 #include "dma.h"
+#include <stdbool.h>
 
 extern MDMA_HandleTypeDef hmdma_mdma_channel0_sw_0;
 
-
+static bool te_wait_done = false;
 static volatile uint8_t TEFLAG = 0U;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -93,7 +94,6 @@ void hardRst()
 
 void LCD_Init()
 {
-	   uint32_t pixel_count;
 
 	    hardRst();
 
@@ -312,6 +312,7 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
     }
 
     LCD_SetWindow(x0, y0, x1, y1);
+
     LCD_IO_WriteReg(memoryWrite);
 
     pixels_remaining = (uint32_t)(x1 - x0 + 1U) *(uint32_t)(y1 - y0 + 1U);
@@ -321,6 +322,10 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
      * Safe to leave in place with your current non-cacheable SDRAM MPU region.
      */
     //LCD_CleanDCacheForMDMA(pixels,pixels_remaining * sizeof(uint16_t));
+    if (!te_wait_done) {
+        		 LCD_WaitForTE(10U);
+        	            te_wait_done = true;
+        	        }
 
     while (pixels_remaining != 0U) {
 
@@ -354,5 +359,6 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
            }
 
            __DSB();
+           te_wait_done = false;
            return HAL_OK;
 }

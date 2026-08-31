@@ -195,7 +195,7 @@ int main(void)
       Error_Handler();
   }
 
-  __NOP();
+
   if (SDRAM_InitSequence() != HAL_OK) {
       Error_Handler();
   }

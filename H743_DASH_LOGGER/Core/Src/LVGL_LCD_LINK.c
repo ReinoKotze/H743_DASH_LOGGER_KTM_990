@@ -13,7 +13,7 @@
 #include <stdbool.h>
 #include "main.h"
 #include "st7365_3.5Inch.h"
-
+#include <string.h>
 /*********************
  *      DEFINES
  *********************/
@@ -25,11 +25,16 @@
 #define LVGL_FULL_BUFFER_SIZE \
     (MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTES_PER_PIXEL)
 
-#define LVGL_BUF1_ADDRESS     0xC0500000U
-#define LVGL_BUF2_ADDRESS     (LVGL_BUF1_ADDRESS + LVGL_FULL_BUFFER_SIZE)
+//#define LVGL_BUF1_ADDRESS     0xC0500000U
+//#define LVGL_BUF2_ADDRESS     (LVGL_BUF1_ADDRESS + LVGL_FULL_BUFFER_SIZE)
 
+__attribute__((section(".lvgl_fb1"), aligned(32), used))
+static uint8_t lvgl_framebuffer1[LVGL_FULL_BUFFER_SIZE];
 
-static bool te_wait_done = false;
+__attribute__((section(".lvgl_fb2"), aligned(32), used))
+static uint8_t lvgl_framebuffer2[LVGL_FULL_BUFFER_SIZE];
+
+//static bool te_wait_done = false;
 //static volatile bool disp_flush_enabled = true;
 
 
@@ -59,8 +64,7 @@ static void disp_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px
 void lv_port_disp_init(void)
 {
 
-	static uint8_t * const buf1 = (uint8_t *)LVGL_BUF1_ADDRESS;
-	    static uint8_t * const buf2 = (uint8_t *)LVGL_BUF2_ADDRESS;
+
 
 	    lv_display_t *disp;
 
@@ -72,12 +76,9 @@ void lv_port_disp_init(void)
 
 	    lv_display_set_flush_cb(disp, disp_flush);
 
-	    lv_display_set_buffers(disp,
-	                           buf1,
-	                           buf2,
-	                           LVGL_FULL_BUFFER_SIZE,
-	                           LV_DISPLAY_RENDER_MODE_FULL);
-
+	    lv_display_set_buffers( disp,lvgl_framebuffer1,lvgl_framebuffer2,sizeof(lvgl_framebuffer1),LV_DISPLAY_RENDER_MODE_FULL);
+	    memset(lvgl_framebuffer1, 0, sizeof(lvgl_framebuffer1));
+	    memset(lvgl_framebuffer2, 0, sizeof(lvgl_framebuffer2));
 
 }
 
@@ -120,10 +121,10 @@ static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t 
 
 
 
-    	if (!te_wait_done) {
-    		 LCD_WaitForTE(10U);
-    	            te_wait_done = true;
-    	        }
+//    	if (!te_wait_done) {
+//    		 LCD_WaitForTE(10U);
+//    	            te_wait_done = true;
+//    	        }
 
 
 
@@ -141,9 +142,9 @@ static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t 
     }
 
 
-    if (lv_display_flush_is_last(disp_drv)) {
-         te_wait_done = false;
-     }
+//    if (lv_display_flush_is_last(disp_drv)) {
+//         te_wait_done = false;
+//     }
 
 
 
