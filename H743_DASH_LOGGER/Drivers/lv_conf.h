@@ -34,7 +34,7 @@
  *  - LV_STDLIB_RTTHREAD
  *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
-#define LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_MALLOC LV_STDLIB_CLIB
 
 /** String functions source
  *  Possible values:
@@ -43,7 +43,7 @@
  *  - LV_STDLIB_RTTHREAD: RT-Thread (rt_memcpy/rt_memset/rt_strlen/rt_strcpy)
  *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
-#define LV_USE_STDLIB_STRING LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_STRING LV_STDLIB_CLIB
 
 /** Sprintf functions source
  *  Possible values:
@@ -52,16 +52,16 @@
  *  - LV_STDLIB_RTTHREAD: RT-Thread (rt_vsnprintf)
  *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
-#define LV_USE_STDLIB_SPRINTF LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_SPRINTF LV_STDLIB_CLIB
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 /** Size of the pool `lv_malloc()` allocates from. Needs to be at least 2kB (2048). */
-#define LV_MEM_SIZE (5U * 1024U * 1024U)
+#define LV_MEM_SIZE (64U * 1024U)
 
 /** Place the pool at a fixed address instead of allocating it as a normal array.
  *  0: unused.
  */
-#define LV_MEM_ADR  0xc0000000
+#define LV_MEM_ADR   0xc0000000
 
 #endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
@@ -101,7 +101,7 @@
  *  - LV_OS_SDL2
  *  - LV_OS_CUSTOM
  */
-#define LV_USE_OS LV_OS_FREERTOS
+#define LV_USE_OS LV_OS_NONE
 
 #if LV_USE_OS == LV_OS_CUSTOM
 /** Custom OS include header */
@@ -140,16 +140,16 @@
 #define LV_COLOR_MIX_ROUND_OFS 0
 
 /** Default display refresh, input device read and animation step period. */
-#define LV_DEF_REFR_PERIOD 60
+#define LV_DEF_REFR_PERIOD 15
 
 /** Used to initialize default sizes such as widget sizes and style paddings. */
 #define LV_DPI_DEF 130
 
 /** Align the stride of all layers and images to this many bytes. */
-#define LV_DRAW_BUF_STRIDE_ALIGN 32
+#define LV_DRAW_BUF_STRIDE_ALIGN 1
 
 /** Align the start address of draw_buf addresses to this many bytes. */
-#define LV_DRAW_BUF_ALIGN 32
+#define LV_DRAW_BUF_ALIGN 4
 
 /** 3x3 matrix API (lv_matrix_t) for transformations. Requires floating point support.
  *
@@ -517,7 +517,7 @@
 #endif /*LV_USE_PPA*/
 
 /** Accelerate blends, fills and image decoding with the STM32 DMA2D peripheral. */
-#define LV_USE_DRAW_DMA2D 0
+#define LV_USE_DRAW_DMA2D 1 ///was0
 
 #if LV_USE_DRAW_DMA2D
 /** Header that declares the DMA2D HAL API of the target STM32 family. */
@@ -526,7 +526,7 @@
 /** Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
  *  Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
  */
-#define LV_USE_DRAW_DMA2D_INTERRUPT 1
+#define LV_USE_DRAW_DMA2D_INTERRUPT 0 //was1
 
 #endif /*LV_USE_DRAW_DMA2D*/
 
@@ -679,7 +679,7 @@
  *============================================================================*/
 
 /** Speed up style property lookups by adding 2 x 32 bit variables to each lv_obj_t. */
-#define LV_OBJ_STYLE_CACHE 0
+#define LV_OBJ_STYLE_CACHE 0 //was 0
 
 /** Widget names (lv_obj_set_name) */
 #define LV_USE_OBJ_NAME 0
@@ -2029,7 +2029,7 @@
 /** Periodically collect CPU, FPS and memory statistics and optionally show them in an
  *  on-screen overlay.
  */
-#define LV_USE_SYSMON 0
+#define LV_USE_SYSMON 1
 
 #if LV_USE_SYSMON
 /** The port provides `lv_os_get_proc_idle_percent` a per-process idle percentage
@@ -2038,7 +2038,7 @@
 #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
 
 /** Show the CPU usage and FPS count in a label on the screen. */
-#define LV_USE_PERF_MONITOR 0
+#define LV_USE_PERF_MONITOR 1
 
 #if LV_USE_PERF_MONITOR
 /** Performance monitor position

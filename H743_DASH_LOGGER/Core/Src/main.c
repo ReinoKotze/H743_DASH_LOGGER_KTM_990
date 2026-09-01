@@ -18,11 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "FreeRTOS.h"
-#include "cmsis_os2.h"
 #include "crc.h"
 #include "dma.h"
-#include "mdma.h"
 #include "quadspi.h"
 #include "tim.h"
 #include "usart.h"
@@ -38,6 +35,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "User_Libs/LVGL_LCD_LINK.h"
+//#include "ui.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -81,7 +79,6 @@ volatile uint32_t sdram_actual;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MPU_Config(void);
-void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 
@@ -127,6 +124,21 @@ static void ReadFlashData(void)
 
 	    qspi_test_value = flash[0x100U];
 }
+
+
+void lv_example_spinner_1(void)
+{
+    /*Create a spinner*/
+    lv_obj_t * spinner = lv_spinner_create(lv_screen_active());
+    lv_obj_set_size(spinner, 100, 100);
+    lv_obj_center(spinner);
+    lv_spinner_set_anim_params(spinner, 10000, 200);
+}
+static uint32_t my_get_millis(void)
+{
+    return HAL_GetTick();
+}
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -175,7 +187,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_MDMA_Init();
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_FMC_Init();
@@ -186,34 +197,33 @@ int main(void)
 
   HAL_Delay(5U);
 
-  if (CSP_QUADSPI_Init() != HAL_OK) {
-      Error_Handler();
-  }
+CSP_QUADSPI_Init();
 
   /* Enter read-only memory-mapped mode at 0x90000000. */
-  if (CSP_QSPI_EnableMemoryMappedMode() != HAL_OK) {
-      Error_Handler();
-  }
+CSP_QSPI_EnableMemoryMappedMode();
 
 
-  if (SDRAM_InitSequence() != HAL_OK) {
-      Error_Handler();
-  }
+ SDRAM_InitSequence();
+
 
 
   //SDRAM_TestLVGLHeap();
   LCD_Init();
 
+  /*
+   * Bare-metal LVGL setup. HAL_GetTick() is driven by the HAL time base,
+   * so LVGL needs no RTOS tick task and no manual lv_tick_inc() calls.
+   */
+  lv_init();
+  lv_tick_set_cb(HAL_GetTick);
+  lv_port_disp_init();
+  //ui_init();
+  lv_example_spinner_1();
+  //////////////////////////////////////////////////////////////
+
+
+
   /* USER CODE END 2 */
-
-  /* Init scheduler */
-  osKernelInitialize();  /* Call init function for freertos objects (in cmsis_os2.c) */
-  MX_FREERTOS_Init();
-
-  /* Start scheduler */
-  osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -222,6 +232,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    /* Run all LVGL timers, animations, rendering and display refreshes. */
+	  lv_timer_handler();
+	  	  HAL_Delay(5);
+
+    /*
+     * This prevents a useless 100% busy loop while retaining a responsive
+     * 1 ms service cadence for LVGL and the display driver.
+     */
+
   }
   /* USER CODE END 3 */
 }
@@ -331,36 +350,11 @@ void MPU_Config(void)
   MPU_InitStruct.BaseAddress = 0xc0000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
   MPU_InitStruct.SubRegionDisable = 0x00;
-  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 
-}
-
-/**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM6 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM6)
-  {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
 }
 
 /**

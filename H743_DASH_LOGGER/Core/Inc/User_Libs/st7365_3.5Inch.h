@@ -34,6 +34,7 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA(uint16_t x0, uint16_t y0,uint16_t x1, uint1
 void LCD_CleanDCacheForMDMA(const void *address, uint32_t size);
 HAL_StatusTypeDef LCD_DMA2_Init(void);
 HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,uint16_t x1, uint16_t y1,const uint16_t *pixels);
+HAL_StatusTypeDef LCD_WriteBitmapDMA2Strided(uint16_t x0, uint16_t y0,uint16_t x1, uint16_t y1,const uint16_t *framebuffer,uint32_t source_stride_pixels);
 
 //command list
 

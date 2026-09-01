@@ -12,7 +12,7 @@
  */
 
 /* clang-format off */
-#if 1 /* Set this to "1" to enable content */
+#if 0 /* Set this to "1" to enable content */
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
@@ -56,12 +56,12 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 /** Size of the pool `lv_malloc()` allocates from. Needs to be at least 2kB (2048). */
-#define LV_MEM_SIZE (16U * 1024U * 1024U)
+#define LV_MEM_SIZE 65536
 
 /** Place the pool at a fixed address instead of allocating it as a normal array.
  *  0: unused.
  */
-#define LV_MEM_ADR  0xC0000000U
+#define LV_MEM_ADR 0x0
 
 #endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
@@ -101,7 +101,7 @@
  *  - LV_OS_SDL2
  *  - LV_OS_CUSTOM
  */
-#define LV_USE_OS LV_OS_FREERTOS
+#define LV_USE_OS LV_OS_NONE
 
 #if LV_USE_OS == LV_OS_CUSTOM
 /** Custom OS include header */
@@ -140,7 +140,7 @@
 #define LV_COLOR_MIX_ROUND_OFS 0
 
 /** Default display refresh, input device read and animation step period. */
-#define LV_DEF_REFR_PERIOD 60
+#define LV_DEF_REFR_PERIOD 33
 
 /** Used to initialize default sizes such as widget sizes and style paddings. */
 #define LV_DPI_DEF 130
@@ -517,7 +517,7 @@
 #endif /*LV_USE_PPA*/
 
 /** Accelerate blends, fills and image decoding with the STM32 DMA2D peripheral. */
-#define LV_USE_DRAW_DMA2D 1
+#define LV_USE_DRAW_DMA2D 0
 
 #if LV_USE_DRAW_DMA2D
 /** Header that declares the DMA2D HAL API of the target STM32 family. */
@@ -526,7 +526,7 @@
 /** Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
  *  Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
  */
-#define LV_USE_DRAW_DMA2D_INTERRUPT 1
+#define LV_USE_DRAW_DMA2D_INTERRUPT 0
 
 #endif /*LV_USE_DRAW_DMA2D*/
 

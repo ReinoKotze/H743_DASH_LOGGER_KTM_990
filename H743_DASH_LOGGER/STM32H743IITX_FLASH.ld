@@ -49,8 +49,7 @@ MEMORY
   RAM_D2 (xrw)   : ORIGIN = 0x30000000, LENGTH = 288K
   RAM_D3 (xrw)   : ORIGIN = 0x38000000, LENGTH = 64K
   ITCMRAM (xrw)  : ORIGIN = 0x00000000, LENGTH = 64K
-  W25Q128_FLASH (rx)     : ORIGIN = 0x90000000, LENGTH = 16M
-  W9825_SDRAM (xrw)      : ORIGIN = 0xc0000000, LENGTH = 32M
+
 }
 
 /* Define output sections */
@@ -177,45 +176,7 @@ SECTIONS
   }
   
   
-  .extFlash :
-{
-*(.extFlash)
-} > W25Q128_FLASH 
 
-
-
-/* LVGL heap: 5 MiB, matching LV_MEM_SIZE and LV_MEM_ADR. */
-.lvgl_heap 0xC0000000 (NOLOAD) :
-{
-  __lvgl_heap_start__ = .;
-  . += 5 * 1024 * 1024;
-  __lvgl_heap_end__ = .;
-} >W9825_SDRAM
-
-/* Framebuffer 1: 320 x 480 x 2 = 307200 bytes. */
-.lvgl_fb1 0xC0500000 (NOLOAD) :
-{
-  . = ALIGN(32);
-  KEEP(*(.lvgl_fb1))
-  . = ALIGN(32);
-} >W9825_SDRAM
-
-/* Framebuffer 2: immediately after framebuffer 1. */
-.lvgl_fb2 0xC054B000 (NOLOAD) :
-{
-  . = ALIGN(32);
-  KEEP(*(.lvgl_fb2))
-  . = ALIGN(32);
-} >W9825_SDRAM
-
-ASSERT(SIZEOF(.lvgl_fb1) == 307200,
-       "Framebuffer 1 size does not match SDRAM layout")
-
-ASSERT(SIZEOF(.lvgl_fb2) == 307200,
-       "Framebuffer 2 size does not match SDRAM layout")
-  
-  
-  
   
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
