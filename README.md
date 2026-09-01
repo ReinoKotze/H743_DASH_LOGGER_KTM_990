@@ -32,12 +32,16 @@ The main controller will also datalog all information onto an sdcard for tunning
 
 NOTE: I am not getting any senor data from the ecu's canbus (KWP2000 SEA ISO 2014230-2 protocol), I am reading voltages directly and calculating the variables in the controllers. I will be datalogging every 10ms and I can guarantee the log rate and sensor data. Basically I know nothing about the ktm 990's keihin ecu's canbus and I can find very little information on the pid's for each value I am interested in. The learning curve is immense with this project and I don't want to get stuck down with reverse engineering the motorcycles canbus communication. 
 
-For those who would just like to see the MPU settings and FMC setting. Again, the timings can be tighter, but the long wires used to connect the display to the MCU is causing issues on the whole FMC bus. 
+For those who would just like to see the MPU settings and FMC setting. Again, the timings can be tighter, but the long wires used to connect the display to the MCU is causing issues on the whole FMC bus. No bank swapping. 
 <img width="1357" height="880" alt="image" src="https://github.com/user-attachments/assets/df307a3e-1531-4a8c-8937-b9d19f484b96" />
 MPU settings 
+
 0x60000000 is the FMC display 
+
 0x90000000 is the qspi w25q128 flash 
+
 0xc0000000 is the SDRAM w9825
+
 <img width="1023" height="858" alt="image" src="https://github.com/user-attachments/assets/a743d89a-278a-4202-a365-122d3c8dae92" />
 My current clock setup 
 <img width="1162" height="1017" alt="image" src="https://github.com/user-attachments/assets/6ae0defc-2d4b-423f-b123-8e46c3bf5e27" />
