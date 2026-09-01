@@ -20,7 +20,7 @@
 
 #define MY_DISP_HOR_RES       320U
 #define MY_DISP_VER_RES       480U
-#define MY_DISP_ROWS          (MY_DISP_VER_RES/2)
+#define MY_DISP_ROWS          (MY_DISP_VER_RES/1)
 #define BYTE_PER_PIXEL       (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565))
 
 #define LVGL_DRAW_BUFFER_SIZE (MY_DISP_HOR_RES * MY_DISP_ROWS * BYTE_PER_PIXEL)
@@ -118,12 +118,12 @@ static void disp_flush(lv_display_t *disp_drv,const lv_area_t *area,uint8_t *px_
          * Synchronize the first LCD transfer in this LVGL refresh
          * to the panel's vertical blanking interval.
          */
-        if(!te_wait_done) {
-            LCD_WaitForTE(1U);
-            te_wait_done = true;
-        }
+//        if(!te_wait_done) {
+//            LCD_WaitForTE(1U);
+//            te_wait_done = true;
+//        }
 
-    LCD_WriteBitmapDMA2((uint16_t)area->x1,(uint16_t)area->y1,(uint16_t)area->x2,(uint16_t)area->y2,(const uint16_t *)px_map);
+    LCD_WriteBitmapDMA((uint16_t)area->x1,(uint16_t)area->y1,(uint16_t)area->x2,(uint16_t)area->y2,(const uint16_t *)px_map);
     }
 
        /*

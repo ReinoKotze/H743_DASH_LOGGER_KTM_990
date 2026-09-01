@@ -34,7 +34,7 @@
  *  - LV_STDLIB_RTTHREAD
  *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
-#define LV_USE_STDLIB_MALLOC LV_STDLIB_CLIB
+#define LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN
 
 /** String functions source
  *  Possible values:
@@ -43,7 +43,7 @@
  *  - LV_STDLIB_RTTHREAD: RT-Thread (rt_memcpy/rt_memset/rt_strlen/rt_strcpy)
  *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
-#define LV_USE_STDLIB_STRING LV_STDLIB_CLIB
+#define LV_USE_STDLIB_STRING LV_STDLIB_BUILTIN
 
 /** Sprintf functions source
  *  Possible values:
@@ -52,16 +52,16 @@
  *  - LV_STDLIB_RTTHREAD: RT-Thread (rt_vsnprintf)
  *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
-#define LV_USE_STDLIB_SPRINTF LV_STDLIB_CLIB
+#define LV_USE_STDLIB_SPRINTF LV_STDLIB_BUILTIN
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 /** Size of the pool `lv_malloc()` allocates from. Needs to be at least 2kB (2048). */
-#define LV_MEM_SIZE (64U * 1024U)
+#define LV_MEM_SIZE 65536
 
 /** Place the pool at a fixed address instead of allocating it as a normal array.
  *  0: unused.
  */
-#define LV_MEM_ADR   0xc0000000
+#define LV_MEM_ADR   0x0 //0xc0000000
 
 #endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
@@ -140,7 +140,7 @@
 #define LV_COLOR_MIX_ROUND_OFS 0
 
 /** Default display refresh, input device read and animation step period. */
-#define LV_DEF_REFR_PERIOD 15
+#define LV_DEF_REFR_PERIOD 10
 
 /** Used to initialize default sizes such as widget sizes and style paddings. */
 #define LV_DPI_DEF 130

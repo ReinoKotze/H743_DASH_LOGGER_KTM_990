@@ -247,11 +247,11 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA(uint16_t x0, uint16_t y0,
 	    uint32_t chunk_bytes;
 	    HAL_StatusTypeDef status;
 
-	    if ((pixels == NULL) ||
-	        (x1 < x0) || (y1 < y0) ||
-	        (x1 >= LCD_WIDTH) || (y1 >= LCD_HEIGHT)) {
-	        return HAL_ERROR;
-	    }
+//	    if ((pixels == NULL) ||
+//	        (x1 < x0) || (y1 < y0) ||
+//	        (x1 >= LCD_WIDTH) || (y1 >= LCD_HEIGHT)) {
+//	        return HAL_ERROR;
+//	    }
 
 	    /*
 	     * TE synchronization occurs once in the LVGL flush callback.
@@ -284,23 +284,23 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA(uint16_t x0, uint16_t y0,
 	                                chunk_bytes,
 	                                1U);
 
-	        if (status != HAL_OK) {
-	            return status;
-	        }
+//	        if (status != HAL_OK) {
+//	            return status;
+//	        }
 
 	        status = HAL_MDMA_PollForTransfer(&hmdma_mdma_channel0_sw_0,
 	                                          HAL_MDMA_FULL_TRANSFER,
 	                                          100U);
 
-	        if (status != HAL_OK) {
-	            return status;
-	        }
+//	        if (status != HAL_OK) {
+//	            return status;
+//	        }
 
 	        pixels += chunk_bytes / sizeof(uint16_t);
 	        bytes_remaining -= chunk_bytes;
 	    }
 
-	    __DSB();
+	   // __DSB();
 	    return HAL_OK;
 }
 
@@ -326,10 +326,10 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
 
 	   LCD_CleanDCacheForMDMA(pixels, byte_count);        /* Remove the // */
 	  //  __DSB();
-	   __NOP();
+	 //  __NOP();
 	    LCD_SetWindow(x0, y0, x1, y1);
 	    LCD_IO_WriteReg(memoryWrite);
-        __NOP();
+       // __NOP();
 	    while(pixels_remaining != 0U) {
 	        chunk_pixels = (pixels_remaining > 65535U) ?
 	                       65535U : pixels_remaining;
@@ -339,24 +339,24 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
 	                               (uint32_t)&FMC_BANK1_DATA,
 	                               chunk_pixels);
 
-	        if(status != HAL_OK) {
-	            return status;
-	        }
+//	        if(status != HAL_OK) {
+//	            return status;
+//	        }
 
 	        status = HAL_DMA_PollForTransfer(&hdma_memtomem_dma2_stream0,
 	                                         HAL_DMA_FULL_TRANSFER,
 	                                         100U);
 
-	        if(status != HAL_OK) {
-	            return status;
-	        }
+//	        if(status != HAL_OK) {
+//	            return status;
+//	        }
 
 	        pixels += chunk_pixels;
 	        pixels_remaining -= chunk_pixels;
 	    }
 
 	   // __DSB();
-	    __NOP();
+	  //  __NOP();
 	    return HAL_OK;
 }
 
