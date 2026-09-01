@@ -131,7 +131,7 @@ void LCD_Init()
 	    /*
 	     * TE mode 1: vertical blanking only.
 	     */
-	    LCD_IO_WriteReg(tearingEffectoff);
+	    LCD_IO_WriteReg(tearingEffectOff);
 	    //LCD_IO_WriteData(0x00U);
 
 	    LCD_IO_WriteReg(DispNormModeOn);

@@ -517,7 +517,7 @@
 #endif /*LV_USE_PPA*/
 
 /** Accelerate blends, fills and image decoding with the STM32 DMA2D peripheral. */
-#define LV_USE_DRAW_DMA2D 1 ///was0
+#define LV_USE_DRAW_DMA2D 0 ///was0
 
 #if LV_USE_DRAW_DMA2D
 /** Header that declares the DMA2D HAL API of the target STM32 family. */

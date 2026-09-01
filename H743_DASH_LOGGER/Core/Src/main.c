@@ -20,6 +20,7 @@
 #include "main.h"
 #include "crc.h"
 #include "dma.h"
+#include "dma2d.h"
 #include "mdma.h"
 #include "quadspi.h"
 #include "tim.h"
@@ -195,6 +196,7 @@ int main(void)
   MX_CRC_Init();
   MX_TIM1_Init();
   MX_QUADSPI_Init();
+  MX_DMA2D_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_Delay(5U);
