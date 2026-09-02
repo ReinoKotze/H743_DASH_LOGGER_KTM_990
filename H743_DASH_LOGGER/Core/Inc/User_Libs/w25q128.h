@@ -10,7 +10,9 @@
 
 #include "main.h"
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* USER CODE BEGIN Private defines */
 uint8_t CSP_QUADSPI_Init(void);
@@ -54,5 +56,9 @@ uint8_t CSP_QSPI_DisableMemoryMappedMode(void);
 #define W25Q128_CHIP_ERASE_TIMEOUT_MS  210000U
 
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INC_W25Q128_H_ */

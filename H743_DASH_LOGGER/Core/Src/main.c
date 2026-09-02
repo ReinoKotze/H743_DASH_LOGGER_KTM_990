@@ -37,14 +37,15 @@
 #include <stdbool.h>
 #include <string.h>
 #include "User_Libs/LVGL_LCD_LINK.h"
-//#include "ui.h"
+#include "ui.h"
+#include "ALTmain.hpp"
+#include "SDRAM_ADD_MANIGMENT.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
 volatile uint8_t qspi_test_value;
-
 volatile uint32_t sdram_fail_address;
 volatile uint32_t sdram_expected;
 volatile uint32_t sdram_actual;
@@ -53,12 +54,10 @@ volatile uint32_t sdram_actual;
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+void setup(void);
+void tasks(void);
 
-//SDRAM address list
-#define LVGL_HEAP_ADD 0xc0000000U // define not used here, seprate define used in lv_conf. 5mb for lvgl heap
-#define lvgl_buf1_ADD 0xC0500000U // LV_HEAP_ADD+(320*480*2)  2 bytes per pixel
-#define lvgl_buf2_ADD 0xC054B000U // LVGL_BUF1_ADDRESS +(320*480*2)  2 bytes per pixel
-#define SDRAM_ADD4    (0xC054B000U+(320*480*2)) // end address (SDRAM_ADD4+data_size_bits)
+
 
 
 
@@ -76,6 +75,9 @@ volatile uint32_t sdram_actual;
 
 /* USER CODE BEGIN PV */
 
+void setup();
+void tasks();
+uint32_t non_blocking_task(uint32_t last_tick, const uint32_t delay_interval) ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -136,10 +138,12 @@ void lv_example_spinner_1(void)
     lv_obj_center(spinner);
     lv_spinner_set_anim_params(spinner, 10000, 200);
 }
-static uint32_t my_get_millis(void)
-{
-    return HAL_GetTick();
-}
+
+
+//static uint32_t my_get_millis(void)
+//{
+//    return HAL_GetTick();
+//}
 
 /* USER CODE END PFP */
 
@@ -199,32 +203,10 @@ int main(void)
   MX_DMA2D_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_Delay(5U);
 
-CSP_QUADSPI_Init();
-
-  /* Enter read-only memory-mapped mode at 0x90000000. */
-CSP_QSPI_EnableMemoryMappedMode();
-
-
- SDRAM_InitSequence();
-
-
-
-  //SDRAM_TestLVGLHeap();
-  LCD_Init();
-
-  /*
-   * Bare-metal LVGL setup. HAL_GetTick() is driven by the HAL time base,
-   * so LVGL needs no RTOS tick task and no manual lv_tick_inc() calls.
-   */
-  lv_init();
-  lv_tick_set_cb(HAL_GetTick);
-  lv_port_disp_init();
-  //ui_init();
-  lv_example_spinner_1();
+  //lv_example_spinner_1();
   //////////////////////////////////////////////////////////////
-
+  setup();
 
 
   /* USER CODE END 2 */
@@ -237,8 +219,7 @@ CSP_QSPI_EnableMemoryMappedMode();
 
     /* USER CODE BEGIN 3 */
     /* Run all LVGL timers, animations, rendering and display refreshes. */
-	  lv_timer_handler();
-	  	  HAL_Delay(5);
+	  tasks();
 
     /*
      * This prevents a useless 100% busy loop while retaining a responsive

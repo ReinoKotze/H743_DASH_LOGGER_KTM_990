@@ -1,6 +1,10 @@
 #ifndef __SDRAM_H
 #define	__SDRAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stm32h7xx.h"
 #include <stdio.h>
 
@@ -72,4 +76,9 @@ HAL_StatusTypeDef SDRAM_InitSequence(void);
 void  SDRAM_Test(void);
 
 
-#endif /* __SDRAM_H */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* INC_BSP_SDRAM_H_ */

@@ -17,6 +17,7 @@
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
+#include "SDRAM_ADD_MANIGMENT.h"
 /* If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
 #if 0 && defined(__ASSEMBLY__)
 #include "my_include.h"
@@ -56,12 +57,12 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 /** Size of the pool `lv_malloc()` allocates from. Needs to be at least 2kB (2048). */
-#define LV_MEM_SIZE 65536
+#define LV_MEM_SIZE LVGL_HEAP_SIZE
 
 /** Place the pool at a fixed address instead of allocating it as a normal array.
  *  0: unused.
  */
-#define LV_MEM_ADR   0x0 //0xc0000000
+#define LV_MEM_ADR   LVGL_HEAP_ADD
 
 #endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
@@ -140,7 +141,7 @@
 #define LV_COLOR_MIX_ROUND_OFS 0
 
 /** Default display refresh, input device read and animation step period. */
-#define LV_DEF_REFR_PERIOD 10
+#define LV_DEF_REFR_PERIOD 14
 
 /** Used to initialize default sizes such as widget sizes and style paddings. */
 #define LV_DPI_DEF 130

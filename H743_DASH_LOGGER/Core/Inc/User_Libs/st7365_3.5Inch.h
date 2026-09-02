@@ -9,6 +9,10 @@
 #define INC_ST7365_3_5INCH_H_
 #include "main.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LCD_MDMA_MAX_BYTES  (LCD_WIDTH * sizeof(uint16_t))
 //#define LCD_MDMA_MAX_BYTES  (65534U) /* Even number: RGB565 pixels */
 #define FMC_BANK1_REG  *(volatile uint16_t *)((uint32_t)0x60000000)  // Register Address for A0
@@ -83,4 +87,8 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2Strided(uint16_t x0, uint16_t y0,uint16_t x
 
 
 
-#endif /* INC_ST7365_3_5INCH_H_ */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* INC_W25Q128_H_ */

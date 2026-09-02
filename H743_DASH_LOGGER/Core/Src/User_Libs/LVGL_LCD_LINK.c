@@ -15,23 +15,11 @@
 #include "User_Libs/st7365_3.5Inch.h"
 #include <string.h>
 #include "dma2d.h"
+#include "SDRAM_ADD_MANIGMENT.h"
 /*********************
  *      DEFINES
  *********************/
 
-#define MY_DISP_HOR_RES       320U
-#define MY_DISP_VER_RES       480U
-#define MY_DISP_ROWS          (MY_DISP_VER_RES/1)
-#define BYTE_PER_PIXEL       (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565))
-
-#define LVGL_DRAW_BUFFER_SIZE (MY_DISP_HOR_RES * MY_DISP_ROWS * BYTE_PER_PIXEL)
-
-//#define LVGL_DRAW_BUFFER_SIZE (MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL)
-
-#define LVGL_SDRAM_BUF1_ADDRESS  0xC0500000U
-#define LVGL_SDRAM_BUF2_ADDRESS  (LVGL_SDRAM_BUF1_ADDRESS + LVGL_DRAW_BUFFER_SIZE)
-#define DMA2D_SDRAM_BUF3_ADDRESS (LVGL_SDRAM_BUF2_ADDRESS + (MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL))
-#define DMA2D_SDRAM_BUF3_SIZE    (MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL)
 
 static bool compose_error = false;
 
