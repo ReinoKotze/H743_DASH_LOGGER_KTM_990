@@ -14,16 +14,16 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_WAYLAND
 
 
-#include "lv_wayland_backend_private.h"
 #include <sys/poll.h>
 #include <wayland-client-protocol.h>
 #include <wayland_xdg_shell.h>
-#include "lv_wayland_backend_private.h"
+#include "../../misc/lv_types.h"
+#include "lv_wl_backend_private.h"
 
 /*********************
  *      DEFINES
@@ -41,7 +41,6 @@ struct _lv_wl_window_t;
 typedef struct {
     struct wl_pointer * wl_pointer;
     struct wl_surface * cursor_surface;
-    struct wl_cursor_theme * cursor_theme;
     lv_point_t point;
     lv_indev_state_t left_btn_state;
     lv_indev_state_t right_btn_state;
@@ -64,7 +63,6 @@ typedef struct {
 
 typedef struct {
     struct wl_keyboard * wl_keyboard;
-    struct xkb_context * xkb_context;
     struct xkb_keymap * xkb_keymap;
     struct xkb_state * xkb_state;
 
@@ -128,12 +126,12 @@ typedef struct {
 
 
 typedef struct _lv_wl_window_t {
+    void * backend_display_data;
     lv_display_t * lv_disp;
     lv_indev_t * lv_indev_pointer;
     lv_indev_t * lv_indev_pointeraxis;
     lv_indev_t * lv_indev_touch;
     lv_indev_t * lv_indev_keyboard;
-    lv_wayland_backend_display_data_t backend_ddata;
     lv_wayland_display_close_cb_t close_cb;
     lv_wl_window_xdg_t xdg;
 
@@ -211,8 +209,6 @@ void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard);
 
 /* Updates indev's driver data with the given 'read_cb' to 'new_driver_data' */
 void lv_wayland_update_indevs(lv_indev_read_cb_t read_cb, void * new_driver_data);
-
-void lv_wayland_indevs_ready(lv_indev_read_cb_t read_cb);
 
 #endif /* LV_USE_WAYLAND */
 

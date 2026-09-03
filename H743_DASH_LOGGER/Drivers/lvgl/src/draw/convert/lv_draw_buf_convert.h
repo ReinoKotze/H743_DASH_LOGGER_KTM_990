@@ -10,7 +10,8 @@
 extern "C" {
 #endif
 
-#include "../../lvgl_public.h"
+#include "../../misc/lv_color.h"
+#include "../lv_draw_buf.h"
 
 /*********************
  *      DEFINES
@@ -26,9 +27,9 @@ extern "C" {
 
 /**
  * Convert draw_buf  to premultiplied format
- * @param draw_buf pointer to a draw buf
+ * @param buf     pointer to a draw buf
  */
-lv_result_t lv_draw_buf_convert_premultiply(lv_draw_buf_t * draw_buf);
+lv_result_t lv_draw_buf_convert_premultiply(lv_draw_buf_t * buf);
 
 
 #ifdef __cplusplus

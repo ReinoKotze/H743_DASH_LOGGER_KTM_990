@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include LV_STDINT_INCLUDE
+#include <stdint.h>
 
 /*********************
  *      DEFINES

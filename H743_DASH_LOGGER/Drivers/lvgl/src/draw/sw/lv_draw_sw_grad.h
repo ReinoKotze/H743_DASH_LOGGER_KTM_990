@@ -13,7 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_sw.h"
+#include "../../misc/lv_color.h"
+#include "../../misc/lv_style.h"
 
 #if LV_USE_DRAW_SW
 

@@ -13,17 +13,32 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl_public.h"
+#include "../lv_conf_internal.h"
 
+#include "../misc/lv_types.h"
+#include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 #include "../draw/sw/lv_draw_sw.h"
 #endif
+#include "../misc/lv_anim.h"
+#include "../misc/lv_area.h"
+#include "../misc/lv_color_op.h"
+#include "../misc/lv_ll.h"
+#include "../misc/lv_log.h"
+#include "../misc/lv_style.h"
+#include "../misc/lv_timer.h"
 #include "../osal/lv_os_private.h"
+#include "../debugging/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
 #include "../font/fmt_txt/lv_font_fmt_txt_private.h"
 #endif
+
+#include "../tick/lv_tick.h"
+#include "../layouts/lv_layout.h"
+
+#include "../misc/lv_types.h"
 
 #include "../misc/lv_timer_private.h"
 #include "../misc/lv_anim_private.h"
@@ -269,9 +284,7 @@ typedef struct _lv_global_t {
  **********************/
 
 #if LV_ENABLE_GLOBAL_CUSTOM
-#if LV_GLOBAL_USE_CUSTOM_INCLUDE
 #include LV_GLOBAL_CUSTOM_INCLUDE
-#endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE*/
 
 #ifndef LV_GLOBAL_CUSTOM
 #define LV_GLOBAL_CUSTOM() lv_global_default()
@@ -280,7 +293,7 @@ typedef struct _lv_global_t {
 #else
 LV_ATTRIBUTE_EXTERN_DATA extern lv_global_t lv_global;
 #define LV_GLOBAL_DEFAULT() (&lv_global)
-#endif /*LV_ENABLE_GLOBAL_CUSTOM*/
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

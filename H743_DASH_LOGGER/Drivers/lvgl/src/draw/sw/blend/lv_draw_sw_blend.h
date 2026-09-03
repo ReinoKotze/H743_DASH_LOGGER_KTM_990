@@ -13,22 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
-#include "../../../lvgl_public.h"
-
+#include "../lv_draw_sw_mask.h"
 #if LV_USE_DRAW_SW
 
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
-#include "neon/lv_blend_neon.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_SVE2
-#include "sve2/lv_blend_sve2.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
-#include "helium/lv_blend_helium.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_RISCV_V
-#include "riscv_v/lv_blend_riscv_v.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
-#include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
-#endif
+#include "../../../misc/lv_color.h"
+#include "../../../misc/lv_area.h"
+#include "../../../misc/lv_style.h"
 
 /*********************
  *      DEFINES
@@ -56,7 +46,7 @@ typedef struct {
 
 /**
  * Call the blend function of the `layer`.
- * @param t             pointer to a draw unit
+ * @param draw_unit     pointer to a draw unit
  * @param dsc           pointer to an initialized blend descriptor
  */
 void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * dsc);

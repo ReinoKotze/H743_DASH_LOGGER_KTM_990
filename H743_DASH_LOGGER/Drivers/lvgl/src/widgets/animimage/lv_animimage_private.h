@@ -16,9 +16,9 @@ extern "C" {
 
 #include "../image/lv_image_private.h"
 #include "../../misc/lv_anim_private.h"
-#include "../../lvgl_public.h"
+#include "lv_animimage.h"
 
-#if LV_USE_ANIMIMG
+#if LV_USE_ANIMIMG != 0
 
 /*********************
  *      DEFINES

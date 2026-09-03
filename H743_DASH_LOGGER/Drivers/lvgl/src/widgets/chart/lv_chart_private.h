@@ -15,9 +15,9 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
+#include "lv_chart.h"
 
-#if LV_USE_CHART
+#if LV_USE_CHART != 0
 
 /*********************
  *      DEFINES

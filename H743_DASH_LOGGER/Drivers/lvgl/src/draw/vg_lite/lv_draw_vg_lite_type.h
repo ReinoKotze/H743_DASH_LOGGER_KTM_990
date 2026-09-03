@@ -14,11 +14,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_VG_LITE
 
 #include "../lv_draw_private.h"
+#include "../../misc/lv_array.h"
 
 #if LV_USE_VG_LITE_THORVG
 #include "../../debugging/vg_lite_tvg/vg_lite.h"

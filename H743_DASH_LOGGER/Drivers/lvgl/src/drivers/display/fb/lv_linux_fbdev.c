@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl_public.h"
+#include "lv_linux_fbdev.h"
 #if LV_USE_LINUX_FBDEV
 
 #include <stdlib.h>
 #include <unistd.h>
-#include LV_STDDEF_INCLUDE
+#include <stddef.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -124,8 +124,6 @@ lv_display_t * lv_linux_fbdev_create(void)
 
 lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 {
-    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(file != NULL, return LV_RESULT_INVALID);
     char * devname = lv_strdup(file);
     LV_ASSERT_MALLOC(devname);
     if(devname == NULL) {
@@ -260,7 +258,6 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
 void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
 {
-    LV_CHECK_ARG(disp != NULL, return);
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->force_refresh = enabled;
 }
@@ -377,7 +374,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             LV_ASSERT_MALLOC(dsc->rotated_buf);
             dsc->rotated_buf_size = buf_size;
         }
-        lv_draw_rotate(color_p, dsc->rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
+        lv_draw_sw_rotate(color_p, dsc->rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
         area = &rotated_area;
         color_p = dsc->rotated_buf;
     }

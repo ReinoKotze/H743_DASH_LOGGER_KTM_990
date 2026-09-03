@@ -1,6 +1,5 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "../lvgl_private.h"
 #include "unity/unity.h"
 
 #define TEST_DRAW_BUF_SAVE_PATH(path) "A:src/test_files/draw_buf_save_" path

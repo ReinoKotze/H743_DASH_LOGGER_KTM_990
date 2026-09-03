@@ -3,14 +3,7 @@
 #if LV_USE_SVG && LV_USE_VECTOR_GRAPHIC
 
 /**
- * @title SVG from inline markup
- * @brief Render an SVG circle described by a literal string as an image source.
- *
- * A static `lv_image_dsc_t` is populated with `LV_IMAGE_HEADER_MAGIC`, a
- * 450x150 display size, and a pointer to the literal SVG markup drawing
- * a red circle with a blue stroke. The descriptor is handed to
- * `lv_image_set_src` on an image widget placed on the active screen so
- * the SVG decoder renders the markup on demand.
+ * Load an SVG from data
  */
 void lv_example_svg_1(void)
 {

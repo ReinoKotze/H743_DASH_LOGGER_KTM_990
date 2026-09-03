@@ -6,12 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "lv_calendar_private.h"
-
+#include "../../core/lv_obj_class_private.h"
+#include "lv_calendar_header_dropdown.h"
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_DROPDOWN
 
-#include "../../core/lv_obj_class_private.h"
+#include "lv_calendar.h"
+#include "../dropdown/lv_dropdown.h"
+#include "../../layouts/flex/lv_flex.h"
 
 /*********************
  *      DEFINES

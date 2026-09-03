@@ -6,9 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
+#include "lv_gif.h"
 
-#include "../../lvgl_public.h"
 #if LV_USE_GIF
 #include "../../misc/lv_timer_private.h"
 #include "../../misc/cache/lv_cache.h"
@@ -25,7 +24,7 @@
  *      TYPEDEFS
  **********************/
 
-/* the type of the AnimatedGIF palette type passed to `GIF_begin` */
+/* the type of the AnimatedGIF pallete type passed to `GIF_begin` */
 typedef unsigned char animatedgif_color_format_t;
 
 typedef struct {
@@ -82,7 +81,7 @@ lv_obj_t * lv_gif_create(lv_obj_t * parent)
 
 void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(gifobj->color_format == color_format) {
@@ -111,7 +110,7 @@ void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format)
 
 void lv_gif_set_src(lv_obj_t * obj, const void * src)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(gifobj->is_open) {
@@ -125,7 +124,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
 void lv_gif_restart(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -135,9 +134,6 @@ void lv_gif_restart(lv_obj_t * obj)
 
     GIF_reset(&gifobj->gif);
     gifobj->loop_count = -1; /* match the behavior of the old library */
-
-    lv_draw_buf_clear(gifobj->draw_buf, NULL);
-
     lv_timer_resume(gifobj->timer);
     lv_timer_reset(gifobj->timer);
 
@@ -146,7 +142,7 @@ void lv_gif_restart(lv_obj_t * obj)
 
 void lv_gif_pause(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     lv_timer_pause(gifobj->timer);
@@ -154,7 +150,7 @@ void lv_gif_pause(lv_obj_t * obj)
 
 void lv_gif_resume(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -167,7 +163,7 @@ void lv_gif_resume(lv_obj_t * obj)
 
 bool lv_gif_is_loaded(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     return gifobj->is_open;
@@ -175,7 +171,7 @@ bool lv_gif_is_loaded(lv_obj_t * obj)
 
 int32_t lv_gif_get_loop_count(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -187,7 +183,7 @@ int32_t lv_gif_get_loop_count(lv_obj_t * obj)
 
 void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -200,7 +196,7 @@ void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
 
 void lv_gif_set_auto_pause_invisible(lv_obj_t * obj, bool auto_pause)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     gifobj->is_auto_pause = auto_pause;
@@ -231,7 +227,7 @@ bool lv_gif_get_size(const char * src, uint16_t * w, uint16_t * h)
 
 int32_t lv_gif_get_frame_count(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -253,7 +249,7 @@ int32_t lv_gif_get_frame_count(lv_obj_t * obj)
 
 int32_t lv_gif_get_current_frame_index(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -313,12 +309,38 @@ static inline void gif_blend_to_rgb565(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf
     uint16_t * dst = (uint16_t *)((uint8_t *)draw_buf->data + ((pDraw->iY + pDraw->y) * draw_buf->header.stride + pDraw->iX
                                                                * 2));
 
-    while(src < end) {
-        pixel = *src++;
-        if(!pDraw->ucHasTransparency || pixel != pDraw->ucTransparent) {
-            *dst = pal[pixel];
+    if(pDraw->ucHasTransparency) {
+        if(pDraw->ucDisposalMethod == 2) {
+            /* Disposal 2: Replace transparent pixels with background color */
+            while(src < end) {
+                pixel = *src++;
+                if(pixel == pDraw->ucTransparent) {
+                    pixel = pDraw->ucBackground;
+                }
+                *dst++ = pal[pixel];
+            }
         }
-        dst++;
+        else {
+            /* Disposal 0,1,3: Replace transparent pixels with background color to maintain position
+             * The gif_disposal_last_frame function handles the actual background clearing
+            */
+            uint16_t bg_color = pal[pDraw->ucBackground];
+            while(src < end) {
+                pixel = *src++;
+                if(pixel == pDraw->ucTransparent) {
+                    *dst++ = bg_color;
+                }
+                else {
+                    *dst++ = pal[pixel];
+                }
+            }
+        }
+    }
+    else {
+        while(src < end) {
+            pixel = *src++;
+            *dst++ = pal[pixel];
+        }
     }
 
     LV_PROFILER_DECODER_END;
@@ -334,16 +356,49 @@ static inline void gif_blend_to_rgb888(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf
     uint8_t * pal = pDraw->pPalette24;
     uint8_t * dst = (uint8_t *)draw_buf->data + ((pDraw->iY + pDraw->y) * draw_buf->header.stride + pDraw->iX * 3);
 
-    while(src < end) {
-        pixel = *src++;
-        if(!pDraw->ucHasTransparency || pixel != pDraw->ucTransparent) {
-            /* The memory layout of gif files store the channels as RGB, while lv_color_t stores BGR,
-             * so the byte reversal is intentional. */
+    if(pDraw->ucHasTransparency) {
+        if(pDraw->ucDisposalMethod == 2) {
+            /* Disposal 2: Replace transparent pixels with background color */
+            while(src < end) {
+                pixel = *src++;
+                if(pixel == pDraw->ucTransparent) {
+                    pixel = pDraw->ucBackground;
+                }
+                dst[0] = pal[(pixel * 3) + 2];
+                dst[1] = pal[(pixel * 3) + 1];
+                dst[2] = pal[(pixel * 3) + 0];
+                dst += 3;
+            }
+        }
+        else {
+            /* Disposal 0,1,3: Replace transparent pixels with background color to maintain position */
+            uint8_t bg_r = pal[(pDraw->ucBackground * 3) + 2];
+            uint8_t bg_g = pal[(pDraw->ucBackground * 3) + 1];
+            uint8_t bg_b = pal[(pDraw->ucBackground * 3) + 0];
+            while(src < end) {
+                pixel = *src++;
+                if(pixel == pDraw->ucTransparent) {
+                    dst[0] = bg_r;
+                    dst[1] = bg_g;
+                    dst[2] = bg_b;
+                }
+                else {
+                    dst[0] = pal[(pixel * 3) + 2];
+                    dst[1] = pal[(pixel * 3) + 1];
+                    dst[2] = pal[(pixel * 3) + 0];
+                }
+                dst += 3;
+            }
+        }
+    }
+    else {
+        while(src < end) {
+            pixel = *src++;
             dst[0] = pal[(pixel * 3) + 2];
             dst[1] = pal[(pixel * 3) + 1];
             dst[2] = pal[(pixel * 3) + 0];
+            dst += 3;
         }
-        dst += 3;
     }
 
     LV_PROFILER_DECODER_END;
@@ -359,17 +414,49 @@ static inline void gif_blend_to_argb8888(GIFDRAW * pDraw, lv_draw_buf_t * draw_b
     uint8_t * pal = pDraw->pPalette24;
     uint8_t * dst = (uint8_t *)draw_buf->data + ((pDraw->iY + pDraw->y) * draw_buf->header.stride + pDraw->iX * 4);
 
-    while(src < end) {
-        pixel = *src++;
-        if(!pDraw->ucHasTransparency || pixel != pDraw->ucTransparent) {
-            /* The memory layout of gif files store the channels as RGB, while lv_color_t stores BGR,
-             * so the byte reversal is intentional. */
+    if(pDraw->ucHasTransparency) {
+        if(pDraw->ucDisposalMethod == 2) {
+            /* Disposal 2: Transparent pixels get alpha=0, opaque pixels get alpha=255 */
+            while(src < end) {
+                pixel = *src++;
+                if(pixel != pDraw->ucTransparent) {
+                    dst[0] = pal[(pixel * 3) + 2];
+                    dst[1] = pal[(pixel * 3) + 1];
+                    dst[2] = pal[(pixel * 3) + 0];
+                    dst[3] = 0xFF;
+                }
+                else {
+                    dst[3] = 0x00;
+                }
+                dst += 4;
+            }
+        }
+        else {
+            /* Disposal 0,1,3: Transparent pixels get alpha=0, opaque pixels get alpha=255 */
+            while(src < end) {
+                pixel = *src++;
+                if(pixel != pDraw->ucTransparent) {
+                    dst[0] = pal[(pixel * 3) + 2];
+                    dst[1] = pal[(pixel * 3) + 1];
+                    dst[2] = pal[(pixel * 3) + 0];
+                    dst[3] = 0xFF;
+                }
+                else {
+                    dst[3] = 0x00;
+                }
+                dst += 4;
+            }
+        }
+    }
+    else {
+        while(src < end) {
+            pixel = *src++;
             dst[0] = pal[(pixel * 3) + 2];
             dst[1] = pal[(pixel * 3) + 1];
             dst[2] = pal[(pixel * 3) + 0];
             dst[3] = 0xFF;
+            dst += 4;
         }
-        dst += 4;
     }
 
     LV_PROFILER_DECODER_END;
@@ -476,8 +563,6 @@ static void gif_initialize(lv_gif_t * gifobj)
         return;
     }
 
-    lv_draw_buf_clear(gifobj->draw_buf, NULL);
-
     lv_image_set_src((lv_obj_t *) gifobj, gifobj->draw_buf);
 
     gifobj->loop_count = GIF_getLoopCount(&gifobj->gif);
@@ -500,13 +585,13 @@ static void gif_initialize(lv_gif_t * gifobj)
  * Only disposal method 2 ("restore to background") is handled in this function.
  *
  * @param gif      Pointer to the GIFIMAGE structure representing the current GIF frame.
- * @param draw_buf Pointer to the draw buffer where the frame is rendered.
+ * @param drawbuf  Pointer to the draw buffer where the frame is rendered.
  *
  * Assumptions:
  *   - The coordinates and dimensions (iX, iY, iWidth, iHeight) are within the bounds of the draw buffer.
  *   - The palette type and background color are valid for the current GIF frame.
  */
-static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * draw_buf)
+static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
 {
     LV_PROFILER_DECODER_BEGIN;
 
@@ -519,7 +604,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * draw_buf)
 
     /* Bounds validation to prevent out-of-bounds access */
     if(x < 0 || y < 0 || w <= 0 || h <= 0 ||
-       x + w > draw_buf->header.w || y + h > draw_buf->header.h) {
+       x + w > drawbuf->header.w || y + h > drawbuf->header.h) {
         LV_PROFILER_DECODER_END;
         return;
     }
@@ -533,51 +618,33 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * draw_buf)
             case GIF_PALETTE_RGB565_LE:
             case GIF_PALETTE_RGB565_BE: {
                     unsigned short * palette16 = (unsigned short *)palette;
-                    uint16_t color = palette16[bg];
-
-                    /* This check is equivalent to whether the gif has defined a transparent color or not. */
-                    if(gif->ucGIFBits & 1) color = 0;
-
                     for(i = y; i < y + h; i++) {
-                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
+                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
                         for(j = x; j < x + w; j++) {
-                            *(uint16_t *)(dst + 2 * j) = color;
+                            *(uint16_t *)(dst + 2 * j) = palette16[bg];
                         }
                     }
                 }
                 break;
-            case GIF_PALETTE_RGB888: {
-                    uint8_t r = palette[(bg * 3) + 2];
-                    uint8_t g = palette[(bg * 3) + 1];
-                    uint8_t b = palette[(bg * 3) + 0];
-
-                    /* This check is equivalent to whether the gif has defined a transparent color or not. */
-                    if(gif->ucGIFBits & 1) {
-                        r = 0;
-                        g = 0;
-                        b = 0;
-                    }
-
-                    for(i = y; i < y + h; i++) {
-                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
-                        for(j = x; j < x + w; j++) {
-                            dst[3 * j] = r;
-                            dst[3 * j + 1] = g;
-                            dst[3 * j + 2] = b;
-                        }
+            case GIF_PALETTE_RGB888:
+                for(i = y; i < y + h; i++) {
+                    uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                    for(j = x; j < x + w; j++) {
+                        dst[3 * j] = palette[(bg * 3) + 2];
+                        dst[3 * j + 1] = palette[(bg * 3) + 1];
+                        dst[3 * j + 2] = palette[(bg * 3) + 0];
                     }
                 }
                 break;
             case GIF_PALETTE_RGB8888: {
                     lv_color32_t bg_color = lv_color32_make(palette[(bg * 3) + 2], palette[(bg * 3) + 1], palette[(bg * 3)], 0xff);
-
-                    /* This check is equivalent to whether the gif has defined a transparent color or not. */
+                    /* has transparent */
                     if(gif->ucGIFBits & 1) {
                         bg_color = lv_color32_make(0, 0, 0, 0);
                     }
 
                     for(i = y; i < y + h; i++) {
-                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
+                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
                         for(j = x; j < x + w; j++) {
                             *(lv_color32_t *)(dst + 4 * j) = bg_color;
                         }
@@ -588,11 +655,8 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * draw_buf)
                 break;
         }
     }
-    /* disposal_method 3: not supported, do nothing */
-    else if(disposal_method == 3) {
-        LV_LOG_WARN("GIF disposal method 3 not supported");
-    }
     /* disposal_method 0 and 1: do nothing, leave existing content */
+    /* disposal_method 3: not supported, do nothing */
 
     LV_PROFILER_DECODER_END;
 }

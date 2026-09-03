@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl_public.h"
+#include "lv_3dmath.h"
 #if LV_USE_GLTF
 
 /*********************

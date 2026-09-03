@@ -12,7 +12,19 @@
 #if LV_DRAW_SW_SUPPORT_ARGB8888
 
 #include "lv_draw_sw_blend_private.h"
+#include "../../../misc/lv_math.h"
+#include "../../../display/lv_display.h"
+#include "../../../core/lv_refr.h"
+#include "../../../misc/lv_color.h"
+#include "../../../stdlib/lv_string.h"
 
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
+    #include "neon/lv_blend_neon.h"
+#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
+    #include "helium/lv_blend_helium.h"
+#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
+    #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+#endif
 
 /*********************
  *      DEFINES
@@ -377,7 +389,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_argb8888(lv_draw_sw_blend_i
             break;
 #endif
         default:
-            LV_LOG_WARN("Not supported source color format 0x%02X", dsc->src_color_format);
+            LV_LOG_WARN("Not supported source color format");
             break;
     }
 }

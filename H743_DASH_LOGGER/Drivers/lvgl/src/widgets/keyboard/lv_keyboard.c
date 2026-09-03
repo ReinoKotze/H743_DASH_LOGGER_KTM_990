@@ -8,10 +8,12 @@
  *      INCLUDES
  *********************/
 #include "lv_keyboard_private.h"
-
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_KEYBOARD
 
-#include "../../core/lv_obj_class_private.h"
+#include "../textarea/lv_textarea.h"
+#include "../../misc/lv_assert.h"
+#include "../../stdlib/lv_string.h"
 
 /*Testing of dependencies*/
 #if LV_USE_BUTTONMATRIX == 0
@@ -237,10 +239,10 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * parent)
 void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
 {
     if(ta) {
-        LV_CHECK_OBJ(ta, &lv_textarea_class, return);
+        LV_ASSERT_OBJ(ta, &lv_textarea_class);
     }
 
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
 
     /*Hide the cursor of the old Text area if cursor management is enabled*/
@@ -258,7 +260,7 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
 
 void lv_keyboard_set_mode(lv_obj_t * obj, lv_keyboard_mode_t mode)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     if(keyboard->mode == mode) return;
 
@@ -281,7 +283,7 @@ void lv_keyboard_set_popovers(lv_obj_t * obj, bool en)
 void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * const map[],
                          const lv_buttonmatrix_ctrl_t ctrl_map[])
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     kb_map[mode] = map;
     kb_ctrl[mode] = ctrl_map;
     lv_keyboard_update_map(obj);
@@ -293,14 +295,14 @@ void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * c
 
 lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     return keyboard->ta;
 }
 
 lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     return keyboard->mode;
 }
@@ -319,7 +321,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_current_target(e);
 
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     uint32_t btn_id = lv_buttonmatrix_get_selected_button(obj);
     if(btn_id == LV_BUTTONMATRIX_BUTTON_NONE) return;
@@ -441,7 +443,7 @@ const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
 static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
-    lv_obj_set_click_focusable(obj, false);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     keyboard->ta         = NULL;

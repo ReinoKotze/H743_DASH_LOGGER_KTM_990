@@ -16,8 +16,8 @@ extern "C" {
 
 #if LV_USE_OS == LV_OS_WINDOWS
 
-#include <windows.h>
-#include LV_STDBOOL_INCLUDE
+#include <Windows.h>
+#include <stdbool.h>
 
 /*********************
  *      DEFINES

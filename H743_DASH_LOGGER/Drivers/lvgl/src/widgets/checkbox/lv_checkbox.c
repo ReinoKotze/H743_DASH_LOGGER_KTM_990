@@ -6,16 +6,17 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_checkbox_private.h"
-
-#if LV_USE_CHECKBOX
-
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
+#if LV_USE_CHECKBOX != 0
+
+#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../font/lv_font_private.h"
+#include "../../core/lv_group.h"
+#include "../../draw/lv_draw.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -89,7 +90,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
         size_t len;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        len = lv_text_ap_strlen(txt) + 1;
+        len = lv_text_ap_calc_bytes_count(txt) + 1;
 #else
         len = lv_strlen(txt) + 1;
 #endif
@@ -155,10 +156,10 @@ static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     cb->static_txt = 1;
 #endif
 
-    lv_obj_set_clickable(obj, true);
-    lv_obj_set_checkable(obj, true);
-    lv_obj_set_scroll_on_focus(obj, true);
-    lv_obj_set_scrollable(obj, false);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -193,7 +194,7 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t font_h = lv_font_get_line_height_internal(font);
+        int32_t font_h = lv_font_get_line_height(font);
         lv_text_attributes_t attributes = {0};
 
         attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -234,7 +235,7 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_layer_t * layer = lv_event_get_layer(e);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    int32_t font_h = lv_font_get_line_height_internal(font);
+    int32_t font_h = lv_font_get_line_height(font);
 
     const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 

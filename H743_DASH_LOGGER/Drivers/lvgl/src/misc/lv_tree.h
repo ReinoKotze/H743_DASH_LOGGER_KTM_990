@@ -1,5 +1,6 @@
 /**
  * @file lv_tree.h
+ * Tree. The tree nodes are dynamically allocated by the 'lv_mem' module.
  */
 
 #ifndef LV_TREE_H
@@ -12,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl_public.h"
+#include "lv_types.h"
 
 /*********************
  *      DEFINES
@@ -24,6 +25,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct _lv_tree_class_t lv_tree_class_t;
+typedef struct _lv_tree_node_t lv_tree_node_t;
 
 typedef void (*lv_tree_constructor_cb_t)(const lv_tree_class_t * class_p, lv_tree_node_t * node);
 typedef void (*lv_tree_destructor_cb_t)(const lv_tree_class_t * class_p, lv_tree_node_t * node);
@@ -85,7 +88,7 @@ void lv_tree_node_delete(lv_tree_node_t * node);
  * @param cb callback function to call on each node
  * @param bcb callback function to call before visiting a node
  * @param acb callback function to call after visiting a node
- * @param user_data user data to pass to the callback functions @nullable
+ * @param user_data user data to pass to the callback functions
  * @return true: traversal is finished; false: traversal broken
  */
 bool lv_tree_walk(const lv_tree_node_t * node,

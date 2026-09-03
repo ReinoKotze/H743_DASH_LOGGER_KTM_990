@@ -27,6 +27,10 @@ extern "C" {
 
 extern lv_obj_t * ui____initial_actions0;
 
+// IMAGES AND IMAGE SETS
+LV_IMG_DECLARE(ui_img_1414997601);    // assets/Adobe Express - file (1).png
+LV_IMG_DECLARE(ui_img_pngegg_png);    // assets/pngegg.PNG
+
 // UI INIT
 void ui_init(void);
 void ui_destroy(void);

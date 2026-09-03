@@ -22,10 +22,10 @@
  */
 
 #include "qrcodegen.h"
-#include "../../lvgl_public.h"
+#include "../../misc/lv_assert.h"
 
 #if LV_USE_QRCODE
-#include LV_LIMITS_INCLUDE
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 

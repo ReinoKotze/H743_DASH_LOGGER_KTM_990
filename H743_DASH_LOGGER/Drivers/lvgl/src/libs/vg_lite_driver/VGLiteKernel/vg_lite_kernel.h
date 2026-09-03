@@ -55,7 +55,7 @@
 #ifndef VG_LITE_KERNEL_H
 #define VG_LITE_KERNEL_H
 
-#include "../../../lvgl_public.h"
+#include "../../../lv_conf_internal.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include "../VGLite/vg_lite_options.h"

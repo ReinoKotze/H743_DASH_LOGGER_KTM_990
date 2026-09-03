@@ -13,11 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
 #include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
 
-#if LV_USE_ARCLABEL
+#if LV_USE_ARCLABEL != 0
+#include "lv_arclabel.h"
 
 /*********************
  *      DEFINES

@@ -8,10 +8,11 @@
  *********************/
 
 #include "lv_opengles_debug.h"
-
 #if LV_USE_OPENGLES
 
 #include "lv_opengles_private.h"
+
+#include "../../misc/lv_log.h"
 
 /*********************
  *      DEFINES

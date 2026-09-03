@@ -5,12 +5,10 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "../../lvgl_public.h"
-
+#include "../lv_mem.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_MICROPYTHON
-
-#include <include/lv_mp_mem_custom_include.h>
+#include "../../stdlib/lv_mem.h"
+#include "include/lv_mp_mem_custom_include.h"
 
 /*********************
  *      DEFINES

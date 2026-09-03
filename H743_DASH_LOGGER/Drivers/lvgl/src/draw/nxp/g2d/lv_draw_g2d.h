@@ -20,9 +20,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl_public.h"
+#include "../../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include "../../sw/lv_draw_sw_private.h"
 
 /*********************
@@ -60,7 +61,8 @@ void lv_draw_g2d_img(lv_draw_task_t * t);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_G2D*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

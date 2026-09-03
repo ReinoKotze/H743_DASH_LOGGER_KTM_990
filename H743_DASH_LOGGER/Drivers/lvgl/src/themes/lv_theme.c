@@ -10,6 +10,7 @@
 #include "../core/lv_obj_private.h"
 #include "../core/lv_obj_style_private.h"
 #include "../core/lv_obj_class_private.h"
+#include "../../lvgl.h"
 
 /*********************
  *      DEFINES
@@ -114,14 +115,14 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
 }
 
 #if LV_USE_EXT_DATA
-void lv_theme_set_external_data(lv_theme_t * theme, void * user_data, void (* free_cb)(void * data))
+void lv_theme_set_external_data(lv_theme_t * theme, void * data, void (* free_cb)(void * data))
 {
     if(!theme) {
         LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL theme");
         return;
     }
 
-    theme->ext_data.data = user_data;
+    theme->ext_data.data = data;
     theme->ext_data.free_cb = free_cb;
 }
 #endif

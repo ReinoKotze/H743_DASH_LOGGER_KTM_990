@@ -10,9 +10,6 @@
 extern "C" {
 #endif
 
-#include "lv_draw_dave2d.h"
-#if LV_USE_DRAW_DAVE2D
-
 /*********************
  *      INCLUDES
  *********************/
@@ -41,7 +38,6 @@ bool lv_draw_dave2d_is_dest_cf_supported(lv_color_format_t cf);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_DAVE2D*/
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

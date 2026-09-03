@@ -1,2 +1,43 @@
-#warning Include public headers from the `src` folder is deprecated. This file will be removed soon. To ensure your application keeps working, you can choose to include the new header in <include/lvgl/images/lv_bmp.h> or include the main header file <include/lvgl/lvgl.h>
-#include "../../../include/lvgl/lvgl.h"
+/**
+ * @file lv_bmp.h
+ *
+ */
+
+#ifndef LV_BMP_H
+#define LV_BMP_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+#include "../../lv_conf_internal.h"
+#if LV_USE_BMP
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+void lv_bmp_init(void);
+void lv_bmp_deinit(void);
+
+/**********************
+ *      MACROS
+ **********************/
+
+#endif /*LV_USE_BMP*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif /*LV_BMP_H*/

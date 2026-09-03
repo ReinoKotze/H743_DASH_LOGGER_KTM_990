@@ -14,12 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
-
-#if LV_USE_SLIDER
-
 #include "../bar/lv_bar_private.h"
+#include "lv_slider.h"
+
+#if LV_USE_SLIDER != 0
 
 /*********************
  *      DEFINES

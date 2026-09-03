@@ -29,17 +29,11 @@ typedef enum {
 } time_am_pm_t;
 
 /**
- * @title Time setting with a group subject
- * @brief Aggregate hour, minute, format, and AM/PM subjects into one `lv_subject_init_group`.
- *
- * Four int subjects hold hour, minute, 12/24 format, and AM/PM. They are gathered
- * into `time_subject` via `lv_subject_init_group` so a single observer can
- * re-render the time label whenever any element changes. A "Set" button creates
- * a bottom container with two rollers and two dropdowns bound through
- * `lv_roller_bind_value` and `lv_dropdown_bind_value`; the AM/PM dropdown uses
- * `lv_obj_bind_state_if_eq` to disable itself in `TIME_FORMAT_24`. A second
- * observer on the format subject swaps the hour roller options between the 12
- * and 24 lists.
+ * Show how to handle a complex time setting with hour, minute, 12/24 hour mode, and AM/PM switch
+ * In a real application the time can be displayed on multiple screens and it's not trivial
+ * how and where to store the current values and how to get them.
+ * In this example the widgets to set the time are create/deleted dynamically,
+ * yet they always know what the current values are by using subjects.
  */
 void lv_example_observer_3(void)
 {
@@ -82,7 +76,7 @@ static void set_btn_clicked_event_cb(lv_event_t * e)
     lv_obj_align(cont, LV_ALIGN_BOTTOM_MID, 0, 0);
 
     lv_obj_t * hour_roller = lv_roller_create(cont);
-    lv_obj_set_flex_in_new_track(hour_roller, true);
+    lv_obj_add_flag(hour_roller, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
     lv_subject_add_observer_obj(&format_subject, hour_roller_options_update, hour_roller, NULL);
     lv_roller_bind_value(hour_roller, &hour_subject);
     lv_obj_set_pos(hour_roller, 0, 0);

@@ -6,9 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "lv_text_ap.h"
+#include "lv_bidi.h"
 #include "lv_text_private.h"
+#include "lv_text_ap.h"
+#include "lv_types.h"
+#include "../stdlib/lv_mem.h"
+#include "../draw/lv_draw.h"
 
 /*********************
  *      DEFINES
@@ -104,10 +107,8 @@ const ap_chars_map_t ap_chars_map[] = {
 /**********************
 *   GLOBAL FUNCTIONS
 **********************/
-
-size_t lv_text_ap_strlen(const char * txt)
+uint32_t lv_text_ap_calc_bytes_count(const char * txt)
 {
-    LV_ASSERT_NULL(txt);
     uint32_t txt_length = 0;
     uint32_t chars_cnt = 0;
     uint32_t current_ap_idx = 0;
@@ -137,7 +138,7 @@ size_t lv_text_ap_strlen(const char * txt)
         i++;
     }
 
-    return chars_cnt;
+    return chars_cnt + 1;
 }
 
 void lv_text_ap_proc(const char * txt, char * txt_out)
@@ -147,9 +148,6 @@ void lv_text_ap_proc(const char * txt, char * txt_out)
     uint32_t * ch_enc;
     uint32_t * ch_fin;
     char * txt_out_temp;
-    if(!txt || !txt_out) {
-        return;
-    }
 
     txt_length = lv_text_get_encoded_length(txt);
 

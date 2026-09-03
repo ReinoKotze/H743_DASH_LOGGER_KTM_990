@@ -29,7 +29,7 @@
 #else
 
 #define LVGL_HEAP_ADD 0x0 // define not used here, seprate define used in lv_conf. 5mb for lvgl heap
-#define LVGL_HEAP_SIZE 65536
+#define LVGL_HEAP_SIZE (1024*10)
 #define USE_START_ADD SDRAM_START_ADD
 
 #endif

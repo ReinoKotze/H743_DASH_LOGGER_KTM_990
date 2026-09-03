@@ -11,8 +11,11 @@
 
 #if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
 
+#include "../../core/lv_group.h"
+#include "../../misc/lv_log.h"
+
 #include <errno.h>
-#include LV_STDBOOL_INCLUDE
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +50,6 @@ static struct xkb_context * context = NULL;
 
 bool lv_xkb_init(lv_xkb_t * dsc, struct xkb_rule_names names)
 {
-    LV_CHECK_ARG(dsc != NULL, return false);
     if(!context) {
         context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
         if(!context) {
@@ -61,8 +63,6 @@ bool lv_xkb_init(lv_xkb_t * dsc, struct xkb_rule_names names)
 
 void lv_xkb_deinit(lv_xkb_t * dsc)
 {
-    if(dsc == NULL) return;
-
     if(dsc->state) {
         xkb_state_unref(dsc->state);
         dsc->state = NULL;
@@ -76,8 +76,6 @@ void lv_xkb_deinit(lv_xkb_t * dsc)
 
 uint32_t lv_xkb_process_key(lv_xkb_t * dsc, uint32_t scancode, bool down)
 {
-    LV_CHECK_ARG(dsc != NULL, return 0);
-
     /* Offset the evdev scancode by 8, see https://xkbcommon.org/doc/current/xkbcommon_8h.html#ac29aee92124c08d1953910ab28ee1997 */
     xkb_keycode_t keycode = scancode + 8;
 
@@ -154,7 +152,6 @@ uint32_t lv_xkb_process_key(lv_xkb_t * dsc, uint32_t scancode, bool down)
 
 static bool _set_keymap(lv_xkb_t * dsc, struct xkb_rule_names names)
 {
-    LV_ASSERT(dsc != NULL);
     if(dsc->keymap) {
         xkb_keymap_unref(dsc->keymap);
         dsc->keymap = NULL;

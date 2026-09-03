@@ -10,6 +10,8 @@
 #include "lv_vg_lite_pending.h"
 
 #if LV_USE_DRAW_VG_LITE
+
+#include "../../misc/lv_assert.h"
 #include "../../misc/lv_array.h"
 
 /*********************

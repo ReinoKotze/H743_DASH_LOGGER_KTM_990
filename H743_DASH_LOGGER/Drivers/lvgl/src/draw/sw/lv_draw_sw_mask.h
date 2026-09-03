@@ -13,7 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_sw.h"
+#include "../../misc/lv_area.h"
+#include "../../misc/lv_color.h"
+#include "../../misc/lv_math.h"
+#include "../../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -140,10 +143,9 @@ void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, int32_t v
  * @param rect coordinates of the rectangle to affect (absolute coordinates)
  * @param radius radius of the rectangle
  * @param inv true: keep the pixels inside the rectangle; keep the pixels outside of the rectangle
- * @return LV_RESULT_OK if the mask radius was initialized correctly else LV_RESULT_INVALID
  */
-lv_result_t lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const lv_area_t * rect, int32_t radius,
-                                        bool inv);
+void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const lv_area_t * rect, int32_t radius,
+                                 bool inv);
 
 /**
  * Initialize a fade mask.

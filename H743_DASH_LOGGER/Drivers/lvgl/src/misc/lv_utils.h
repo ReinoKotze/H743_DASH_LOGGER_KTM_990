@@ -14,7 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lvgl_public.h"
+#include "lv_types.h"
+#include "../draw/lv_draw_buf.h"
 
 /*********************
  *      DEFINES
@@ -76,7 +77,7 @@ static inline uint32_t lv_swap_bytes_32(uint32_t x)
  */
 static inline uint16_t lv_swap_bytes_16(uint16_t x)
 {
-    return (uint16_t)(x << 8) | (x >> 8);
+    return (x << 8) | (x >> 8);
 }
 
 /**********************

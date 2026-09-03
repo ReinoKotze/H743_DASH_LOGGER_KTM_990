@@ -4,16 +4,16 @@
  * Driver for NXP's ELCD
  */
 
-#include "../../../lvgl_public.h"
+#include "lv_nxp_elcdif.h"
 
-#if LV_USE_NXP_ELCDIF
+#if LV_USE_NXP_ELCDIF == 1
 /*********************
  *      INCLUDES
  *********************/
 #include "../../../display/lv_display_private.h"
-#include <fsl_video_common.h>
-#include <fsl_elcdif.h>
-#include <fsl_cache.h>
+#include "fsl_video_common.h"
+#include "fsl_elcdif.h"
+#include "fsl_cache.h"
 
 /*********************
  *      DEFINES
@@ -51,9 +51,6 @@ lv_display_t * lv_nxp_display_elcdif_create_direct(LCDIF_Type * base, const elcd
                                                    void * frame_buffer1,
                                                    void * frame_buffer2, size_t buf_size)
 {
-    LV_CHECK_ARG(base != NULL, return NULL);
-    LV_CHECK_ARG(config != NULL, return NULL);
-    LV_CHECK_ARG(frame_buffer1 != NULL, return NULL);
     LV_ASSERT(base);
     LV_ASSERT(config);
 
@@ -75,9 +72,6 @@ lv_display_t * lv_nxp_display_elcdif_create_partial(LCDIF_Type * base, const elc
                                                     void * frame_buffer1,
                                                     void * frame_buffer2, size_t buf_size)
 {
-    LV_CHECK_ARG(base != NULL, return NULL);
-    LV_CHECK_ARG(config != NULL, return NULL);
-    LV_CHECK_ARG(frame_buffer1 != NULL, return NULL);
     LV_ASSERT(base);
     LV_ASSERT(config);
 
@@ -97,7 +91,6 @@ lv_display_t * lv_nxp_display_elcdif_create_partial(LCDIF_Type * base, const elc
 
 void lv_nxp_display_elcdif_event_handler(const lv_display_t * disp)
 {
-    LV_CHECK_ARG(disp != NULL, return);
     if(disp == NULL) {
         /* Just return since no valid display has been set yet */
         return;

@@ -7,12 +7,14 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
-
+#include "lv_opengles_texture.h"
 #if LV_USE_OPENGLES
 
 #include "lv_opengles_debug.h"
+#include "lv_opengles_driver.h"
 
+#include "../../misc/lv_types.h"
+#include "../../stdlib/lv_mem.h"
 #include "lv_opengles_private.h"
 #include "lv_opengles_texture_private.h"
 #include "../../display/lv_display_private.h"
@@ -37,7 +39,6 @@ static void lv_opengles_texture_attach_to_display(lv_opengles_texture_t * textur
 static unsigned int create_texture(int32_t w, int32_t h);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void release_disp_cb(lv_event_t * e);
-static inline unsigned int lv_opengles_texture_get_texture_id_internal(lv_display_t * disp);
 
 /**********************
  *  STATIC VARIABLES
@@ -85,8 +86,8 @@ lv_display_t * lv_opengles_texture_create_from_texture_id(int32_t w, int32_t h, 
 lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_display_t * display, int32_t width,
                                         int32_t height)
 {
-    LV_ASSERT(display != NULL);
-    LV_ASSERT(texture != NULL);
+    LV_ASSERT_NULL(display);
+    LV_ASSERT_NULL(texture);
     unsigned int new_texture = create_texture(width, height);
     if(new_texture == GL_NONE) {
         LV_LOG_ERROR("Failed to reshape texture. Couldn't acquire new texture from GPU");
@@ -121,7 +122,7 @@ lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_disp
 
 static void lv_opengles_texture_attach_to_display(lv_opengles_texture_t * texture, lv_display_t * display)
 {
-    LV_ASSERT(display != NULL);
+    LV_ASSERT_NULL(display);
     LV_UNUSED(texture);
 #if !LV_USE_DRAW_NANOVG
     display->layer_head->user_data = (void *)(lv_uintptr_t)texture->texture_id;
@@ -163,15 +164,17 @@ void lv_opengles_texture_deinit(lv_opengles_texture_t * texture)
 
 unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)
 {
-    LV_CHECK_ARG(disp != NULL, return 0);
-    return lv_opengles_texture_get_texture_id_internal(disp);
+    if(!disp) {
+        LV_LOG_ERROR("Invalid display");
+        return 0;
+    }
+    return (unsigned int)(lv_uintptr_t)disp->layer_head->user_data;
 }
-
 lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id)
 {
     lv_display_t * disp = NULL;
     while(NULL != (disp = lv_display_get_next(disp))) {
-        unsigned int disp_texture_id = lv_opengles_texture_get_texture_id_internal(disp);
+        unsigned int disp_texture_id = lv_opengles_texture_get_texture_id(disp);
         if(disp_texture_id == texture_id) {
             return disp;
         }
@@ -290,12 +293,6 @@ static void release_disp_cb(lv_event_t * e)
     lv_opengles_texture_t * texture = lv_display_get_driver_data(disp);
     lv_opengles_texture_deinit(texture);
     lv_free(texture);
-}
-
-static inline unsigned int lv_opengles_texture_get_texture_id_internal(lv_display_t * disp)
-{
-    LV_ASSERT(disp != NULL);
-    return (unsigned int)(lv_uintptr_t)disp->layer_head->user_data;
 }
 
 #endif /*LV_USE_OPENGLES*/

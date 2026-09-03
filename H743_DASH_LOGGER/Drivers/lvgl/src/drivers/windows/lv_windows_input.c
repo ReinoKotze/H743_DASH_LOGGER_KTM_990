@@ -7,8 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
-
+#include "lv_windows_input.h"
 #if LV_USE_WINDOWS
 
 #ifdef __GNUC__
@@ -16,6 +15,7 @@
 #endif
 
 #include "lv_windows_context.h"
+#include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_obj_private.h"
@@ -23,6 +23,7 @@
 #include <windowsx.h>
 
 #include "../../widgets/textarea/lv_textarea_private.h"
+#include "../../widgets/keyboard/lv_keyboard.h"
 
 /*********************
  *      DEFINES
@@ -68,13 +69,11 @@ static void lv_windows_release_encoder_device_event_callback(lv_event_t * e);
 
 HWND lv_windows_get_indev_window_handle(lv_indev_t * indev)
 {
-    LV_CHECK_ARG(indev != NULL, return NULL);
     return lv_windows_get_display_window_handle(lv_indev_get_display(indev));
 }
 
 lv_indev_t * lv_windows_acquire_pointer_indev(lv_display_t * display)
 {
-    LV_CHECK_ARG(display != NULL, return NULL);
     HWND window_handle = lv_windows_get_display_window_handle(display);
     if(!window_handle) {
         return NULL;
@@ -118,7 +117,6 @@ lv_indev_t * lv_windows_acquire_pointer_indev(lv_display_t * display)
 
 lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
 {
-    LV_CHECK_ARG(display != NULL, return NULL);
     HWND window_handle = lv_windows_get_display_window_handle(display);
     if(!window_handle) {
         return NULL;
@@ -164,7 +162,6 @@ lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
 
 lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display)
 {
-    LV_CHECK_ARG(display != NULL, return NULL);
     HWND window_handle = lv_windows_get_display_window_handle(display);
     if(!window_handle) {
         return NULL;

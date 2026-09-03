@@ -15,7 +15,6 @@ extern "C" {
  *********************/
 #include "flex/lv_example_flex.h"
 #include "grid/lv_example_grid.h"
-#include "split/lv_example_split.h"
 
 /*********************
  *      DEFINES

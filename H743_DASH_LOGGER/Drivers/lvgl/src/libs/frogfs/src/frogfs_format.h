@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../../../lvgl_public.h"
+#include "../../../lv_conf_internal.h"
 #include LV_STDINT_INCLUDE
 
 

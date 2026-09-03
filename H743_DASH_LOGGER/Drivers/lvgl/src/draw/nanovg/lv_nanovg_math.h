@@ -14,12 +14,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_NANOVG
 
 #include <math.h>
-#include LV_STDBOOL_INCLUDE
+#include <stdbool.h>
 #include <float.h>
 
 /*********************

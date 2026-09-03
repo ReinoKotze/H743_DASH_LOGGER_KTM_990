@@ -1,26 +1,16 @@
 from typing import Union
 import gdb
 
-from lvglgdb.value import Value, ValueInput
+from lvglgdb.value import Value
 
 
 class LVList(Value):
     """LVGL linked list iterator"""
 
-    _DISPLAY_SPEC = {
-        "info": [
-            ("_title", lambda d: "Linked List Info:"),
-            ("Address", "addr"),
-            ("Node Size", "n_size"),
-            ("Node Count", "node_count"),
-            ("_skip_if", "nodetype", None, ("Node Type", "nodetype")),
-        ],
-        "table": [],
-        "empty_msg": "",
-    }
-
-    def __init__(self, ll: ValueInput, nodetype: Union[gdb.Type, str] = None):
-        super().__init__(Value.normalize(ll, "lv_ll_t"))
+    def __init__(self, ll: Value, nodetype: Union[gdb.Type, str] = None):
+        if not ll:
+            raise ValueError("Invalid linked list")
+        super().__init__(ll)
 
         self.nodetype = (
             gdb.lookup_type(nodetype).pointer()
@@ -47,26 +37,17 @@ class LVList(Value):
         if not self.current:
             raise StopIteration
 
-        node = self.current.cast(self.nodetype or self.lv_ll_node_t)
+        nodetype = self.nodetype if self.nodetype else self.lv_ll_node_t
+        node = self.current.cast(nodetype)
+
         self.current = self._next(self.current)
         return node
 
     @property
     def len(self):
-        count = 0
+        len = 0
         node = self.head
         while node:
-            count += 1
+            len += 1
             node = self._next(node)
-        return count
-
-    def snapshot(self):
-        from lvglgdb.lvgl.snapshot import Snapshot
-
-        d = {
-            "addr": hex(int(self)),
-            "n_size": int(self.n_size),
-            "node_count": self.len,
-            "nodetype": str(self.nodetype) if self.nodetype else None,
-        }
-        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+        return len

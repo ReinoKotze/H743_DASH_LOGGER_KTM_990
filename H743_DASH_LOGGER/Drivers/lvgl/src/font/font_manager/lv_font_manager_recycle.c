@@ -11,6 +11,9 @@
 
 #if LV_USE_FONT_MANAGER
 
+#include "../../font/lv_font.h"
+#include "../../misc/lv_ll.h"
+
 /*********************
  *      DEFINES
  *********************/

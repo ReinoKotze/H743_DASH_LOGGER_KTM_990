@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lvgl_public.h"
+#include "lv_observer.h"
 
 #if LV_USE_OBSERVER
 

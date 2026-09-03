@@ -46,9 +46,12 @@
 
 #include "lv_cache_lru_rb.h"
 #include "../lv_cache_entry.h"
-#include "../../../lvgl_public.h"
+#include "../../../stdlib/lv_sprintf.h"
+#include "../../../stdlib/lv_string.h"
+#include "../../lv_ll.h"
 #include "../../lv_rb_private.h"
-#include "../../lv_iter_private.h"
+#include "../../lv_rb.h"
+#include "../../lv_iter.h"
 
 /*********************
  *      DEFINES

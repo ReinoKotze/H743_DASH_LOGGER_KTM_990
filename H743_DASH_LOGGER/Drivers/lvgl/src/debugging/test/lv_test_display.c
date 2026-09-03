@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
+#include "lv_test_display.h"
 #if LV_USE_TEST
 
 #include "../../core/lv_global.h"

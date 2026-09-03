@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_os_private.h"
+#include "lv_os.h"
 #ifdef __linux__
 /*********************
  *      DEFINES

@@ -10,7 +10,8 @@
 extern "C" {
 #endif
 
-#include "../../../lvgl_public.h"
+#include "../../../misc/lv_color.h"
+#include "../../lv_draw_buf.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
 

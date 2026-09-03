@@ -2,15 +2,7 @@
 #if LV_USE_GRIDNAV && LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
- * @title Basic grid navigation
- * @brief Two side-by-side containers, one plain and one with rollover keypad navigation.
- *
- * Each container is added to the default group with `lv_group_add_obj` and
- * registered with `lv_gridnav_add`. The left container uses
- * `LV_GRIDNAV_CTRL_NONE` and wraps 10 checkable buttons in `LV_FLEX_FLOW_ROW_WRAP`.
- * The right container uses `LV_GRIDNAV_CTRL_ROLLOVER` and holds a textarea, a
- * checkbox, and two switches placed by absolute position. Children are removed
- * from the group with `lv_group_remove_obj` so gridnav handles keypad movement.
+ * Demonstrate a a basic grid navigation
  */
 void lv_example_gridnav_1(void)
 {
@@ -26,10 +18,7 @@ void lv_example_gridnav_1(void)
     lv_obj_set_size(cont1, lv_pct(50), lv_pct(100));
 
     /*Only the container needs to be in a group*/
-    lv_group_t * g = lv_group_get_default();
-    if(g) {
-        lv_group_add_obj(g, cont1);
-    }
+    lv_group_add_obj(lv_group_get_default(), cont1);
 
     lv_obj_t * label = lv_label_create(cont1);
     lv_label_set_text_fmt(label, "No rollover");
@@ -38,7 +27,7 @@ void lv_example_gridnav_1(void)
     for(i = 0; i < 10; i++) {
         lv_obj_t * obj = lv_button_create(cont1);
         lv_obj_set_size(obj, 70, LV_SIZE_CONTENT);
-        lv_obj_set_checkable(obj, true);
+        lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
         lv_group_remove_obj(obj);   /*Not needed, we use the gridnav instead*/
 
         label = lv_label_create(obj);
@@ -59,9 +48,7 @@ void lv_example_gridnav_1(void)
     lv_label_set_text_fmt(label, "Rollover\nUse tab to focus the other container");
 
     /*Only the container needs to be in a group*/
-    if(g) {
-        lv_group_add_obj(g, cont2);
-    }
+    lv_group_add_obj(lv_group_get_default(), cont2);
 
     /*Add and place some children manually*/
     lv_obj_t * ta = lv_textarea_create(cont2);

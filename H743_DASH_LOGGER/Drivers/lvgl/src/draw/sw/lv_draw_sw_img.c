@@ -8,14 +8,20 @@
  *********************/
 #include "../../misc/lv_area_private.h"
 #include "blend/lv_draw_sw_blend_private.h"
-#include "../../image/lv_image_decoder_private.h"
+#include "../lv_image_decoder_private.h"
 #include "../lv_draw_image_private.h"
 #include "../lv_draw_private.h"
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
+#include "../../display/lv_display.h"
 #include "../../display/lv_display_private.h"
+#include "../../misc/lv_log.h"
 #include "../../core/lv_refr_private.h"
+#include "../../stdlib/lv_mem.h"
+#include "../../misc/lv_math.h"
+#include "../../misc/lv_color.h"
+#include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
@@ -381,7 +387,6 @@ static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc
         blend_area.y1 ++;
         blend_area.y2 ++;
     }
-    lv_draw_sw_mask_free_param(&mask_param);
     lv_free(mask_buf);
 
 }
@@ -407,7 +412,7 @@ static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
         buf_stride = 1;
     }
     buf_h = MAX_BUF_SIZE / buf_stride;
-    buf_h = LV_CLAMP(1, buf_h, blend_h);
+    if(buf_h > blend_h) buf_h = blend_h;
     tmp_buf = lv_malloc(buf_stride * buf_h);
     LV_ASSERT_MALLOC(tmp_buf);
     if(!tmp_buf) {
@@ -496,19 +501,19 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
     if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
         uint32_t buf_stride = blend_w * 3;
         buf_h = MAX_BUF_SIZE / buf_stride;
-        buf_h = LV_CLAMP(1, buf_h, blend_h);
+        if(buf_h > blend_h) buf_h = blend_h;
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     else if(cf_final == LV_COLOR_FORMAT_AL88) {
         uint32_t buf_stride = blend_w;
         buf_h = MAX_BUF_SIZE / (buf_stride * 2);
-        buf_h = LV_CLAMP(1, buf_h, blend_h);
+        if(buf_h > blend_h) buf_h = blend_h;
         transformed_buf = lv_malloc(buf_stride * buf_h * 2);
     }
     else {
         uint32_t buf_stride = blend_w * lv_color_format_get_size(cf_final);
         buf_h = MAX_BUF_SIZE / buf_stride;
-        buf_h = LV_CLAMP(1, buf_h, blend_h);
+        if(buf_h > blend_h) buf_h = blend_h;
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     LV_ASSERT_MALLOC(transformed_buf);

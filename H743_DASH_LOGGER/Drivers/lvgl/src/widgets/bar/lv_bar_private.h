@@ -15,9 +15,9 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
+#include "lv_bar.h"
 
-#if LV_USE_BAR
+#if LV_USE_BAR != 0
 
 /*********************
  *      DEFINES

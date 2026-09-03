@@ -14,9 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
+#include "lv_monkey.h"
 
-#if LV_USE_MONKEY
+#if LV_USE_MONKEY != 0
 
 /*********************
  *      DEFINES

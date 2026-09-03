@@ -14,10 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
+#include "lv_roller.h"
 
-#if LV_USE_ROLLER
+#if LV_USE_ROLLER != 0
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES

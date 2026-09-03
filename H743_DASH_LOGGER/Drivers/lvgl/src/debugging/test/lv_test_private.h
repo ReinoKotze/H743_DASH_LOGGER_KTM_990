@@ -13,9 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
-
+#include "../../lv_conf_internal.h"
 #if LV_USE_TEST
+
+#include "../../misc/lv_types.h"
+#include "../../indev/lv_indev_gesture.h"
 
 /*********************
  *      DEFINES

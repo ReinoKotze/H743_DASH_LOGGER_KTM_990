@@ -4,7 +4,7 @@
  * @file lv_keyboard_properties.c
  */
 
-#include "../../lvgl_public.h"
+#include "../keyboard/lv_keyboard.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

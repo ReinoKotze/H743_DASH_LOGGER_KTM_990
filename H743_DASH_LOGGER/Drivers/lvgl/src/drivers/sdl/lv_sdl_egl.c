@@ -6,13 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_SDL_USE_EGL
 
 #include <SDL2/SDL_syswm.h>
 #include "lv_sdl_private.h"
 #include "../opengles/lv_opengles_egl_private.h"
+#include "../opengles/lv_opengles_driver.h"
+#include "../../draw/lv_draw_buf.h"
 
 /*********************
  *      DEFINES
@@ -77,9 +79,7 @@ static lv_result_t init_display(lv_display_t * display)
     }
     ddata->egl_ctx = lv_opengles_egl_context_create(&ifc);
     if(!ddata->egl_ctx) {
-        LV_LOG_ERROR("Failed to initialize EGL context.");
-        LV_LOG_ERROR("This probably means you're trying to use an unsupported SDL_VIDEO_DRIVER.");
-        LV_LOG_ERROR("Try setting SDL_VIDEODRIVER=x11 via an environment variable");
+        LV_LOG_ERROR("Failed to initialize EGL context");
         lv_free(ddata);
         return LV_RESULT_INVALID;
     }
@@ -117,7 +117,7 @@ static lv_result_t resize_display(lv_display_t * display)
     }
 
     lv_sdl_egl_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
-    LV_ASSERT(ddata != NULL);
+    LV_ASSERT_NULL(ddata);
 
     int32_t hor_res = lv_sdl_window_get_horizontal_resolution(display);
     int32_t ver_res = lv_sdl_window_get_vertical_resolution(display);
@@ -161,26 +161,19 @@ static void * create_window_cb(void * driver_data, const lv_egl_native_window_pr
     lv_display_t * display = (lv_display_t *)driver_data;
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
-    if(SDL_GetWindowWMInfo(lv_sdl_window_get_window(display), &wmInfo) != SDL_TRUE) {
-        LV_LOG_ERROR("SDL_GetWindowWMInfo failed: %s", SDL_GetError());
-        return NULL;
-    }
+    SDL_GetWindowWMInfo(lv_sdl_window_get_window(display), &wmInfo);
 
     EGLNativeWindowType native_window;
-    const char * driver = SDL_GetCurrentVideoDriver();
-
-    if(driver && strcmp(driver, "x11") == 0) {
-#if defined(SDL_VIDEO_DRIVER_X11)
-        native_window = (EGLNativeWindowType)wmInfo.info.x11.window;
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+    native_window = wmInfo.info.win.window;
+#elif defined(SDL_VIDEO_DRIVER_X11)
+    native_window = wmInfo.info.x11.window;
+#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
+    native_window = wmInfo.info.wl.surface;
 #else
-        LV_LOG_ERROR("SDL built without X11 support");
-        return NULL;
+    LV_LOG_ERROR("Unsupported platform for EGL");
+    return NULL;
 #endif
-    }
-    else {
-        LV_LOG_ERROR("Unsupported SDL video driver: (%s)", driver ? driver : "(null)");
-        return NULL;
-    }
     return (void *)native_window;
 }
 
@@ -190,14 +183,14 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
     LV_UNUSED(area);
     LV_UNUSED(px_map);
     lv_sdl_egl_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
-    LV_ASSERT(ddata != NULL);
+    LV_ASSERT_NULL(ddata);
 
     if(lv_display_flush_is_last(display)) {
 #if LV_USE_DRAW_OPENGLES
         lv_opengles_viewport(0, 0,
                              lv_display_get_original_horizontal_resolution(display),
                              lv_display_get_original_vertical_resolution(display));
-        lv_opengles_render_display_texture_internal(display, false, true);
+        lv_opengles_render_display_texture(display, false, true);
 #endif /*LV_USE_DRAW_OPENGLES*/
         lv_opengles_egl_update(ddata->egl_ctx);
     }

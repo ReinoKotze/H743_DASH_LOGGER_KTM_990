@@ -6,10 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_font_private.h"
+#include "../lv_font.h"
 #include "lv_font_fmt_txt_private.h"
 #include "../../core/lv_global.h"
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_types.h"
+#include "../../misc/lv_log.h"
 #include "../../misc/lv_utils.h"
+#include "../../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES
@@ -85,14 +89,9 @@ const lv_font_class_t lv_builtin_font_class = {
 
 const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
-    /* TODO: We can't add an arg check here because this is used in a hot path for all fonts stored as a C array
-     * changing this will mean also changing the font converter so for now these assertions are an exception */
-    LV_ASSERT(g_dsc != NULL);
-
     const lv_font_t * font = g_dsc->resolved_font;
-    LV_ASSERT(font != NULL);
+
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    LV_ASSERT(fdsc != NULL);
     uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
@@ -100,7 +99,6 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
     if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
 
-    LV_ASSERT(draw_buf != NULL);
     uint8_t * bitmap_out = draw_buf->data;
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
@@ -224,17 +222,12 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
-    /* TODO: We can't add an arg check here because this is used in a hot path for all fonts stored as a C array
-     * changing this will mean also changing the font converter so for now these assertions are an exception */
-    LV_ASSERT(font != NULL);
-    LV_ASSERT(dsc_out != NULL);
     /*It fixes a strange compiler optimization issue: https://github.com/lvgl/lvgl/issues/4370*/
     bool is_tab = unicode_letter == '\t';
     if(is_tab) {
         unicode_letter = ' ';
     }
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    LV_ASSERT(fdsc != NULL);
     uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
     if(!gid) return false;
 
@@ -254,7 +247,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     uint32_t adv_w = gdsc->adv_w;
     if(is_tab) adv_w *= 2;
 
-    adv_w = (uint32_t)LV_CLAMP(0, (int32_t)adv_w + kv, INT32_MAX);
+    adv_w += kv;
     adv_w  = (adv_w + (1 << 3)) >> 4;
 
     dsc_out->adv_w = adv_w;
@@ -289,7 +282,6 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
 
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 {
-    LV_ASSERT(font != NULL);
     if(letter == '\0') return 0;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
@@ -343,9 +335,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
 static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right)
 {
-    LV_ASSERT(font != NULL);
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    LV_ASSERT(fdsc != NULL);
 
     int8_t value = 0;
 
@@ -401,8 +391,6 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 
 static int kern_pair_8_compare(const void * ref, const void * element)
 {
-    LV_ASSERT(ref != NULL);
-    LV_ASSERT(element != NULL);
     const kern_pair_ref_t * ref8_p = ref;
     const uint8_t * element8_p = element;
 
@@ -413,8 +401,6 @@ static int kern_pair_8_compare(const void * ref, const void * element)
 
 static int kern_pair_16_compare(const void * ref, const void * element)
 {
-    LV_ASSERT(ref != NULL);
-    LV_ASSERT(element != NULL);
     const kern_pair_ref_t * ref16_p = ref;
     const uint16_t * element16_p = element;
 
@@ -429,15 +415,12 @@ static int kern_pair_16_compare(const void * ref, const void * element)
  * The compress a glyph's bitmap
  * @param in the compressed bitmap
  * @param out buffer to store the result
- * @param w width of the glyph in pixels
- * @param h height of the glyph in pixels
+ * @param px_num number of pixels in the glyph (width * height)
  * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
  * @param prefilter true: the lines are XORed
  */
 static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter)
 {
-    LV_ASSERT(in != NULL);
-    LV_ASSERT(out != NULL);
     const lv_opa_t * opa_table;
     switch(bpp) {
         case 2:
@@ -505,7 +488,6 @@ static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, 
  */
 static inline void decompress_line(uint8_t * out, int32_t w)
 {
-    LV_ASSERT(out != NULL);
     int32_t i;
     for(i = 0; i < w; i++) {
         out[i] = rle_next();
@@ -521,7 +503,6 @@ static inline void decompress_line(uint8_t * out, int32_t w)
  */
 static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len)
 {
-    LV_ASSERT(in != NULL);
     uint8_t bit_mask;
     switch(len) {
         case 1:
@@ -557,7 +538,6 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
 
 static inline void rle_init(const uint8_t * in,  uint8_t bpp)
 {
-    LV_ASSERT(in != NULL);
     lv_font_fmt_rle_t * rle = &font_rle;
     rle->in = in;
     rle->bpp = bpp;
@@ -630,8 +610,8 @@ static inline uint8_t rle_next(void)
  *
  *  Compares the value of both input arguments.
  *
- *  @param[in]  ref         Pointer to the reference.
- *  @param[in]  element     Pointer to the element to compare.
+ *  @param[in]  pRef        Pointer to the reference.
+ *  @param[in]  pElement    Pointer to the element to compare.
  *
  *  @return Result of comparison.
  *  @retval < 0   Reference is less than element.
@@ -641,15 +621,11 @@ static inline uint8_t rle_next(void)
  */
 static int unicode_list_compare(const void * ref, const void * element)
 {
-    LV_ASSERT(ref != NULL);
-    LV_ASSERT(element != NULL);
     return (*(uint16_t *)ref) - (*(uint16_t *)element);
 }
 
 static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const void * src)
 {
-    LV_ASSERT(info != NULL);
-    LV_ASSERT(src != NULL);
     const lv_builtin_font_src_t * font_src = src;
 
     /**
@@ -675,7 +651,6 @@ static void builtin_font_delete_cb(lv_font_t * font)
 
 static void * builtin_font_dup_src_cb(const void * src)
 {
-    LV_ASSERT(src != NULL);
     const lv_builtin_font_src_t * font_src = src;
     uint32_t len = 0;
 

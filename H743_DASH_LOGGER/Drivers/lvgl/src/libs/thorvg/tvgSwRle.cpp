@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
 
 /*
@@ -970,7 +970,7 @@ SwRle* rleRender(SwRle* rle, const SwOutline* outline, const SwBBox& renderRegio
     return rw.rle;
 
 error:
-    rleFree(rw.rle);
+    lv_free(rw.rle);
     return nullptr;
 }
 

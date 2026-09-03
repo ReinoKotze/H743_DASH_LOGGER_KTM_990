@@ -6,8 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "../lvgl_public.h"
+#include "lv_palette.h"
 
 /*********************
  *      DEFINES

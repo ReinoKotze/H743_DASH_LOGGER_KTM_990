@@ -7,9 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "lv_uefi_private.h"
+#include "../../lvgl.h"
 
 #if LV_USE_UEFI
+
+#include "lv_uefi_display.h"
+#include "lv_uefi_private.h"
 
 #if LV_COLOR_DEPTH != 32
     #error [lv_uefi] Unsupported LV_COLOR_DEPTH.
@@ -65,7 +68,6 @@ static EFI_GUID _uefi_guid_edid_active = EFI_EDID_ACTIVE_PROTOCOL_GUID;
  */
 lv_display_t * lv_uefi_display_create(void * handle)
 {
-    LV_CHECK_ARG(handle != NULL, return NULL);
     lv_display_t * display = NULL;
     lv_uefi_display_context_t * display_ctx;
 
@@ -211,7 +213,7 @@ static void _display_flush_cb(lv_display_t * display, const lv_area_t * area, ui
     int32_t h;
 
     lv_uefi_display_context_t * display_ctx = (lv_uefi_display_context_t *)lv_display_get_user_data(display);
-    LV_ASSERT(display_ctx != NULL);
+    LV_ASSERT_NULL(display_ctx);
 
     w = (int32_t)area->x2 - (int32_t)area->x1 + 1;
     h = (int32_t)area->y2 - (int32_t)area->y1 + 1;
@@ -226,7 +228,7 @@ static void _display_flush_cb(lv_display_t * display, const lv_area_t * area, ui
         goto error;
     }
 
-    if((uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->VerticalResolution) {
+    if((uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
         LV_LOG_ERROR("[lv_uefi] Invalid lv_display_flush_cb call (invalid height).");
         goto error;
     }

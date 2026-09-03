@@ -21,7 +21,7 @@
  *********************/
 
 
-static bool compose_error = false;
+//static bool compose_error = false;
 
 static HAL_StatusTypeDef LCD_DMA2D_CopyArea(const lv_area_t *area, const uint8_t *px_map);
 volatile HAL_StatusTypeDef lcd_dma2d_status = HAL_OK;
@@ -33,7 +33,7 @@ static uint8_t * const buf_2_2 = (uint8_t *)LVGL_SDRAM_BUF2_ADDRESS;
 
 static uint8_t * const buf3 = (uint8_t *)DMA2D_SDRAM_BUF3_ADDRESS;
 
-//static bool te_wait_done = false;
+static bool te_wait_done = false;
 
 /**********************
  *      TYPEDEFS
@@ -209,7 +209,7 @@ static void disp_flush(lv_display_t *disp_drv,const lv_area_t *area,uint8_t *px_
 
 
 
-
+	//LCD_WaitForTE(2);
 
 
     if(disp_flush_enabled)
@@ -218,7 +218,7 @@ static void disp_flush(lv_display_t *disp_drv,const lv_area_t *area,uint8_t *px_
     }
 
     lv_display_flush_ready(disp_drv);
-
+    //TEFLAG=1U;
 }
 
 

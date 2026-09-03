@@ -16,6 +16,7 @@
 
 #include "../lv_draw_private.h"
 #include "../lv_draw_label_private.h"
+#include "../lv_draw_rect.h"
 #include "lv_eve.h"
 
 /*********************

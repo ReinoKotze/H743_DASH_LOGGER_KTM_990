@@ -36,7 +36,7 @@
  **********************/
 static lv_obj_t * ctrl;
 static lv_obj_t * list;
-static int32_t music_height;
+static uint32_t music_height;
 
 static const char * title_list[] = {
     "Waiting for true love",

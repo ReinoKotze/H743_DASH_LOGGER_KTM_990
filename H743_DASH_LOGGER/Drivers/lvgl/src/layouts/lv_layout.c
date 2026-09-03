@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-
+#include "lv_layout.h"
 #include "lv_layout_private.h"
 #include "../core/lv_global.h"
 
@@ -68,17 +68,17 @@ uint32_t lv_layout_create(lv_layout_callbacks_t callbacks, void * user_data)
 
 uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
 {
-    LV_CHECK_ARG(cb != NULL, return 0);
-
-    LV_LOG_DEPRECATED("`lv_layout_register` is deprecated and replaced by `lv_layout_create`.");
+    static bool warned = false;
+    if(!warned) {
+        LV_LOG_WARN("`lv_layout_register` is deprecated and replaced by `lv_layout_create`.");
+        warned = true;
+    }
     lv_layout_callbacks_t cbs = {.layout_update_cb  = cb, . get_min_size_cb = NULL};
     return lv_layout_create(cbs, user_data);
 }
 
 bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
 {
-    LV_ASSERT(obj != NULL);
-    LV_ASSERT(size != NULL);
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id < layout_cnt) {
         void * user_data = layout_list_def[layout_id].user_data;
@@ -91,7 +91,6 @@ bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
 
 void lv_layout_apply(lv_obj_t * obj)
 {
-    LV_ASSERT(obj != NULL);
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id < layout_cnt) {
         void  * user_data = layout_list_def[layout_id].user_data;

@@ -15,9 +15,9 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
+#include "lv_dropdown.h"
 
-#if LV_USE_DROPDOWN
+#if LV_USE_DROPDOWN != 0
 
 /*********************
  *      DEFINES

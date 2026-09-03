@@ -6,9 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl_public.h"
+#include "lv_gridnav.h"
 #if LV_USE_GRIDNAV
 
+#include "../misc/lv_assert.h"
+#include "../misc/lv_math.h"
+#include "../indev/lv_indev.h"
 #include "../core/lv_obj_private.h"
 
 /*********************
@@ -59,8 +62,6 @@ static int32_t get_y_center(lv_obj_t * obj);
 
 void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-
     lv_gridnav_remove(obj); /*Be sure to not add gridnav twice*/
 
     lv_gridnav_dsc_t * dsc = lv_malloc(sizeof(lv_gridnav_dsc_t));
@@ -69,13 +70,11 @@ void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl)
     dsc->focused_obj = NULL;
     lv_obj_add_event_cb(obj, gridnav_event_cb, LV_EVENT_ALL, dsc);
 
-    lv_obj_set_scroll_with_arrow(obj, false);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
 }
 
 void lv_gridnav_remove(lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-
     lv_event_dsc_t * event_dsc = NULL;
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t i;
@@ -92,8 +91,7 @@ void lv_gridnav_remove(lv_obj_t * obj)
 
 void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable_t anim_en)
 {
-    LV_CHECK_ARG(cont != NULL, return);
-    LV_CHECK_ARG(to_focus != NULL, return);
+    LV_ASSERT_NULL(to_focus);
 
     uint32_t i;
     uint32_t event_cnt = lv_obj_get_event_count(cont);
@@ -132,11 +130,8 @@ void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable
 
 static void gridnav_event_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_current_target(e);
     lv_gridnav_dsc_t * dsc = lv_event_get_user_data(e);
-    LV_ASSERT(obj != NULL);
-    LV_ASSERT(dsc != NULL);
     lv_event_code_t code = lv_event_get_code(e);
 
     if(code == LV_EVENT_KEY) {
@@ -150,7 +145,7 @@ static void gridnav_event_cb(lv_event_t * e)
         lv_obj_t * guess = NULL;
 
         if(key == LV_KEY_RIGHT && !(dsc->ctrl & LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY)) {
-            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_is_scrollable(dsc->focused_obj) &&
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_right(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_width(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
@@ -170,7 +165,7 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
         else if(key == LV_KEY_LEFT && !(dsc->ctrl & LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY)) {
-            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_is_scrollable(dsc->focused_obj) &&
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_left(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_width(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
@@ -190,7 +185,7 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
         else if(key == LV_KEY_DOWN && !(dsc->ctrl & LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY)) {
-            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_is_scrollable(dsc->focused_obj) &&
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_bottom(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_height(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
@@ -209,7 +204,7 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
         else if(key == LV_KEY_UP && !(dsc->ctrl & LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY)) {
-            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_is_scrollable(dsc->focused_obj) &&
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_top(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_height(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
@@ -294,8 +289,6 @@ static void gridnav_event_cb(lv_event_t * e)
 
 static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t mode)
 {
-    LV_ASSERT(obj != NULL);
-    LV_ASSERT(start_child != NULL);
     int32_t x_start = get_x_center(start_child);
     int32_t y_start = get_y_center(start_child);
     uint32_t child_cnt = lv_obj_get_child_count(obj);
@@ -366,7 +359,6 @@ static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t 
 
 static lv_obj_t * find_first_focusable(lv_obj_t * obj)
 {
-    LV_ASSERT(obj != NULL);
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     uint32_t i;
     for(i = 0; i < child_cnt; i++) {
@@ -379,7 +371,6 @@ static lv_obj_t * find_first_focusable(lv_obj_t * obj)
 
 static lv_obj_t * find_last_focusable(lv_obj_t * obj)
 {
-    LV_ASSERT(obj != NULL);
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     int32_t i;
     for(i = child_cnt - 1; i >= 0; i--) {
@@ -391,21 +382,18 @@ static lv_obj_t * find_last_focusable(lv_obj_t * obj)
 
 static bool obj_is_focusable(lv_obj_t * obj)
 {
-    LV_ASSERT(obj != NULL);
-    if(lv_obj_is_hidden(obj)) return false;
-
-    return lv_obj_is_clickable(obj) && lv_obj_is_click_focusable(obj);
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE)) return true;
+    else return false;
 }
 
 static int32_t get_x_center(lv_obj_t * obj)
 {
-    LV_ASSERT(obj != NULL);
     return obj->coords.x1 + lv_area_get_width(&obj->coords) / 2;
 }
 
 static int32_t get_y_center(lv_obj_t * obj)
 {
-    LV_ASSERT(obj != NULL);
     return obj->coords.y1 + lv_area_get_height(&obj->coords) / 2;
 }
 

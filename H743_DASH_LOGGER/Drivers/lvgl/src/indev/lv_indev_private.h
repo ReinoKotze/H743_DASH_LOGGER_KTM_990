@@ -13,9 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl_public.h"
+#include "../misc/lv_ext_data.h"
+#include "lv_indev.h"
+#include "../misc/lv_anim.h"
 #include "lv_indev_scroll.h"
-#include "../misc/lv_event_private.h"
+#include "lv_indev_gesture.h"
 
 /*********************
  *      DEFINES
@@ -75,9 +77,6 @@ struct _lv_indev_t {
     /**< Long press time in milliseconds*/
     uint16_t long_press_time;
 
-    /**< Maximum time to detect double clicks in milliseconds*/
-    uint16_t double_click_time;
-
     /**< Repeated trigger period in long press [ms]*/
     uint16_t long_press_repeat_time;
 
@@ -113,7 +112,6 @@ struct _lv_indev_t {
         uint8_t gesture_sent : 1;
         uint8_t press_moved : 1;
         uint8_t pressed : 1;
-        uint8_t ccw_rotation : 1;
     } pointer;
     struct {
         /*Keypad data*/

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
+#include "../../misc/lv_types.h"
 
 #if LV_USE_DRAW_NANOVG
 

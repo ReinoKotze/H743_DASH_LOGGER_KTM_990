@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
+#include "lv_test.h"
 #if LV_USE_TEST && LV_USE_GESTURE_RECOGNITION
 
 #include "../../core/lv_global.h"

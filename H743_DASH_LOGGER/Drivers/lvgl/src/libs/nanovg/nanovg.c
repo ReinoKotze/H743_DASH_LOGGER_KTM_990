@@ -16,11 +16,14 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_NANOVG
 
 #include <math.h>
+#include "../../stdlib/lv_mem.h"
+#include "../../stdlib/lv_string.h"
+#include "../../misc/lv_log.h"
 
 #include "nanovg.h"
 

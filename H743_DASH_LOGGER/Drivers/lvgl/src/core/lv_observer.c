@@ -10,9 +10,10 @@
 #include "lv_observer_private.h"
 #if LV_USE_OBSERVER
 
-#include "../lvgl_public.h"
+#include "../lvgl.h"
 #include "../core/lv_obj_private.h"
 #include "../misc/lv_event_private.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -93,7 +94,10 @@ static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 #if LV_USE_EXT_DATA
 void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
 {
-    LV_CHECK_ARG(subject != NULL, return);
+    if(!subject) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL subject");
+        return;
+    }
 
     subject->ext_data.data = data;
     subject->ext_data.free_cb = free_cb;
@@ -102,8 +106,6 @@ void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* f
 
 void lv_subject_init_int(lv_subject_t * subject, int32_t value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-
     lv_memzero(subject, sizeof(lv_subject_t));
     subject->type = LV_SUBJECT_TYPE_INT;
     subject->value.num = value;
@@ -115,8 +117,10 @@ void lv_subject_init_int(lv_subject_t * subject, int32_t value)
 
 void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return);
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        return;
+    }
 
     value = LV_CLAMP(subject->min_value.num, value, subject->max_value.num);
 
@@ -127,32 +131,40 @@ void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 
 int32_t lv_subject_get_int(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return 0);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return 0);
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        return 0;
+    }
 
     return subject->value.num;
 }
 
 int32_t lv_subject_get_previous_int(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return 0);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return 0);
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        return 0;
+    }
 
     return subject->prev_value.num;
 }
 
 void lv_subject_set_min_value_int(lv_subject_t * subject, int32_t min_value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return);
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        return;
+    }
 
     subject->min_value.num = min_value;
 }
 
 void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return);
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        return;
+    }
 
     subject->max_value.num = max_value;
 }
@@ -161,8 +173,6 @@ void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value)
 
 void lv_subject_init_float(lv_subject_t * subject, float value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-
     lv_memzero(subject, sizeof(lv_subject_t));
     subject->type = LV_SUBJECT_TYPE_FLOAT;
     subject->value.float_v = value;
@@ -174,8 +184,10 @@ void lv_subject_init_float(lv_subject_t * subject, float value)
 
 void lv_subject_set_float(lv_subject_t * subject, float value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return);
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return;
+    }
 
     value = LV_CLAMP(subject->min_value.float_v, value, subject->max_value.float_v);
 
@@ -186,32 +198,40 @@ void lv_subject_set_float(lv_subject_t * subject, float value)
 
 float lv_subject_get_float(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return 0.0);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return 0.0);
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return 0;
+    }
 
     return subject->value.float_v;
 }
 
 float lv_subject_get_previous_float(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return 0.0);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return 0.0);
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return 0;
+    }
 
     return subject->prev_value.float_v;
 }
 
 void lv_subject_set_min_value_float(lv_subject_t * subject, float min_value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return);
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return;
+    }
 
     subject->min_value.float_v = min_value;
 }
 
 void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return);
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return;
+    }
 
     subject->max_value.float_v = max_value;
 }
@@ -221,11 +241,6 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value)
 
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(buf != NULL, return);
-    LV_CHECK_ARG(size > 0, return);
-    LV_CHECK_ARG(value != NULL, return);
-
     lv_memzero(subject, sizeof(lv_subject_t));
     lv_strlcpy(buf, value, size);
     if(prev_buf) lv_strlcpy(prev_buf, value, size);
@@ -240,11 +255,12 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
 
 void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
-    LV_CHECK_ARG(buf != NULL, return);
+    if(subject->type != LV_SUBJECT_TYPE_STRING) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_STRING");
+        return;
+    }
 
-    if(subject->size == 0) return;
+    if(subject->size < 1) return;
     if(subject->prev_value.pointer) {
         lv_strlcpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size);
     }
@@ -256,9 +272,10 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 
 void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
-    LV_CHECK_ARG(format != NULL, return);
+    if(subject->type != LV_SUBJECT_TYPE_STRING) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_STRING");
+        return;
+    }
 
     if(subject->size < 1U) return;
 
@@ -277,24 +294,26 @@ void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
 
 const char * lv_subject_get_string(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return NULL);
+    if(subject->type != LV_SUBJECT_TYPE_STRING) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_STRING");
+        return "";
+    }
 
     return subject->value.pointer;
 }
 
 const char * lv_subject_get_previous_string(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return NULL);
+    if(subject->type != LV_SUBJECT_TYPE_STRING) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_STRING");
+        return NULL;
+    }
 
     return subject->prev_value.pointer;
 }
 
 void lv_subject_init_pointer(lv_subject_t * subject, void * value)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-
     lv_memzero(subject, sizeof(lv_subject_t));
     subject->type = LV_SUBJECT_TYPE_POINTER;
     subject->value.pointer = value;
@@ -304,8 +323,10 @@ void lv_subject_init_pointer(lv_subject_t * subject, void * value)
 
 void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_POINTER, return);
+    if(subject->type != LV_SUBJECT_TYPE_POINTER) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_POINTER");
+        return;
+    }
 
     subject->prev_value.pointer = subject->value.pointer;
     subject->value.pointer = ptr;
@@ -314,25 +335,26 @@ void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)
 
 const void * lv_subject_get_pointer(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_POINTER, return NULL);
-
+    if(subject->type != LV_SUBJECT_TYPE_POINTER) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_POINTER");
+        return NULL;
+    }
 
     return subject->value.pointer;
 }
 
 const void * lv_subject_get_previous_pointer(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_POINTER, return NULL);
+    if(subject->type != LV_SUBJECT_TYPE_POINTER) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_POINTER");
+        return NULL;
+    }
 
     return subject->prev_value.pointer;
 }
 
 void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-
     lv_memzero(subject, sizeof(lv_subject_t));
     subject->type = LV_SUBJECT_TYPE_COLOR;
     subject->value.color = color;
@@ -342,8 +364,10 @@ void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)
 
 void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
 {
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_COLOR, return);
+    if(subject->type != LV_SUBJECT_TYPE_COLOR) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_COLOR");
+        return;
+    }
 
     subject->prev_value.color = subject->value.color;
     subject->value.color = color;
@@ -352,25 +376,26 @@ void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
 
 lv_color_t lv_subject_get_color(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return lv_color_black());
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_COLOR, return lv_color_black());
+    if(subject->type != LV_SUBJECT_TYPE_COLOR) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_COLOR");
+        return lv_color_black();
+    }
 
     return subject->value.color;
 }
 
 lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return lv_color_black());
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_COLOR, return lv_color_black());
+    if(subject->type != LV_SUBJECT_TYPE_COLOR) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_COLOR");
+        return lv_color_black();
+    }
 
     return subject->prev_value.color;
 }
 
 void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len)
 {
-    LV_CHECK_ARG(group_subject != NULL, return);
-    LV_CHECK_ARG(list != NULL, return);
-
     group_subject->type = LV_SUBJECT_TYPE_GROUP;
     group_subject->size = list_len;
     lv_ll_init(&(group_subject->subs_ll), sizeof(lv_observer_t));
@@ -384,49 +409,49 @@ void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], 
     }
 }
 
-lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)
-{
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_GROUP, return NULL);
-    LV_CHECK_ARG(index >= 0 && index < subject->size, return NULL);
-
-    return ((lv_subject_t **)(subject->value.pointer))[index];
-}
-
 void lv_subject_deinit(lv_subject_t * subject)
 {
-    if(subject == NULL) return;
-
     lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {
         lv_observer_t * observer_next = lv_ll_get_next(&subject->subs_ll, observer);
 
-        lv_observer_delete(observer);
+        lv_observer_remove(observer);
         observer = observer_next;
     }
 
     lv_ll_clear(&subject->subs_ll);
 }
 
-lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t observer_cb, void * user_data)
+lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)
 {
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(observer_cb != NULL, return NULL);
+    if(subject->type != LV_SUBJECT_TYPE_GROUP) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_GROUP");
+        return NULL;
+    }
 
-    lv_observer_t * observer = lv_subject_add_observer_obj(subject, observer_cb, NULL, user_data);
+    if(index >= (int32_t)subject->size)  return NULL;
+    if(index < 0)  return NULL;
+
+    return ((lv_subject_t **)(subject->value.pointer))[index];
+}
+
+lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data)
+{
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, cb, NULL, user_data);
     if(observer == NULL) return NULL;
 
     observer->for_obj = 0;
     return observer;
 }
 
-lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t observer_cb, lv_obj_t * obj,
+lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t cb, lv_obj_t * obj,
                                             void * user_data)
 {
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(observer_cb != NULL, return NULL);
-    LV_CHECK_ARG(subject->type != LV_SUBJECT_TYPE_INVALID, return NULL);
-
+    LV_ASSERT_NULL(subject);
+    if(subject->type == LV_SUBJECT_TYPE_INVALID) {
+        LV_LOG_WARN("Subject not initialized yet");
+        return NULL;
+    }
     lv_observer_t * observer = lv_ll_ins_tail(&(subject->subs_ll));
     LV_ASSERT_MALLOC(observer);
     if(observer == NULL) return NULL;
@@ -434,7 +459,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     lv_memzero(observer, sizeof(*observer));
 
     observer->subject = subject;
-    observer->cb = observer_cb;
+    observer->cb = cb;
     observer->user_data = user_data;
     observer->target = obj;
     observer->for_obj = 1;
@@ -444,18 +469,19 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     }
 
     /* Update Observer immediately. */
-    observer->cb(observer, subject);
+    if(observer->cb) observer->cb(observer, subject);
 
     return observer;
 }
 
-lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t observer_cb, void * target,
+lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t cb, void * target,
                                                     void * user_data)
 {
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(observer_cb != NULL, return NULL);
-    LV_CHECK_ARG(subject->type != LV_SUBJECT_TYPE_INVALID, return NULL);
-
+    LV_ASSERT_NULL(subject);
+    if(subject->type == LV_SUBJECT_TYPE_INVALID) {
+        LV_LOG_WARN("Subject not initialized yet");
+        return NULL;
+    }
     lv_observer_t * observer = lv_ll_ins_tail(&(subject->subs_ll));
     LV_ASSERT_MALLOC(observer);
     if(observer == NULL) return NULL;
@@ -463,7 +489,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     lv_memzero(observer, sizeof(*observer));
 
     observer->subject = subject;
-    observer->cb = observer_cb;
+    observer->cb = cb;
     observer->user_data = user_data;
     observer->target = target;
 
@@ -474,9 +500,9 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 }
 
 
-void lv_observer_delete(lv_observer_t * observer)
+void lv_observer_remove(lv_observer_t * observer)
 {
-    if(observer == NULL) return;
+    LV_ASSERT_NULL(observer);
 
     if(observer->for_obj && observer->target) {
         lv_obj_remove_event_cb_with_user_data(observer->target, unsubscribe_on_delete_cb, observer);
@@ -502,9 +528,7 @@ void lv_observer_delete(lv_observer_t * observer)
 
 void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-    /* subject == NULL is documented as valid: remove from ALL subjects */
-
+    LV_ASSERT_NULL(obj);
     /*
      * Look for the `observer` that connects `obj` and `subject`
      * Since the obj is associated with the subject,
@@ -519,8 +543,8 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
         if(event_dsc->cb == unsubscribe_on_delete_cb) {
             lv_observer_t * observer = event_dsc->user_data;
             if(subject == NULL || subject == observer->subject) {
-                /* lv_observer_delete handles the deletion of all possible event callbacks */
-                lv_observer_delete(observer);
+                /* lv_observer_remove handles the deletion of all possible event callbacks */
+                lv_observer_remove(observer);
             }
         }
     }
@@ -533,14 +557,14 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 
 void * lv_observer_get_target(lv_observer_t * observer)
 {
-    LV_CHECK_ARG(observer != NULL, return NULL);
+    LV_ASSERT_NULL(observer);
 
     return observer->target;
 }
 
 void lv_subject_notify(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return);
+    LV_ASSERT_NULL(subject);
 
     lv_observer_t * observer;
     LV_LL_READ(&(subject->subs_ll), observer) {
@@ -562,9 +586,10 @@ void lv_subject_notify(lv_subject_t * subject)
 lv_subject_increment_dsc_t * lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject,
                                                                 lv_event_code_t trigger, int32_t step)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT, return NULL);
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type must be `int` or `float` (was %d)", subject->type);
+        return NULL;
+    }
 
     lv_subject_increment_dsc_t * user_data = lv_malloc(sizeof(lv_subject_increment_dsc_t));
     if(user_data == NULL) {
@@ -587,8 +612,11 @@ lv_subject_increment_dsc_t * lv_obj_add_subject_increment_event(lv_obj_t * obj, 
 void lv_obj_set_subject_increment_event_min_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t min_value)
 {
     LV_UNUSED(obj);
-    LV_CHECK_OBJ(obj, &lv_obj_class, return);
-    LV_CHECK_ARG(dsc != NULL, return);
+    LV_ASSERT_NULL(dsc);
+    if(dsc == NULL) {
+        LV_LOG_WARN("Invalid parameters");
+        return;
+    }
 
     dsc->min_value = min_value;
     if(dsc->subject->type == LV_SUBJECT_TYPE_INT) {
@@ -608,8 +636,12 @@ void lv_obj_set_subject_increment_event_min_value(lv_obj_t * obj, lv_subject_inc
 void lv_obj_set_subject_increment_event_max_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t max_value)
 {
     LV_UNUSED(obj);
-    LV_CHECK_OBJ(obj, &lv_obj_class, return);
-    LV_CHECK_ARG(dsc != NULL, return);
+    LV_ASSERT_NULL(dsc);
+    if(dsc == NULL) {
+        LV_LOG_WARN("Invalid parameters");
+        return;
+    }
+
 
     dsc->max_value = max_value;
     if(dsc->subject->type == LV_SUBJECT_TYPE_INT) {
@@ -629,26 +661,30 @@ void lv_obj_set_subject_increment_event_max_value(lv_obj_t * obj, lv_subject_inc
 void lv_obj_set_subject_increment_event_rollover(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, bool rollover)
 {
     LV_UNUSED(obj);
-    LV_CHECK_OBJ(obj, &lv_obj_class, return);
-    LV_CHECK_ARG(dsc != NULL, return);
+    LV_ASSERT_NULL(dsc);
+    if(dsc == NULL) {
+        LV_LOG_WARN("Invalid parameters");
+        return;
+    }
 
     dsc->rollover = rollover;
 }
 
 void lv_obj_add_subject_toggle_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return);
-
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type must be `int` (was %d)", subject->type);
+        return;
+    }
     lv_obj_add_event_cb(obj, subject_toggle_cb, trigger, subject);
 }
 
 void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return);
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type must be `int` (was %d)", subject->type);
+        return;
+    }
 
     subject_set_int_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
     if(user_data == NULL) {
@@ -667,9 +703,10 @@ void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv
 #if LV_USE_FLOAT
 void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, float value)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return);
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type must be `float` (was %d)", subject->type);
+        return;
+    }
 
     subject_set_float_user_data_t * user_data = lv_malloc(sizeof(subject_set_float_user_data_t));
     if(user_data == NULL) {
@@ -689,12 +726,13 @@ void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, 
 void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
                                          const char * value)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
-    LV_CHECK_ARG(value != NULL, return);
 
-    subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_string_user_data_t));
+    if(subject->type != LV_SUBJECT_TYPE_STRING) {
+        LV_LOG_WARN("Subject type must be `string` (was %d)", subject->type);
+        return;
+    }
+
+    subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
     if(user_data == NULL) {
         LV_ASSERT_MALLOC(user_data);
         LV_LOG_WARN("Couldn't allocate user_data");
@@ -703,12 +741,7 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
 
     user_data->subject = subject;
     user_data->value = lv_strdup(value);
-    if(user_data->value == NULL) {
-        LV_ASSERT_MALLOC(user_data->value);
-        LV_LOG_WARN("Couldn't allocate string value");
-        lv_free(user_data);
-        return;
-    }
+    LV_ASSERT_MALLOC(user_data->value);
 
     lv_obj_add_event_cb(obj, subject_set_string_cb, trigger, user_data);
     lv_obj_add_event_cb(obj, subject_set_string_free_user_data_event_cb, LV_EVENT_DELETE, user_data);
@@ -717,10 +750,6 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
 
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_EQ);
     return observable;
 }
@@ -728,18 +757,11 @@ lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, l
 lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag,
                                            int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_EQ);
     return observable;
 }
 lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
 
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_GT);
     return observable;
@@ -747,9 +769,6 @@ lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, l
 
 lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
 
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_GE);
     return observable;
@@ -757,10 +776,6 @@ lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, l
 
 lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     /* a < b == !(a >= b) */
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_GE);
     return observable;
@@ -768,10 +783,6 @@ lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, l
 
 lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     /* a <= b == !(a > b) */
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_GT);
     return observable;
@@ -780,22 +791,13 @@ lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, l
 
 lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
                                                   FLAG_COND_EQ);
     return observable;
 }
 
-lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state,
-                                            int32_t ref_value)
+lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
                                                   FLAG_COND_EQ);
     return observable;
@@ -803,9 +805,6 @@ lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subje
 
 lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
 
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
                                                   FLAG_COND_GT);
@@ -814,10 +813,6 @@ lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, 
 
 lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
                                                   FLAG_COND_GE);
     return observable;
@@ -825,10 +820,6 @@ lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, 
 
 lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     /* a < b == !(a >= b) */
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
                                                   FLAG_COND_GE);
@@ -838,9 +829,6 @@ lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, 
 
 lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
 
     /* a <= b == !(a > b) */
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
@@ -851,10 +839,6 @@ lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, 
 
 lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
-
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 0, true,
                                                   FLAG_COND_EQ);
 
@@ -866,30 +850,13 @@ lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 
 lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
 {
-    LV_CHECK_ARG(observer != NULL, return NULL);
-
     return (lv_obj_t *)lv_observer_get_target(observer);
 }
 
 void * lv_observer_get_user_data(const lv_observer_t * observer)
 {
-    LV_CHECK_ARG(observer != NULL, return NULL);
-
+    LV_ASSERT_NULL(observer);
     return observer->user_data;
-}
-
-void lv_observer_set_user_data(lv_observer_t * observer, void * user_data)
-{
-    LV_CHECK_ARG(observer != NULL, return);
-
-    /* Release internally-owned data only when replacing it. */
-    if(observer->auto_free_user_data && observer->user_data != user_data) {
-        lv_free(observer->user_data);
-    }
-
-    /* Data assigned through the public setter is always caller-owned. */
-    observer->user_data = user_data;
-    observer->auto_free_user_data = 0;
 }
 
 /**********************
@@ -898,7 +865,6 @@ void lv_observer_set_user_data(lv_observer_t * observer, void * user_data)
 
 static void subject_toggle_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     lv_subject_t * subject = lv_event_get_user_data(e);
     int32_t v = lv_subject_get_int(subject);
     v = !v;
@@ -908,7 +874,6 @@ static void subject_toggle_cb(lv_event_t * e)
 
 static void subject_set_int_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     subject_set_int_user_data_t * user_data = lv_event_get_user_data(e);
     lv_subject_set_int(user_data->subject, user_data->value);
 }
@@ -917,7 +882,6 @@ static void subject_set_int_cb(lv_event_t * e)
 #if LV_USE_FLOAT
 static void subject_set_float_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     subject_set_float_user_data_t * user_data = lv_event_get_user_data(e);
     lv_subject_set_float(user_data->subject, user_data->value);
 }
@@ -925,14 +889,12 @@ static void subject_set_float_cb(lv_event_t * e)
 
 static void subject_set_string_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
     lv_subject_copy_string(user_data->subject, user_data->value);
 }
 
 static void subject_increment_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     lv_subject_increment_dsc_t * user_data = lv_event_get_user_data(e);
 
     if(user_data->subject->type == LV_SUBJECT_TYPE_INT) {
@@ -986,7 +948,6 @@ static void subject_increment_cb(lv_event_t * e)
 
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    LV_ASSERT(observer != NULL);
     LV_UNUSED(subject);
     lv_subject_t * subject_group = observer->user_data;
     lv_subject_notify(subject_group);
@@ -994,18 +955,20 @@ static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 static void unsubscribe_on_delete_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     lv_observer_t * observer = lv_event_get_user_data(e);
-    lv_observer_delete(observer);
+    lv_observer_remove(observer);
 }
 
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv, flag_cond_t cond)
 {
-    LV_ASSERT(subject != NULL);
-    LV_ASSERT(obj != NULL);
-    LV_ASSERT(subject->type == LV_SUBJECT_TYPE_INT);
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
 
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
 
     flag_and_cond_t * p = lv_malloc(sizeof(flag_and_cond_t));
     if(p == NULL) {
@@ -1026,10 +989,7 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
 
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    LV_ASSERT(observer != NULL);
-    LV_ASSERT(subject != NULL);
     flag_and_cond_t * p = observer->user_data;
-    LV_ASSERT(p != NULL);
 
     /* Initializing this keeps some compilers happy */
     bool res = false;
@@ -1046,23 +1006,17 @@ static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
     }
     if(p->inv) res = !res;
 
-    /*TODO: the flag binding API is deprecated separately; suppress the warning until then*/
-    LV_DEPRECATIONS_IGNORE_BEGIN
     if(res) {
         lv_obj_add_flag(observer->target, p->flag);
     }
     else {
         lv_obj_remove_flag(observer->target, p->flag);
     }
-    LV_DEPRECATIONS_IGNORE_END
 }
 
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    LV_ASSERT(observer != NULL);
-    LV_ASSERT(subject != NULL);
     flag_and_cond_t * p = observer->user_data;
-    LV_ASSERT(p != NULL);
 
     /* Initializing this keeps some compilers happy */
     bool res = false;
@@ -1089,21 +1043,19 @@ static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subje
 
 static void obj_value_changed_event_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_current_target(e);
     lv_subject_t * subject = lv_event_get_user_data(e);
-    LV_ASSERT(subject != NULL);
-    LV_ASSERT(obj != NULL);
 
     lv_subject_set_int(subject, lv_obj_has_state(obj, LV_STATE_CHECKED));
 }
 
 static void lv_subject_notify_if_changed(lv_subject_t * subject)
 {
-    LV_ASSERT(subject != NULL);
-    LV_ASSERT(subject->type != LV_SUBJECT_TYPE_INVALID && subject->type != LV_SUBJECT_TYPE_NONE);
 
     switch(subject->type) {
+        case LV_SUBJECT_TYPE_INVALID :
+        case LV_SUBJECT_TYPE_NONE :
+            return;
         case LV_SUBJECT_TYPE_INT :
             if(subject->value.num != subject->prev_value.num) {
                 lv_subject_notify(subject);
@@ -1132,17 +1084,12 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject)
                 lv_subject_notify(subject);
             }
             break;
-        case LV_SUBJECT_TYPE_INVALID :
-        case LV_SUBJECT_TYPE_NONE :
-            LV_UNREACHABLE();
     }
 }
 
 static void subject_set_string_free_user_data_event_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
-    LV_ASSERT(user_data != NULL);
     lv_free((void *)user_data->value);
     lv_free(user_data);
 }

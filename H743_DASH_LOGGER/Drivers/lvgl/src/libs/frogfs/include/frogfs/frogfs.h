@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#include "../../../../lvgl_public.h"
+#include "../../../../lv_conf_internal.h"
 #include LV_STDDEF_INCLUDE
 #include LV_STDINT_INCLUDE
 #include "frogfs_types.h"

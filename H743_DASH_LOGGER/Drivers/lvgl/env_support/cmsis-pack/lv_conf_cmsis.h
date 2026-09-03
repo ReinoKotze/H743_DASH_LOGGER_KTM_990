@@ -127,9 +127,6 @@
      * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
      */
     #define LV_USE_FREERTOS_TASK_NOTIFY 1
-
-    /* Enable this to provide a custom implementation of lv_os_get_idle_percent. */
-    #define LV_OS_IDLE_PERCENT_CUSTOM 0
 #endif
 
 /*========================
@@ -361,9 +358,11 @@
 
     /** Enable usage of the LVGL's built-in vg_lite driver */
     #if LV_USE_VG_LITE_DRIVER
-        /** Pick the GPU series + revision; maps to the matching
-         *  VGLite/Series/<series>/<revision>/vg_lite_options.h */
-        #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC255_0X40A
+        /** Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
+        #define LV_VG_LITE_HAL_GPU_SERIES gc255
+
+        /** Used to pick the correct GPU revision header it depends on the vendor */
+        #define LV_VG_LITE_HAL_GPU_REVISION 0x40
 
         /** Base memory address of the GPU IP it depends on SoC,
          *  default value is for NXP based devices */
@@ -531,8 +530,8 @@
  * Others
  *-----------*/
 
-#define LV_GLOBAL_USE_CUSTOM_INCLUDE 0
-#if LV_GLOBAL_USE_CUSTOM_INCLUDE
+#define LV_ENABLE_GLOBAL_CUSTOM 0
+#if LV_ENABLE_GLOBAL_CUSTOM
     /** Header to include for custom 'lv_global' function" */
     #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
 #endif

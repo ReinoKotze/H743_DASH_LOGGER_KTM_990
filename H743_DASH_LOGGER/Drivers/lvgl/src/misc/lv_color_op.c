@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "../lvgl_public.h"
+#include "lv_color_op_private.h"
+#include "lv_log.h"
 
 /*********************
  *      DEFINES

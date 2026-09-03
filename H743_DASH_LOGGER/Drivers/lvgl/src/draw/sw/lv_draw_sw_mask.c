@@ -7,10 +7,16 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_mask_private.h"
+#include "../lv_draw_mask.h"
+#include "../lv_draw.h"
 
 #if LV_DRAW_SW_COMPLEX
 #include "../../core/lv_global.h"
+#include "../../misc/lv_math.h"
+#include "../../misc/lv_log.h"
+#include "../../misc/lv_assert.h"
 #include "../../osal/lv_os_private.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -52,14 +58,10 @@ static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ line_mask_steep(lv_opa_
                                                                          int32_t len,
                                                                          lv_draw_sw_mask_line_param_t * p);
 
-static lv_draw_sw_mask_radius_circle_dsc_t * acquire_mask_radius_from_cache(int32_t radius);
-static lv_draw_sw_mask_radius_circle_dsc_t * create_non_cached_mask_radius(int32_t radius);
-static inline void init_mask_radius_cache(lv_draw_sw_mask_radius_circle_dsc_t * circle, bool cached);
-static void release_mask_radius(lv_draw_sw_mask_radius_param_t * radius);
 static void circ_init(lv_point_t * c, int32_t * tmp, int32_t radius);
 static bool circ_cont(lv_point_t * c);
 static void circ_next(lv_point_t * c, int32_t * tmp);
-static lv_result_t circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radius);
+static void circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radius);
 static lv_opa_t * get_next_line(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t y, int32_t * len,
                                 int32_t * x_start);
 static inline lv_opa_t /* LV_ATTRIBUTE_FAST_MEM */ mask_mix(lv_opa_t mask_act, lv_opa_t mask_new);
@@ -107,10 +109,22 @@ lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_apply(void * masks[]
 
 void lv_draw_sw_mask_free_param(void * p)
 {
+    lv_mutex_lock(&circle_cache_mutex);
     lv_draw_sw_mask_common_dsc_t * pdsc = p;
     if(pdsc->type == LV_DRAW_SW_MASK_TYPE_RADIUS) {
-        release_mask_radius((lv_draw_sw_mask_radius_param_t *) p);
+        lv_draw_sw_mask_radius_param_t * radius_p = (lv_draw_sw_mask_radius_param_t *) p;
+        if(radius_p->circle) {
+            if(radius_p->circle->life < 0) {
+                lv_free(radius_p->circle->cir_opa);
+                lv_free(radius_p->circle);
+            }
+            else {
+                radius_p->circle->used_cnt--;
+            }
+        }
     }
+
+    lv_mutex_unlock(&circle_cache_mutex);
 }
 
 void lv_draw_sw_mask_cleanup(void)
@@ -206,7 +220,7 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int3
     if(param->steep < 0) param->spx = -param->spx;
 }
 
-void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t px, int32_t py, int16_t angle,
+void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t py, int16_t angle,
                                      lv_draw_sw_mask_line_side_t side)
 {
     /*Find an optimal degree.
@@ -218,10 +232,10 @@ void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32
     int32_t p2x;
     int32_t p2y;
 
-    p2x = (lv_trigo_sin(angle + 90) >> 5) + px;
+    p2x = (lv_trigo_sin(angle + 90) >> 5) + p1x;
     p2y = (lv_trigo_sin(angle) >> 5) + py;
 
-    lv_draw_sw_mask_line_points_init(param, px, py, p2x, p2y, side);
+    lv_draw_sw_mask_line_points_init(param, p1x, py, p2x, p2y, side);
 }
 
 void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, int32_t vertex_x, int32_t vertex_y,
@@ -277,11 +291,9 @@ void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, int32_t v
     lv_draw_sw_mask_line_angle_init(&param->end_line, vertex_x, vertex_y, end_angle, end_side);
 }
 
-lv_result_t lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const lv_area_t * rect, int32_t radius,
-                                        bool inv)
+void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const lv_area_t * rect, int32_t radius,
+                                 bool inv)
 {
-    lv_memset(param, 0, sizeof(*param));
-    lv_result_t res = LV_RESULT_OK;
     int32_t w = lv_area_get_width(rect);
     int32_t h = lv_area_get_height(rect);
     int32_t short_side = LV_MIN(w, h);
@@ -295,21 +307,51 @@ lv_result_t lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, 
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_RADIUS;
 
     if(radius == 0) {
-        return res;
+        param->circle = NULL;
+        return;
     }
 
-    lv_draw_sw_mask_radius_circle_dsc_t * circle = acquire_mask_radius_from_cache(radius);
-    if(!circle) {
-        circle = create_non_cached_mask_radius(radius);
+    lv_mutex_lock(&circle_cache_mutex);
+
+    uint32_t i;
+
+    /*Try to reuse a circle cache entry*/
+    for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
+        if(_circle_cache[i].radius == radius) {
+            _circle_cache[i].used_cnt++;
+            CIRCLE_CACHE_AGING(_circle_cache[i].life, radius);
+            param->circle = &(_circle_cache[i]);
+            lv_mutex_unlock(&circle_cache_mutex);
+            return;
+        }
     }
 
-    if(!circle) {
-        LV_LOG_WARN("Failed to allocate memory for circle mask");
-        return LV_RESULT_INVALID;
+    /*If not cached use the free entry with lowest life*/
+    lv_draw_sw_mask_radius_circle_dsc_t * entry = NULL;
+    for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
+        if(_circle_cache[i].used_cnt == 0) {
+            if(!entry) entry = &(_circle_cache[i]);
+            else if(_circle_cache[i].life < entry->life) entry = &(_circle_cache[i]);
+        }
     }
 
-    param->circle = circle;
-    return res;
+    /*There is no unused entry. Allocate one temporarily*/
+    if(!entry) {
+        entry = lv_malloc_zeroed(sizeof(lv_draw_sw_mask_radius_circle_dsc_t));
+        LV_ASSERT_MALLOC(entry);
+        entry->life = -1;
+    }
+    else {
+        entry->used_cnt++;
+        entry->life = 0;
+        CIRCLE_CACHE_AGING(entry->life, radius);
+    }
+
+    param->circle = entry;
+
+    circ_calc_aa4(param->circle, radius);
+    lv_mutex_unlock(&circle_cache_mutex);
+
 }
 
 void lv_draw_sw_mask_fade_init(lv_draw_sw_mask_fade_param_t * param, const lv_area_t * coords, lv_opa_t opa_top,
@@ -1026,19 +1068,17 @@ static void circ_next(lv_point_t * c, int32_t * tmp)
     c->y++;
 }
 
-static lv_result_t circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radius)
+static void circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radius)
 {
-    LV_ASSERT_MSG(radius > 0, "caller should handle radius == 0 fast path");
-
-    uint8_t * new_buf = lv_realloc(c->buf, radius * 6 + 6);
-    LV_ASSERT_MALLOC(new_buf);
-    if(!new_buf) {
-        LV_LOG_WARN("Failed to allocate memory for circle mask (radius %" LV_PRId32 ")", radius);
-        return LV_RESULT_INVALID;
-    }
-
-    c->cir_opa = c->buf = new_buf;
+    if(radius == 0) return;
     c->radius = radius;
+
+    /*Allocate buffers*/
+    if(c->buf) lv_free(c->buf);
+
+    c->buf = lv_malloc(radius * 6 + 6);  /*Use uint16_t for opa_start_on_y and x_start_on_y*/
+    LV_ASSERT_MALLOC(c->buf);
+    c->cir_opa = c->buf;
     c->opa_start_on_y = (uint16_t *)(c->buf + 2 * radius + 2);
     c->x_start_on_y = (uint16_t *)(c->buf + 4 * radius + 4);
 
@@ -1048,19 +1088,12 @@ static lv_result_t circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_
         c->opa_start_on_y[0] = 0;
         c->opa_start_on_y[1] = 1;
         c->x_start_on_y[0] = 0;
-        return LV_RESULT_OK;
+        return;
     }
 
     const size_t cir_xy_size = (radius + 1) * 2 * 2 * sizeof(int32_t);
     int32_t * cir_x = lv_malloc_zeroed(cir_xy_size);
     LV_ASSERT_MALLOC(cir_x);
-    if(!cir_x) {
-        LV_LOG_WARN("Failed to allocate memory for circle points (radius %" LV_PRId32 ")", radius);
-        lv_free(c->buf);
-        c->buf = c->cir_opa = NULL;
-        c->opa_start_on_y  = c->x_start_on_y = NULL;
-        return LV_RESULT_INVALID;
-    }
     int32_t * cir_y = &cir_x[(radius + 1) * 2];
 
     uint32_t y_8th_cnt = 0;
@@ -1176,14 +1209,13 @@ static lv_result_t circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_
     while(i < cir_size) {
         c->opa_start_on_y[y] = i;
         c->x_start_on_y[y] = cir_x[i];
-        for(; i < (int32_t)cir_size && cir_y[i] <= y; i++) {
+        for(; i < (int32_t)cir_size && cir_y[i] == y; i++) {
             c->x_start_on_y[y] = LV_MIN(c->x_start_on_y[y], cir_x[i]);
         }
         y++;
     }
 
     lv_free(cir_x);
-    return LV_RESULT_OK;
 }
 
 static lv_opa_t * get_next_line(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t y, int32_t * len,
@@ -1200,110 +1232,6 @@ static inline lv_opa_t LV_ATTRIBUTE_FAST_MEM mask_mix(lv_opa_t mask_act, lv_opa_
     if(mask_new <= LV_OPA_MIN) return 0;
 
     return LV_UDIV255(mask_act * mask_new);
-}
-
-
-static lv_draw_sw_mask_radius_circle_dsc_t * create_non_cached_mask_radius(int32_t radius)
-{
-    lv_draw_sw_mask_radius_circle_dsc_t * circle = lv_malloc_zeroed(sizeof(*circle));
-    LV_ASSERT_MALLOC(circle);
-    if(!circle) {
-        return NULL;
-    }
-    init_mask_radius_cache(circle, false);
-
-    lv_result_t res = circ_calc_aa4(circle, radius);
-    if(res != LV_RESULT_OK) {
-        lv_free(circle);
-        return NULL;
-    }
-    return circle;
-}
-static lv_draw_sw_mask_radius_circle_dsc_t * acquire_mask_radius_from_cache(int32_t radius)
-{
-    lv_mutex_lock(&circle_cache_mutex);
-    lv_draw_sw_mask_radius_circle_dsc_t * entry = NULL;
-
-    uint32_t i;
-
-    /*Try to reuse a circle cache entry*/
-    for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
-        if(_circle_cache[i].radius != radius) {
-            continue;
-        }
-
-        _circle_cache[i].used_cnt++;
-        CIRCLE_CACHE_AGING(_circle_cache[i].life, radius);
-        entry =  &(_circle_cache[i]);
-        goto exit;
-    }
-
-    /*If not cached use the free entry with lowest life*/
-    for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
-        if(_circle_cache[i].used_cnt > 0) {
-            continue;
-        }
-        if(!entry) {
-            entry = &(_circle_cache[i]);
-            continue;
-        }
-        if(_circle_cache[i].life >= entry->life) {
-            continue;
-        }
-        entry = &(_circle_cache[i]);
-    }
-
-    if(!entry) {
-        goto exit;
-    }
-
-    entry->radius = radius;
-
-    lv_result_t res = circ_calc_aa4(entry, radius);
-    if(res != LV_RESULT_OK) {
-        entry = NULL;
-        goto exit;
-    }
-
-    /* only init cache after initializing the entry*/
-    init_mask_radius_cache(entry, true);
-
-exit:
-    lv_mutex_unlock(&circle_cache_mutex);
-    return entry;
-}
-
-static void release_mask_radius(lv_draw_sw_mask_radius_param_t * radius_p)
-{
-    LV_ASSERT(radius_p != NULL);
-    if(!radius_p->circle) {
-        return;
-    }
-
-    /* not cached */
-    if(radius_p->circle->life < 0) {
-        lv_free(radius_p->circle->cir_opa);
-        lv_free(radius_p->circle);
-    }
-    else {
-        lv_mutex_lock(&circle_cache_mutex);
-        radius_p->circle->used_cnt--;
-        lv_mutex_unlock(&circle_cache_mutex);
-    }
-}
-
-static inline void init_mask_radius_cache(lv_draw_sw_mask_radius_circle_dsc_t * circle, bool cached)
-{
-
-    LV_ASSERT(circle != NULL);
-    if(cached) {
-        circle->life = 0;
-        circle->used_cnt = 1;
-        CIRCLE_CACHE_AGING(circle->life, circle->radius);
-    }
-    else {
-        circle->life = -1;
-    }
 }
 
 #endif /*LV_DRAW_SW_COMPLEX*/

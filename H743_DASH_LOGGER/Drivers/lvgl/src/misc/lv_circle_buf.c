@@ -7,8 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "lv_circle_buf_private.h"
-#include "../lvgl_public.h"
+#include "lv_assert.h"
+
+#include "lv_circle_buf.h"
+#include "lv_array.h"
 
 /*********************
  *      DEFINES
@@ -184,22 +186,16 @@ void * lv_circle_buf_head(const lv_circle_buf_t * circle_buf)
 {
     LV_ASSERT_NULL(circle_buf);
 
-    uint32_t capacity = lv_circle_buf_capacity(circle_buf);
-    LV_ASSERT_MSG(capacity > 0, "circle buffer capacity must be > 0");
-
     return lv_array_at(&circle_buf->array,
-                       circle_buf->head % capacity);
+                       circle_buf->head % lv_circle_buf_capacity(circle_buf));
 }
 
 void * lv_circle_buf_tail(const lv_circle_buf_t * circle_buf)
 {
     LV_ASSERT_NULL(circle_buf);
 
-    uint32_t capacity = lv_circle_buf_capacity(circle_buf);
-    LV_ASSERT_MSG(capacity > 0, "circle buffer capacity must be > 0");
-
     return lv_array_at(&circle_buf->array,
-                       circle_buf->tail % capacity);
+                       circle_buf->tail % lv_circle_buf_capacity(circle_buf));
 }
 
 lv_result_t lv_circle_buf_read(lv_circle_buf_t * circle_buf, void * data)
@@ -280,7 +276,6 @@ lv_result_t lv_circle_buf_peek_at(const lv_circle_buf_t * circle_buf, const uint
 {
     LV_ASSERT_NULL(circle_buf);
     LV_ASSERT_NULL(data);
-    LV_ASSERT_MSG(lv_circle_buf_size(circle_buf) > 0, "can't peek into an empty buffer");
 
     const uint32_t real_index = (index % lv_circle_buf_size(circle_buf) + circle_buf->head) % lv_circle_buf_capacity(
                                     circle_buf);

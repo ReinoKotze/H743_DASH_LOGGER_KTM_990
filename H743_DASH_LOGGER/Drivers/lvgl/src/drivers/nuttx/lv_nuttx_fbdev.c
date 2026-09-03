@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
+#include "lv_nuttx_fbdev.h"
 #if LV_USE_NUTTX
 
 #include <stdlib.h>
 #include <unistd.h>
-#include LV_STDDEF_INCLUDE
+#include <stddef.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -25,6 +25,7 @@
     #include "mock/nuttx_video_fb.h"
 #endif
 
+#include "../../../lvgl.h"
 #include "../../lvgl_private.h"
 
 /*********************
@@ -100,8 +101,6 @@ lv_display_t * lv_nuttx_fbdev_create(void)
 
 int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
 {
-    LV_CHECK_ARG(disp != NULL, return -EINVAL);
-    LV_CHECK_ARG(file != NULL, return -EINVAL);
     int ret;
     LV_ASSERT(disp && file);
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);

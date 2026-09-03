@@ -14,8 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
-
+#include "lv_3dtexture.h"
 #if LV_USE_3DTEXTURE
 
 #include "../../core/lv_obj_private.h"

@@ -14,12 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
+#include "../buttonmatrix/lv_buttonmatrix_private.h"
+#include "lv_keyboard.h"
 
 #if LV_USE_KEYBOARD
-
-#include "../buttonmatrix/lv_buttonmatrix_private.h"
 
 /*********************
  *      DEFINES

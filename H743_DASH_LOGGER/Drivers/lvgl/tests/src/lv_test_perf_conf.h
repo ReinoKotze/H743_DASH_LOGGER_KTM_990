@@ -121,10 +121,8 @@
             * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
             */
             #define LV_USE_FREERTOS_TASK_NOTIFY 1
-
-            /* Enable this to provide a custom implementation of lv_os_get_idle_percent. */
-            #define LV_OS_IDLE_PERCENT_CUSTOM 0
         #endif
+
         /*========================
         * RENDERING CONFIGURATION
         *========================*/
@@ -414,8 +412,8 @@
         * Others
         *-----------*/
 
-        #define LV_GLOBAL_USE_CUSTOM_INCLUDE 0
-        #if LV_GLOBAL_USE_CUSTOM_INCLUDE
+        #define LV_ENABLE_GLOBAL_CUSTOM 0
+        #if LV_ENABLE_GLOBAL_CUSTOM
             /** Header to include for custom 'lv_global' function" */
             #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
         #endif

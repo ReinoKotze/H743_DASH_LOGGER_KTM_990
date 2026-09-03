@@ -6,6 +6,7 @@
 #ifndef LV_CACHE_ENTRY_PRIVATE_H
 #define LV_CACHE_ENTRY_PRIVATE_H
 
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,8 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_cache.h"
-#include "lv_cache_entry.h"
+#include "../lv_types.h"
 
 /*********************
  *      DEFINES

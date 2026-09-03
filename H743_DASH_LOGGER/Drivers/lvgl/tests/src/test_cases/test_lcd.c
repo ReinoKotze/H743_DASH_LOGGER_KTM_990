@@ -1,6 +1,5 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "../lvgl_private.h"
 #include "unity/unity.h"
 
 #define TEST_LCD_WIDTH 64

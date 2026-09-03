@@ -15,9 +15,10 @@
 
 #include "lv_draw_g2d.h"
 
+#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <stdlib.h>
-#include <g2d.h>
+#include "g2d.h"
 #include "../../../misc/lv_area_private.h"
 #include "lv_g2d_buf_map.h"
 #include "lv_g2d_utils.h"
@@ -177,3 +178,4 @@ static void _g2d_fill(void * handle, struct g2d_surface * dst_surf)
 }
 
 #endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_G2D*/

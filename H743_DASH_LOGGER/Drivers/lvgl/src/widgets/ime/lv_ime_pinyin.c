@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_ime_pinyin_private.h"
-#include "../../lvgl_public.h"
 #include "../../core/lv_obj_class_private.h"
 #if LV_USE_IME_PINYIN != 0
 
@@ -426,10 +425,10 @@ lv_obj_t * lv_ime_pinyin_create(lv_obj_t * parent)
 void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
 {
     if(kb) {
-        LV_CHECK_OBJ(kb, &lv_keyboard_class, return);
+        LV_ASSERT_OBJ(kb, &lv_keyboard_class);
     }
 
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
     pinyin_ime->kb = kb;
@@ -441,17 +440,17 @@ void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
 
 void lv_ime_pinyin_set_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     init_pinyin_dict(obj, dict);
 }
 
 void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    LV_CHECK_OBJ(pinyin_ime->kb, &lv_keyboard_class, return);
+    LV_ASSERT_OBJ(pinyin_ime->kb, &lv_keyboard_class);
 
     pinyin_ime->mode = mode;
 
@@ -471,7 +470,7 @@ void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode)
 
 lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
@@ -480,7 +479,7 @@ lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj)
 
 lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
@@ -489,7 +488,7 @@ lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj)
 
 const lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
@@ -538,7 +537,7 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     lv_memzero(pinyin_ime->py_num, sizeof(pinyin_ime->py_num));
     lv_memzero(pinyin_ime->py_pos, sizeof(pinyin_ime->py_pos));
 
-    lv_obj_set_hidden(obj, true);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
 
 #if LV_IME_PINYIN_USE_DEFAULT_DICT
     init_pinyin_dict(obj, lv_ime_pinyin_def_dict);
@@ -548,10 +547,10 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     pinyin_ime->cand_panel = lv_buttonmatrix_create(lv_obj_get_parent(obj));
     lv_buttonmatrix_set_map(pinyin_ime->cand_panel, (const char **)lv_btnm_def_pinyin_sel_map);
     lv_obj_set_size(pinyin_ime->cand_panel, LV_PCT(100), LV_PCT(5));
-    lv_obj_set_hidden(pinyin_ime->cand_panel, true);
+    lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
 
     lv_buttonmatrix_set_one_checked(pinyin_ime->cand_panel, true);
-    lv_obj_set_click_focusable(pinyin_ime->cand_panel, false);
+    lv_obj_remove_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     /* Set cand_panel style*/
     // Default style
@@ -651,7 +650,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
 
         if(lv_strcmp(txt, "Enter") == 0 || lv_strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) {
             pinyin_ime_clear_data(obj);
-            lv_obj_set_hidden(pinyin_ime->cand_panel, true);
+            lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
         }
         else if(lv_strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
             // del input char
@@ -666,7 +665,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
                 pinyin_ime->ta_count--;
                 if(pinyin_ime->ta_count <= 0) {
                     pinyin_ime_clear_data(obj);
-                    lv_obj_set_hidden(pinyin_ime->cand_panel, true);
+                    lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
                 }
                 else if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K26) {
                     pinyin_input_proc(obj);
@@ -695,7 +694,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
             lv_textarea_set_cursor_pos(ta, LV_TEXTAREA_CURSOR_LAST);
             lv_ime_pinyin_set_mode(obj, LV_IME_PINYIN_MODE_K9_NUMBER);
             lv_keyboard_set_mode(kb, LV_KEYBOARD_MODE_NUMBER);
-            lv_obj_set_hidden(pinyin_ime->cand_panel, true);
+            lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
         }
         else if(lv_strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
             if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K26) {
@@ -801,7 +800,7 @@ static void pinyin_input_proc(lv_obj_t * obj)
         }
     }
 
-    lv_obj_set_hidden(pinyin_ime->cand_panel, false);
+    lv_obj_remove_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_invalidate(pinyin_ime->cand_panel);
 }
 
@@ -959,7 +958,7 @@ static void pinyin_ime_clear_data(lv_obj_t * obj)
     }
     lv_memzero(pinyin_ime->input_char, sizeof(pinyin_ime->input_char));
 
-    lv_obj_set_hidden(pinyin_ime->cand_panel, true);
+    lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
 }
 
 #if LV_IME_PINYIN_USE_K9_MODE

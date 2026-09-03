@@ -46,7 +46,7 @@ void LCD_WaitForTE(uint32_t timeout_ms)
 
 	uint32_t start_tick = HAL_GetTick();
 	TEFLAG=0U;
-	 __DMB();
+	 //__DMB();
 
 	    while ((TEFLAG == 0U) &&
 	           ((HAL_GetTick() - start_tick) < timeout_ms)) {
@@ -125,22 +125,26 @@ void LCD_Init()
 //	    LCD_IO_WriteData(0x00U);
 //	    LCD_IO_WriteData(0x01U);
 //	    LCD_IO_WriteData(0xDFU);
-//
-//	    /*
-//	     * Clear all 320 x 480 RGB565 pixels to black before enabling
-//	     * the panel output.
-//	     */
-//	    Fill(BLACK);
+
+	    /*
+	     * Clear all 320 x 480 RGB565 pixels to black before enabling
+	     * the panel output.
+	     */
+	   // Fill(BLACK);
 
 	    /*
 	     * TE mode 1: vertical blanking only.
 	     */
-	    LCD_IO_WriteReg(tearingEffectOff);
-	    //LCD_IO_WriteData(0x00U);
+//	    LCD_IO_WriteReg(tearingEffect);
+//	    LCD_IO_WriteData(0x00U);
+
+
+	    LCD_IO_WriteReg(tearingEffect);
+
 
 	    LCD_IO_WriteReg(DispNormModeOn);
-	    //LCD_IO_WriteReg(0x20U);
-	    LCD_IO_WriteReg(0x21U);
+	    //LCD_IO_WriteReg(0x20U); //invert off
+	    LCD_IO_WriteReg(0x21U);  //invert on
 	    LCD_IO_WriteReg(pwrOn); /* Display ON */
 	    LCD_IO_WriteReg(0x38U);
 	    delay(20U);

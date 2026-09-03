@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2024
+ */
+
 #ifndef LV_DRAW_PRIVATE_H
 #define LV_DRAW_PRIVATE_H
 
@@ -14,10 +18,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lvgl_public.h"
+#include "lv_draw.h"
 #include "../osal/lv_os_private.h"
 #include "../misc/cache/lv_cache.h"
-#include "../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES
@@ -195,13 +198,6 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Free a draw task and everything it owns
- * Used both by the normal dispatch path and to unwind a redraw that is being abandoned.
- * @param  t      draw task to free
- */
-void lv_draw_cleanup_task(lv_draw_task_t * t);
 
 /**********************
  *      MACROS

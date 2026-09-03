@@ -7,7 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_buf_private.h"
+#include "../misc/lv_types.h"
+#include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
+#include "../misc/lv_math.h"
 #include "../misc/lv_area_private.h"
 #include "convert/lv_draw_buf_convert.h"
 
@@ -107,14 +110,14 @@ uint32_t lv_draw_buf_width_to_stride_ex(const lv_draw_buf_handlers_t * handlers,
     else return 0;
 }
 
-void * lv_draw_buf_align(void * buf, lv_color_format_t color_format)
+void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
 {
-    return lv_draw_buf_align_ex(&default_handlers, buf, color_format);
+    return lv_draw_buf_align_ex(&default_handlers, data, color_format);
 }
 
-void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * buf, lv_color_format_t color_format)
+void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * data, lv_color_format_t color_format)
 {
-    if(handlers->align_pointer_cb) return handlers->align_pointer_cb(buf, color_format);
+    if(handlers->align_pointer_cb) return handlers->align_pointer_cb(data, color_format);
     else return NULL;
 }
 
@@ -279,7 +282,7 @@ lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, u
     draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     draw_buf->header.stride = stride;
     draw_buf->header.magic = LV_IMAGE_HEADER_MAGIC;
-    draw_buf->data = lv_draw_buf_align_ex(handlers, buf, cf);
+    draw_buf->data = lv_draw_buf_align(buf, cf);
     draw_buf->unaligned_data = buf;
     draw_buf->data_size = size;
     draw_buf->handlers = handlers;
@@ -347,16 +350,9 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
     LV_PROFILER_DRAW_BEGIN;
     if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_ALLOCATED)) {
         LV_ASSERT_NULL(draw_buf->handlers);
-        LV_ASSERT_FORMAT_MSG(draw_buf->header.magic == LV_IMAGE_HEADER_MAGIC,
-                             "Invalid draw buf magic: 0x%02X", draw_buf->header.magic);
 
         const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
         draw_buf_free(handlers, draw_buf->unaligned_data);
-        draw_buf->unaligned_data = NULL;
-        draw_buf->data = NULL;
-
-        /*Poison the magic before freeing so UAF access can be detected*/
-        draw_buf->header.magic = LV_IMAGE_HEADER_DEADBEEF;
         lv_free(draw_buf);
     }
     else {
@@ -376,11 +372,6 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     dest->handlers->buf_copy_cb(dest, dest_area, src, src_area);
 }
 
-bool lv_draw_buf_is_position_valid(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
-{
-    LV_CHECK_ARG(buf != NULL, return false);
-    return x < buf->header.w && y < buf->header.h;
-}
 void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 {
     LV_ASSERT_NULL(buf);
@@ -540,13 +531,13 @@ void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
 
 void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
 {
-    LV_LOG_DEPRECATED("Use lv_draw_buf_set_palette instead.");
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
     lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
 }
 
 void lv_image_buf_free(lv_image_dsc_t * dsc)
 {
-    LV_LOG_DEPRECATED("Use lv_draw_buf_destroy instead.");
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
     if(dsc != NULL) {
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);
@@ -666,9 +657,6 @@ static void draw_buf_free(const lv_draw_buf_handlers_t * handlers, void * buf)
 
 /**
  * For given width, height, color format, and stride, calculate the size needed for a new draw buffer.
- * The result is rounded up to LV_DRAW_BUF_ALIGN so the allocated buffer length is a multiple of the
- * alignment boundary (required, for example, by the ESP32 PPA whose config structure wants the full
- * allocation size rather than the bytes actually in use).
  */
 static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
@@ -685,7 +673,7 @@ static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format
         size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
     }
 
-    return LV_ROUND_UP(size, LV_DRAW_BUF_ALIGN);
+    return size;
 }
 
 static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * full_area)

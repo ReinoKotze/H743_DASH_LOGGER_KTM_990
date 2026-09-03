@@ -7,12 +7,19 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
-
+#include "lv_opengles_glfw.h"
 #if LV_USE_GLFW
 
-#include "lv_opengles_debug.h"
+#include "lv_opengles_window.h"
+#include "lv_opengles_driver.h"
+#include "lv_opengles_texture.h"
 #include "lv_opengles_private.h"
+#include "lv_opengles_debug.h"
+
+#include "../../core/lv_refr.h"
+#include "../../stdlib/lv_string.h"
+#include "../../indev/lv_indev.h"
+#include "../../lv_init.h"
 #include "../../misc/lv_area_private.h"
 
 #include <stdlib.h>
@@ -100,8 +107,7 @@ static lv_ll_t glfw_window_ll;
 lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev,
                                                          bool h_flip, bool v_flip,  const char * title)
 {
-    LV_CHECK_ARG(title != NULL, return NULL);
-
+    LV_ASSERT_NULL(title);
     if(lv_glfw_init() != 0) {
         LV_LOG_ERROR("Failed to init glfw");
         return NULL;
@@ -166,16 +172,11 @@ lv_opengles_window_t * lv_opengles_glfw_window_create(int32_t hor_res, int32_t v
 
 void lv_opengles_glfw_window_set_title(lv_opengles_window_t * window, const char * new_title)
 {
-    LV_CHECK_ARG(window != NULL, return);
-    LV_CHECK_ARG(new_title != NULL, return);
-
     glfwSetWindowTitle(window->window, new_title);
 }
 
 void lv_opengles_window_delete(lv_opengles_window_t * window)
 {
-    if(window == NULL) return;
-
     glfwDestroyWindow(window->window);
 
     lv_opengles_window_texture_t * texture;
@@ -204,15 +205,11 @@ void lv_opengles_window_delete(lv_opengles_window_t * window)
 
 void * lv_opengles_glfw_window_get_glfw_window(lv_opengles_window_t * window)
 {
-    LV_CHECK_ARG(window != NULL, return NULL);
-
     return (void *)(window->window);
 }
 
 void lv_opengles_glfw_window_set_flip(lv_opengles_window_t * window, bool h_flip, bool v_flip)
 {
-    LV_CHECK_ARG(window != NULL, return);
-
     window->h_flip = h_flip;
     window->v_flip = v_flip;
 }
@@ -220,8 +217,6 @@ void lv_opengles_glfw_window_set_flip(lv_opengles_window_t * window, bool h_flip
 lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window_t * window, unsigned int texture_id,
                                                               int32_t w, int32_t h)
 {
-    LV_CHECK_ARG(window != NULL, return NULL);
-
     lv_opengles_window_texture_t * texture = lv_ll_ins_tail(&window->textures);
     LV_ASSERT_MALLOC(texture);
     if(texture == NULL) return NULL;
@@ -256,8 +251,6 @@ lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window
 
 void lv_opengles_window_texture_remove(lv_opengles_window_texture_t * texture)
 {
-    LV_CHECK_ARG(texture != NULL, return);
-
     if(texture->texture_id == 0) {
         LV_LOG_WARN("window displays should be deleted with `lv_display_delete`");
         return;
@@ -276,8 +269,6 @@ void lv_opengles_window_texture_remove(lv_opengles_window_texture_t * texture)
 
 lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, int32_t w, int32_t h)
 {
-    LV_CHECK_ARG(window != NULL, return NULL);
-
     lv_display_t * disp = lv_display_create(w, h);
     if(disp == NULL) {
         return NULL;
@@ -343,14 +334,11 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
 
 lv_opengles_window_texture_t * lv_opengles_window_display_get_window_texture(lv_display_t * window_display)
 {
-    LV_CHECK_ARG(window_display != NULL, return NULL);
     return lv_display_get_driver_data(window_display);
 }
 
 void lv_opengles_window_texture_set_x(lv_opengles_window_texture_t * texture, int32_t x)
 {
-    LV_CHECK_ARG(texture != NULL, return);
-
     lv_area_set_pos(&texture->area, x, texture->area.y1);
 
 #if LV_USE_DRAW_OPENGLES
@@ -360,8 +348,6 @@ void lv_opengles_window_texture_set_x(lv_opengles_window_texture_t * texture, in
 
 void lv_opengles_window_texture_set_y(lv_opengles_window_texture_t * texture, int32_t y)
 {
-    LV_CHECK_ARG(texture != NULL, return);
-
     lv_area_set_pos(&texture->area, texture->area.x1, y);
 
 #if LV_USE_DRAW_OPENGLES
@@ -371,8 +357,6 @@ void lv_opengles_window_texture_set_y(lv_opengles_window_texture_t * texture, in
 
 void lv_opengles_window_texture_set_opa(lv_opengles_window_texture_t * texture, lv_opa_t opa)
 {
-    LV_CHECK_ARG(texture != NULL, return);
-
     texture->opa = opa;
 
 #if LV_USE_DRAW_OPENGLES
@@ -382,8 +366,6 @@ void lv_opengles_window_texture_set_opa(lv_opengles_window_texture_t * texture, 
 
 lv_indev_t * lv_opengles_window_texture_get_mouse_indev(lv_opengles_window_texture_t * texture)
 {
-    LV_CHECK_ARG(texture != NULL, return NULL);
-
     return texture->indev;
 }
 

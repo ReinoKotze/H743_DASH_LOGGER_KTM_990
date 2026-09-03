@@ -1,4 +1,4 @@
-#include "../../../../lvgl_public.h"
+#include "../../../../lv_conf_internal.h"
 
 #if LV_USE_GLTF
 unsigned char chromatic_jpg[] = {

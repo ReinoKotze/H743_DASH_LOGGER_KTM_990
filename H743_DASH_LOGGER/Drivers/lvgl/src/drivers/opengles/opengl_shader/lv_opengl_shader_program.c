@@ -13,7 +13,8 @@
 
 #include "../lv_opengles_private.h"
 #include "../lv_opengles_debug.h"
-
+#include "../../../misc/lv_assert.h"
+#include "../../../stdlib/lv_mem.h"
 /*********************
  *      DEFINES
  *********************/
@@ -102,7 +103,7 @@ void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program)
 
 GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program)
 {
-    LV_ASSERT(program != NULL);
+    LV_ASSERT_NULL(program);
     return program->id;
 }
 

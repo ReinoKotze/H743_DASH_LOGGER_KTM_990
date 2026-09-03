@@ -16,7 +16,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl_public.h"
+#include "../../../lv_conf_internal.h"
 
 /* detect whether helium is available based on arm compilers' standard */
 #if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE

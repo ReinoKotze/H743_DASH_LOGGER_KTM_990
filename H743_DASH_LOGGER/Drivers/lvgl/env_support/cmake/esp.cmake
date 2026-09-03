@@ -10,7 +10,9 @@ if(LV_MICROPYTHON)
     SRCS
     ${SOURCES}
     INCLUDE_DIRS
-    ${LVGL_ROOT_DIR}/include
+    ${LVGL_ROOT_DIR}
+    ${LVGL_ROOT_DIR}/src
+    ${LVGL_ROOT_DIR}/../
     REQUIRES
     main)
 else()
@@ -55,7 +57,7 @@ else()
 
   set(IDF_COMPONENTS esp_timer log)
 
-  if(${target} STREQUAL "esp32p4" OR ${target} STREQUAL "esp32s31")
+  if(${target} STREQUAL "esp32p4")
     list(APPEND IDF_COMPONENTS esp_driver_ppa esp_mm)
   endif()
 

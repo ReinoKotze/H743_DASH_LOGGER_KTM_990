@@ -6,10 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "lv_sdl_private.h"
-
+#include "lv_sdl_mousewheel.h"
 #if LV_USE_SDL && LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_ENCODER
+
+#include "../../core/lv_group.h"
+#include "../../stdlib/lv_string.h"
+#include "lv_sdl_private.h"
 
 /*********************
  *      DEFINES
@@ -62,10 +64,7 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
 
 static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    LV_ASSERT(indev != NULL);
-    LV_ASSERT(data != NULL);
     lv_sdl_mousewheel_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT(dsc != NULL);
 
     data->state = dsc->state;
     data->enc_diff = dsc->diff;
@@ -74,14 +73,14 @@ static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data)
 
 static void release_indev_cb(lv_event_t * e)
 {
-    LV_ASSERT(e != NULL);
     lv_indev_t * indev = (lv_indev_t *) lv_event_get_user_data(e);
-    LV_ASSERT(indev != NULL);
     lv_sdl_mousewheel_t * dsc = lv_indev_get_driver_data(indev);
-    lv_indev_set_driver_data(indev, NULL);
-    lv_indev_set_read_cb(indev, NULL);
-    lv_free(dsc);
-    LV_LOG_INFO("done");
+    if(dsc) {
+        lv_indev_set_driver_data(indev, NULL);
+        lv_indev_set_read_cb(indev, NULL);
+        lv_free(dsc);
+        LV_LOG_INFO("done");
+    }
 }
 
 void lv_sdl_mousewheel_handler(SDL_Event * event)

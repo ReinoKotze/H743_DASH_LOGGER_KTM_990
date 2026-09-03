@@ -7,12 +7,11 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_CLIB
-
 #include <stdio.h>
-#include LV_STDARG_INCLUDE
+#include <stdarg.h>
+#include "../lv_sprintf.h"
 
 /*********************
  *      DEFINES
@@ -40,9 +39,6 @@
 
 int lv_snprintf(char * buffer, size_t count, const char * format, ...)
 {
-    LV_ASSERT(format != NULL);
-    LV_ASSERT_MSG(count == 0 || buffer != NULL, "NULL buffer with non-zero count");
-
     va_list va;
     va_start(va, format);
     const int ret = vsnprintf(buffer, count, format, va);
@@ -52,9 +48,6 @@ int lv_snprintf(char * buffer, size_t count, const char * format, ...)
 
 int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va)
 {
-    LV_ASSERT(format != NULL);
-    LV_ASSERT_MSG(count == 0 || buffer != NULL, "NULL buffer with non-zero count");
-
     return vsnprintf(buffer, count, format, va);
 }
 

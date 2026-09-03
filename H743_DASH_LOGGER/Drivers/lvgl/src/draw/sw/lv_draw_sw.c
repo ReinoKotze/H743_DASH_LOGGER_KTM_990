@@ -10,15 +10,17 @@
 #include "../lv_draw_private.h"
 #if LV_USE_DRAW_SW
 
+#include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
+#include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../misc/lv_area_private.h"
 
-#if LV_USE_THORVG
-    #if LV_USE_THORVG_INTERNAL
-        #include "../../libs/thorvg/thorvg_capi.h"
-    #else
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
+    #if LV_USE_THORVG_EXTERNAL
         #include <thorvg_capi.h>
+    #else
+        #include "../../libs/thorvg/thorvg_capi.h"
     #endif
 #endif
 
@@ -81,19 +83,8 @@ void lv_draw_sw_init(void)
     draw_sw_unit->base_unit.dispatch_cb = dispatch;
     draw_sw_unit->base_unit.evaluate_cb = evaluate;
     draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
-
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
-    draw_sw_unit->base_unit.name = "SW_NEON";
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && LV_USE_DRAW_ARM2D_SYNC
+#if LV_USE_DRAW_ARM2D_SYNC
     draw_sw_unit->base_unit.name = "SW_ARM2D";
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
-    draw_sw_unit->base_unit.name = "SW_HELIUM";
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_RISCV_V
-    draw_sw_unit->base_unit.name = "SW_RISCV_V";
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_SVE2
-    draw_sw_unit->base_unit.name = "SW_SVE2";
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
-    draw_sw_unit->base_unit.name = "SW_CUSTOM";
 #else
     draw_sw_unit->base_unit.name = "SW";
 #endif
@@ -299,10 +290,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         /*Allocate a buffer if not done yet.*/
         void * buf = lv_draw_layer_alloc_buf(layer);
         /*Do not return is failed. The other thread might already have a buffer can do something. */
-        if(buf == NULL) {
-            t->state = LV_DRAW_TASK_STATE_FAILED;
-            continue;
-        }
+        if(buf == NULL) continue;
 
         /*Take the task*/
         all_idle = false;
@@ -334,7 +322,6 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
         LV_PROFILER_DRAW_END;
         return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }

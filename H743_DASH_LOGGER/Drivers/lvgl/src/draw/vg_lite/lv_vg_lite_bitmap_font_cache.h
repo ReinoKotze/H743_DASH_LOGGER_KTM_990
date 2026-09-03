@@ -14,9 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_VG_LITE
+
+#include "../../font/lv_font.h"
 
 /*********************
  *      DEFINES

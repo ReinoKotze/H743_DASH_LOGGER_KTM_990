@@ -6,10 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_chart_private.h"
-
-#if LV_USE_CHART
+#if LV_USE_CHART != 0
 
 #include "../../misc/lv_area_private.h"
 #include "../../draw/lv_draw_private.h"
@@ -17,8 +15,8 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_draw_private.h"
+#include "../../misc/lv_assert.h"
 
-#include "../../lvgl_public.h"
 /*********************
  *      DEFINES
  *********************/
@@ -116,7 +114,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * parent)
 
 void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->type == type) return;
@@ -145,7 +143,7 @@ void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
 
 void lv_chart_set_point_count(lv_obj_t * obj, uint32_t cnt)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->point_cnt == cnt) return;
@@ -169,7 +167,7 @@ void lv_chart_set_point_count(lv_obj_t * obj, uint32_t cnt)
 
 void lv_chart_set_axis_min_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -200,7 +198,7 @@ void lv_chart_set_axis_min_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t m
 
 void lv_chart_set_axis_max_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t max)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     switch(axis) {
@@ -230,7 +228,7 @@ void lv_chart_set_axis_max_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t m
 
 void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, int32_t max)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_set_axis_min_value(obj, axis, min);
     lv_chart_set_axis_max_value(obj, axis, max);
@@ -238,7 +236,7 @@ void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, 
 
 void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->update_mode == update_mode) return;
@@ -249,7 +247,7 @@ void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode
 
 void lv_chart_set_div_line_count(lv_obj_t * obj, uint32_t hdiv, uint32_t vdiv)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->hdiv_cnt == hdiv && chart->vdiv_cnt == vdiv) return;
@@ -262,7 +260,7 @@ void lv_chart_set_div_line_count(lv_obj_t * obj, uint32_t hdiv, uint32_t vdiv)
 
 void lv_chart_set_hor_div_line_count(lv_obj_t * obj, uint32_t cnt)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->hdiv_cnt == cnt) return;
@@ -272,7 +270,7 @@ void lv_chart_set_hor_div_line_count(lv_obj_t * obj, uint32_t cnt)
 
 void lv_chart_set_ver_div_line_count(lv_obj_t * obj, uint32_t cnt)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->vdiv_cnt == cnt) return;
@@ -282,7 +280,7 @@ void lv_chart_set_ver_div_line_count(lv_obj_t * obj, uint32_t cnt)
 
 lv_chart_type_t lv_chart_get_type(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     return chart->type;
@@ -290,7 +288,7 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * obj)
 
 uint32_t lv_chart_get_point_count(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     return chart->point_cnt;
@@ -298,7 +296,7 @@ uint32_t lv_chart_get_point_count(const lv_obj_t * obj)
 
 lv_chart_update_mode_t lv_chart_get_update_mode(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     return chart->update_mode;
@@ -306,7 +304,7 @@ lv_chart_update_mode_t lv_chart_get_update_mode(const lv_obj_t * obj)
 
 uint32_t lv_chart_get_hor_div_line_count(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     return chart->hdiv_cnt;
@@ -314,7 +312,7 @@ uint32_t lv_chart_get_hor_div_line_count(const lv_obj_t * obj)
 
 uint32_t lv_chart_get_ver_div_line_count(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     return chart->vdiv_cnt;
@@ -332,7 +330,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_NULL(ser);
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(id >= chart->point_cnt) {
@@ -453,7 +451,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
 
 void lv_chart_refresh(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
 }
@@ -466,7 +464,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
 {
     LV_LOG_INFO("begin");
 
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart    = (lv_chart_t *)obj;
 
@@ -526,7 +524,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
 
 void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(series);
 
     lv_chart_t * chart    = (lv_chart_t *)obj;
@@ -541,7 +539,7 @@ void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
 
 void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
 {
-    LV_CHECK_OBJ(chart, MY_CLASS, return);
+    LV_ASSERT_OBJ(chart, MY_CLASS);
     LV_ASSERT_NULL(series);
 
     series->hidden = hide ? 1 : 0;
@@ -550,7 +548,7 @@ void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hid
 
 void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_color_t color)
 {
-    LV_CHECK_OBJ(chart, MY_CLASS, return);
+    LV_ASSERT_OBJ(chart, MY_CLASS);
     LV_ASSERT_NULL(series);
 
     series->color = color;
@@ -559,9 +557,7 @@ void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_
 
 lv_color_t lv_chart_get_series_color(lv_obj_t * chart, const lv_chart_series_t * series)
 {
-    LV_CHECK_OBJ(chart, MY_CLASS, return (lv_color_t) {
-        0
-    });
+    LV_ASSERT_OBJ(chart, MY_CLASS);
     LV_ASSERT_NULL(series);
     LV_UNUSED(chart);
 
@@ -570,7 +566,7 @@ lv_color_t lv_chart_get_series_color(lv_obj_t * chart, const lv_chart_series_t *
 
 void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
@@ -580,7 +576,7 @@ void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_
 
 lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * obj, const lv_chart_series_t * ser)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(ser == NULL) return lv_ll_get_head(&chart->series_ll);
@@ -593,7 +589,7 @@ lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * obj, const lv_char
 
 lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     lv_chart_cursor_t * cursor = lv_ll_ins_head(&chart->cursor_ll);
@@ -611,7 +607,7 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
 
 void lv_chart_remove_cursor(lv_obj_t * obj, lv_chart_cursor_t * cursor)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(cursor);
 
     lv_chart_t * chart = (lv_chart_t *)obj;
@@ -675,7 +671,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
 
 void lv_chart_set_all_values(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
@@ -690,7 +686,7 @@ void lv_chart_set_all_values(lv_obj_t * obj, lv_chart_series_t * ser, int32_t va
 
 void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
@@ -702,7 +698,7 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t va
 
 void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, int32_t x_value, int32_t y_value)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
@@ -738,7 +734,7 @@ void lv_chart_set_series_values2(lv_obj_t * obj, lv_chart_series_t * ser, const 
 
 void lv_chart_set_series_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t value)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -750,7 +746,7 @@ void lv_chart_set_series_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, ui
 void lv_chart_set_series_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t x_value,
                                       int32_t y_value)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -767,7 +763,7 @@ void lv_chart_set_series_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, u
 
 void lv_chart_set_series_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
     if(!ser->y_ext_buf_assigned && ser->y_points) lv_free(ser->y_points);
@@ -778,7 +774,7 @@ void lv_chart_set_series_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, in
 
 void lv_chart_set_series_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
     if(!ser->x_ext_buf_assigned && ser->x_points) lv_free(ser->x_points);
@@ -790,7 +786,7 @@ void lv_chart_set_series_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, in
 int32_t * lv_chart_get_series_y_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
     LV_UNUSED(obj);
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
     return ser->y_points;
 }
@@ -798,7 +794,7 @@ int32_t * lv_chart_get_series_y_array(const lv_obj_t * obj, lv_chart_series_t * 
 int32_t * lv_chart_get_series_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
     LV_UNUSED(obj);
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
     return ser->x_points;
 }
@@ -1235,8 +1231,8 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
 
         lv_draw_vector_dsc_set_fill_opa(dsc, 0);
         lv_draw_vector_dsc_set_stroke_color(dsc, ser->color);
-        lv_draw_vector_dsc_set_stroke_opa(dsc, lv_obj_get_style_line_opa(obj, LV_PART_ITEMS));
-        lv_draw_vector_dsc_set_stroke_width(dsc, (float)lv_obj_get_style_line_width(obj, LV_PART_ITEMS));
+        lv_draw_vector_dsc_set_stroke_opa(dsc, LV_OPA_COVER);
+        lv_draw_vector_dsc_set_stroke_width(dsc, 2.0f);
         if(dashes[0]) lv_draw_vector_dsc_set_stroke_dash(dsc, dashes, 2);
 
         point_dsc_default.bg_color = ser->color;
@@ -1250,7 +1246,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
         int32_t max_dx = w / (chart->point_cnt - 1) + 1;
 
         lv_fpoint_t scaled_points[3];
-        int32_t raw_points[3] = { LV_CHART_POINT_NONE };
+        int32_t raw_points[3];
         int32_t s_prev = 0; /*Previous steepness around N-1 (y_diff of N-2 and N) */
         int32_t s_act = 0; /*Steepness around N (y_diff of N-1 and N+1)*/
         int32_t min_v = chart->ymin[ser->y_axis_sec];
@@ -1331,7 +1327,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
             valid_point_cnt++;
         }
 
-        lv_draw_vector_dsc_add_path(dsc, path); /* Draw a path */
+        lv_draw_vector_dsc_add_path(dsc, path); // draw a path
 
         if(dsc->base.id1 > 0) {
             point_dsc_default.base.id1--;
@@ -1658,7 +1654,7 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
 
 static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(lv_ll_is_empty(&chart->cursor_ll)) return;
@@ -1750,8 +1746,8 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
 
 /**
  * Get the nearest index to an X coordinate
- * @param obj   pointer to a chart object
- * @param x     the coordination of the point relative to the series area.
+ * @param chart pointer to a chart object
+ * @param coord the coordination of the point relative to the series area.
  * @return the found index
  */
 static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x)

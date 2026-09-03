@@ -1,9 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_OBSERVER && LV_USE_ARC && LV_USE_LABEL && LV_USE_BUTTON && LV_USE_SPINNER && LV_BUILD_EXAMPLES
 
-/*The UI is built from the deprecated `lv_win` widget.*/
-LV_DEPRECATIONS_IGNORE_BEGIN
-
 typedef enum {
     FW_UPDATE_STATE_IDLE,
     FW_UPDATE_STATE_CONNECTING,
@@ -22,18 +19,11 @@ static lv_subject_t fw_download_percent_subject;
 static lv_subject_t fw_update_status_subject;
 
 /**
- * @title Firmware update state machine
- * @brief Drive a window through its update states using two int subjects.
- *
- * `fw_update_status_subject` holds an `lv_fw_update_state_t` value and
- * `fw_download_percent_subject` tracks progress. A start button opens an
- * `lv_win` whose observer renders the appropriate content: a spinner for
- * connecting, an arc plus percentage label bound with `lv_arc_bind_value`
- * and `lv_label_bind_text` for downloading, and a restart button for ready.
- * A separate app-side observer spawns `lv_timer_t` instances that simulate
- * the 2-second connect and a 50 ms per-step download. The window's close
- * button pushes `FW_UPDATE_STATE_CANCEL`, which the observer uses to delete
- * the window.
+ * Show how to handle a complete firmware update process with observers.
+ * Normally it's hard to implement a firmware update process because in some cases
+ *   - the App needs to was for the UI (wait for a button press)
+ *   - the UI needs to wait for the App (connecting or downloading)
+ * With observers these complex mechanisms can be implemented a simple and clean way.
  */
 void lv_example_observer_5(void)
 {
@@ -106,7 +96,7 @@ static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * s
         lv_arc_bind_value(arc, &fw_download_percent_subject);
         lv_obj_center(arc);
         lv_obj_set_size(arc, 130, 130);
-        lv_obj_set_clickable(arc, false);
+        lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 
         lv_obj_t * label = lv_label_create(cont);
         lv_label_bind_text(label, &fw_download_percent_subject, "%d %%");
@@ -173,7 +163,5 @@ static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t
         lv_timer_create(download_timer_cb, 50, NULL);
     }
 }
-
-LV_DEPRECATIONS_IGNORE_END
 
 #endif

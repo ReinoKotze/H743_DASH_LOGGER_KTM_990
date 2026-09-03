@@ -50,14 +50,7 @@ void lv_example_freetype_2_vector_font(uint32_t font_size, uint32_t border_width
 }
 
 /**
- * @title FreeType emoji fallback font
- * @brief Render a large label whose primary font falls back to a color emoji font.
- *
- * A 400 px bitmap `Lato-Regular.ttf` is loaded as the primary font and a
- * 200 px subset of `NotoColorEmoji-32.subset.ttf` is loaded as
- * `font->fallback`. A style applies the combined font and centers the text,
- * and a label placed at the center of the active screen shows a greeting
- * ending in an emoji so the fallback glyph is exercised.
+ * Load a font with FreeType
  */
 void lv_example_freetype_2(void)
 {

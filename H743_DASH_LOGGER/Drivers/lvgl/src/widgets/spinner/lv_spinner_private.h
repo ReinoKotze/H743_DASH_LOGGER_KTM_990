@@ -14,9 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
-
+#include "lv_spinner.h"
 #if LV_USE_SPINNER
 
 #include "../arc/lv_arc_private.h"

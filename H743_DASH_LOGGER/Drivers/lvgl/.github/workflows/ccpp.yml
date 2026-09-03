@@ -20,18 +20,18 @@ jobs:
       fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
-        # See build_only_options and test_options in tests/main.py.
-        build_option: ['OPTIONS_MINIMAL',
-                       'OPTIONS_NO_CHECKS',
-                       'OPTIONS_LINUX_SW',
-                       'OPTIONS_LINUX_OPENGLES',
-                       'OPTIONS_NUTTX']
+        # See BUILD_OPTIONS in tests/CMakeLists.txt.
+        build_option: ['OPTIONS_NORMAL_8BIT',
+                       'OPTIONS_16BIT',
+                       'OPTIONS_24BIT',
+                       'OPTIONS_FULL_32BIT',
+                       'OPTIONS_SDL']
     name: Build ${{ matrix.build_option }} - Ubuntu
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v6
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
     - name: Install prerequisites
@@ -48,9 +48,10 @@ jobs:
       fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
-        # See build_only_options and test_options in tests/main.py.
-        build_option: ['OPTIONS_MINIMAL',
-                       'OPTIONS_WINDOWS_SW']
+        # See BUILD_OPTIONS in tests/CMakeLists.txt.
+        build_option: ['OPTIONS_16BIT',
+                       'OPTIONS_24BIT',
+                       'OPTIONS_FULL_32BIT']
         compiler: [gcc, cl]
 
     name: Build ${{ matrix.build_option }} - ${{matrix.compiler }} - Windows
@@ -59,7 +60,7 @@ jobs:
     - name: patch freetype vcpkg URL
       run: (Get-Content C:\vcpkg\ports\freetype\portfile.cmake) -replace 'freedesktop.org', 'com' | Out-File -encoding ASCII C:\vcpkg\ports\freetype\portfile.cmake
 
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v6
 
     - name: Install prerequisites
       run: scripts\install-prerequisites.bat
@@ -88,11 +89,11 @@ jobs:
     container: espressif/idf:v5.3.1
     steps:
     - name: Setup Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
     - name: Clone LVGL as a Component
-      uses: actions/checkout@v7
+      uses: actions/checkout@v6
       with:
         path: components/lvgl
     - name: Copy IDF Project Example
@@ -105,18 +106,17 @@ jobs:
   test-native:
     runs-on: ubuntu-24.04
     strategy:
-      fail-fast: false
-      matrix:
-        # A valid option parameter to the cmake file.
-        # See build_only_options and test_options in tests/main.py.
-        build_config: ['64bit build',
-                       '32bit build']
+     matrix:
+       # A valid option parameter to the cmake file.
+       # See BUILD_OPTIONS in tests/CMakeLists.txt.
+       build_config: ['64bit build',
+                      '32bit build']
     name: Run tests with ${{ matrix.build_config }}
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v6
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
     - name: Install prerequisites
@@ -141,16 +141,13 @@ jobs:
           git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
           MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
           echo "Merge-base: $MB"
-          python scripts/check_gcov_coverage.py \
-            --commit="${MB}...${{ github.event.pull_request.head.sha }}" \
-            --fail-under=50 \
-            --min-lines=5
+          python scripts/check_gcov_coverage.py --commit="${MB}...${{ github.event.pull_request.head.sha }}"
         else
           echo "Not a pull request, skipping code coverage analysis."
         fi
     - name: Archive screenshot errors
       if: failure()
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@v6
       with:
         name: screenshot-errors-amd64
         path: |
@@ -176,7 +173,7 @@ jobs:
 
     - name: Upload untracked reference images
       if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@v6
       with:
         name: Untracked Reference Images
         path: untracked_ref_imgs.zip
@@ -189,7 +186,7 @@ jobs:
 
     - name: Upload coverage reports as artifacts
       if: always()
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@v6
       with:
         name: coverage-reports-${{ matrix.build_config }}
         path: tests/report/

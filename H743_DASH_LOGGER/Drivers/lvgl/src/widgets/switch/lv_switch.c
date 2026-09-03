@@ -10,9 +10,13 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
 
-#if LV_USE_SWITCH
+#if LV_USE_SWITCH != 0
 
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_math.h"
 #include "../../misc/lv_anim_private.h"
+#include "../../indev/lv_indev.h"
+#include "../../display/lv_display.h"
 
 /*********************
  *      DEFINES
@@ -95,7 +99,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent)
 
 void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientation)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     sw->orientation = orientation;
@@ -108,7 +112,7 @@ void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientati
 
 lv_switch_orientation_t lv_switch_get_orientation(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     return sw->orientation;
@@ -128,9 +132,9 @@ static void lv_switch_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     sw->anim_state = LV_SWITCH_ANIM_STATE_INV;
     sw->orientation = LV_SWITCH_ORIENTATION_AUTO;
 
-    lv_obj_set_scrollable(obj, false);
-    lv_obj_set_checkable(obj, true);
-    lv_obj_set_scroll_on_focus(obj, true);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -308,7 +312,7 @@ static void lv_switch_anim_completed(lv_anim_t * a)
  */
 static void lv_switch_trigger_anim(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     /*If the widget is not rendered yet show state changes immediately*/
     if(!obj->rendered) return;
 

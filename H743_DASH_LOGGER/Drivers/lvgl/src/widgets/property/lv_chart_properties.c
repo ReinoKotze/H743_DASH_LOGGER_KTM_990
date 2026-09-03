@@ -4,7 +4,7 @@
  * @file lv_chart_properties.c
  */
 
-#include "../../lvgl_public.h"
+#include "../chart/lv_chart.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

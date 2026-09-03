@@ -6,19 +6,24 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_dropdown_private.h"
-
-#if LV_USE_DROPDOWN
-
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../lvgl_public.h"
+#include "../../core/lv_obj.h"
+#if LV_USE_DROPDOWN != 0
+
+#include "../../misc/lv_assert.h"
 #include "../../draw/lv_draw_private.h"
+#include "../../core/lv_group.h"
+#include "../../indev/lv_indev.h"
+#include "../../display/lv_display.h"
+#include "../../font/lv_symbol_def.h"
+#include "../../misc/lv_anim.h"
+#include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
-#include "../../font/lv_font_private.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -40,7 +45,6 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
-static void refresh_size(lv_obj_t * obj);
 
 static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_dropdownlist_destructor(const lv_obj_class_t * class_p, lv_obj_t * list_obj);
@@ -159,11 +163,8 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent)
 
 void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(!dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
-        return;
-    }
 
     char * copied_text = NULL;
     if(text) {
@@ -180,24 +181,19 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 
 void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    if(dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
-        return;
-    }
-
-    if(!dropdown->static_text)
-        lv_free(dropdown->text);
+    if(!dropdown->static_text) lv_free(dropdown->text);
     dropdown->static_text = 1;
     dropdown->text = (char *)text;
 
-    refresh_size(obj);
+    lv_obj_invalidate(obj);
 }
 
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
@@ -216,7 +212,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     size_t len = lv_strlen(options) + 1;
 #else
-    size_t len = lv_text_ap_strlen(options) + 1;
+    size_t len = lv_text_ap_calc_bytes_count(options) + 1;
 #endif
 
     if(dropdown->options != NULL && dropdown->static_options == 0) {
@@ -238,14 +234,13 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     /*Now the text is dynamically allocated*/
     dropdown->static_options = 0;
 
-    refresh_size(obj);
-    if(dropdown->list)
-        lv_obj_invalidate(dropdown->list);
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
@@ -268,14 +263,13 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
     dropdown->static_options = 1;
     dropdown->options = (char *)options;
 
-    refresh_size(obj);
-    if(dropdown->list)
-        lv_obj_invalidate(dropdown->list);
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(option);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
@@ -299,7 +293,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     size_t ins_len = lv_strlen(option) + 1;
 #else
-    size_t ins_len = lv_text_ap_strlen(option) + 1;
+    size_t ins_len = lv_text_ap_calc_bytes_count(option) + 1;
 #endif
 
     size_t new_len = ins_len + old_len + 2; /*+2 for terminating NULL and possible \n*/
@@ -341,14 +335,13 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 
     dropdown->option_cnt++;
 
-    refresh_size(obj);
-    if(dropdown->list)
-        lv_obj_invalidate(dropdown->list);
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_clear_options(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->options == NULL) return;
 
@@ -359,14 +352,13 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     dropdown->static_options = 1;
     dropdown->option_cnt = 0;
 
-    refresh_size(obj);
-    if(dropdown->list)
-        lv_obj_invalidate(dropdown->list);
+    lv_obj_invalidate(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->sel_opt_id == sel_opt) return;
@@ -378,12 +370,12 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
         position_to_selected(obj, LV_ANIM_OFF);
     }
 
-    refresh_size(obj);
+    lv_obj_invalidate(obj);
 }
 
 void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->dir == dir) return;
@@ -395,16 +387,16 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
 
 void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     dropdown->symbol = symbol;
-    refresh_size(obj);
+    lv_obj_invalidate(obj);
 }
 
 void lv_dropdown_set_selected_highlight(lv_obj_t * obj, bool en)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     dropdown->selected_highlight = en;
@@ -417,7 +409,7 @@ void lv_dropdown_set_selected_highlight(lv_obj_t * obj, bool en)
 
 lv_obj_t * lv_dropdown_get_list(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     return dropdown->list;
@@ -425,7 +417,7 @@ lv_obj_t * lv_dropdown_get_list(lv_obj_t * obj)
 
 const char * lv_dropdown_get_text(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     return dropdown->text;
@@ -433,7 +425,7 @@ const char * lv_dropdown_get_text(lv_obj_t * obj)
 
 const char * lv_dropdown_get_options(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     return dropdown->options == NULL ? "" : dropdown->options;
@@ -441,7 +433,7 @@ const char * lv_dropdown_get_options(const lv_obj_t * obj)
 
 uint32_t lv_dropdown_get_selected(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -450,7 +442,7 @@ uint32_t lv_dropdown_get_selected(const lv_obj_t * obj)
 
 uint32_t lv_dropdown_get_option_count(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -459,7 +451,7 @@ uint32_t lv_dropdown_get_option_count(const lv_obj_t * obj)
 
 void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -517,21 +509,21 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
 
 const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     return dropdown->symbol;
 }
 
 bool lv_dropdown_get_selected_highlight(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     return dropdown->selected_highlight;
 }
 
 lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     return dropdown->dir;
 }
@@ -542,14 +534,14 @@ lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
 
 void lv_dropdown_open(lv_obj_t * dropdown_obj)
 {
-    LV_CHECK_OBJ(dropdown_obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(dropdown_obj, MY_CLASS);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
     lv_obj_add_state(dropdown_obj, LV_STATE_CHECKED);
     lv_obj_set_parent(dropdown->list, lv_obj_get_screen(dropdown_obj));
     lv_obj_move_to_index(dropdown->list, -1);
-    lv_obj_set_hidden(dropdown->list, false);
+    lv_obj_remove_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
     /*To allow styling the list*/
     lv_obj_send_event(dropdown_obj, LV_EVENT_READY, NULL);
@@ -640,23 +632,23 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
 
 void lv_dropdown_close(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_remove_state(obj, LV_STATE_CHECKED);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
-    lv_obj_set_hidden(dropdown->list, true);
+    lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
     lv_obj_send_event(obj, LV_EVENT_CANCEL, NULL);
 }
 
 bool lv_dropdown_is_open(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    return lv_obj_is_hidden(dropdown->list) ? false : true;
+    return lv_obj_has_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN) ? false : true;
 }
 
 #if LV_USE_OBSERVER
@@ -713,7 +705,7 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     dropdown->option_cnt      = 0;
     dropdown->dir = LV_DIR_BOTTOM;
 
-    lv_obj_set_scroll_on_focus(obj, true);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 #if LV_WIDGETS_HAS_DEFAULT_VALUE
     lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
 #endif
@@ -747,10 +739,10 @@ static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_obj_set_scroll_on_focus(obj, false);
-    lv_obj_set_click_focusable(obj, false);
-    lv_obj_set_ignore_layout(obj, true);
-    lv_obj_set_hidden(obj, true);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
 
     lv_label_create(obj);
 
@@ -781,8 +773,8 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     if(code == LV_EVENT_FOCUSED) {
-        lv_group_t * g = lv_obj_get_group(obj);
-        const bool editing = g && lv_group_get_editing(g);
+        lv_group_t * g             = lv_obj_get_group(obj);
+        bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
 
         /*Encoders need special handling*/
@@ -803,11 +795,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         res = btn_release_handler(obj);
-        if(res != LV_RESULT_OK)
-            return;
-    }
-    else if(code == LV_EVENT_VALUE_CHANGED) {
-        refresh_size(obj);
+        if(res != LV_RESULT_OK) return;
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
         lv_obj_refresh_self_size(obj);
@@ -816,73 +804,9 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_refresh_self_size(obj);
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-
-        lv_point_t size;
-        size.x = 0;
-        size.y = 0;
-
-        /* Calculate the symbol width */
-        int32_t symbol_w = 0;
-        if(dropdown->symbol) {
-            lv_draw_label_dsc_t symbol_dsc;
-            lv_draw_label_dsc_init(&symbol_dsc);
-
-            lv_image_src_t symbol_type = lv_image_src_get_type(dropdown->symbol);
-            if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
-                lv_point_t text_size;
-
-                lv_text_get_size(&text_size,
-                                 dropdown->symbol,
-                                 symbol_dsc.font,
-                                 symbol_dsc.letter_space,
-                                 symbol_dsc.line_space,
-                                 LV_COORD_MAX,
-                                 symbol_dsc.flag);
-                symbol_w = text_size.x;
-            }
-            else {
-                lv_image_header_t header;
-                lv_result_t decoder_res = lv_image_decoder_get_info(dropdown->symbol, &header);
-                if(decoder_res == LV_RESULT_OK) {
-                    symbol_w = header.w;
-                }
-                else {
-                    symbol_w = 0;
-                }
-            }
-            size.x += symbol_w;
-            size.x += lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
-        }
-
-        /* Calculate the text width */
-        const char * opt_txt;
-        char buf[128];
-        if(dropdown->text)
-            opt_txt = dropdown->text;
-        else {
-            lv_dropdown_get_selected_str(obj, buf, 128);
-            opt_txt = buf;
-        }
-
-        if(opt_txt == NULL) {
-            size.y = LV_MAX(size.y, lv_font_get_line_height_internal(font));
-        }
-        else {
-            lv_draw_label_dsc_t dsc;
-            lv_draw_label_dsc_init(&dsc);
-
-            lv_point_t text_size;
-            int32_t max_width = lv_obj_calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH) - size.x;
-            lv_text_get_size(&text_size, opt_txt, font, dsc.letter_space, dsc.line_space, max_width, dsc.flag);
-
-            size.x += text_size.x;
-            size.y = LV_MAX(size.y, text_size.y);
-        }
-
         lv_point_t * p = lv_event_get_param(e);
-        p->x = LV_MAX(p->x, size.x);
-        p->y = LV_MAX(p->y, size.y);
+        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+        p->y = lv_font_get_line_height(font);
     }
     else if(code == LV_EVENT_KEY) {
         uint32_t c = lv_event_get_key(e);
@@ -915,8 +839,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_t * indev_obj = lv_indev_get_active_obj();
             if(indev_obj != obj) {
                 res = btn_release_handler(obj);
-                if(res != LV_RESULT_OK)
-                    return;
+                if(res != LV_RESULT_OK) return;
             }
         }
     }
@@ -1109,12 +1032,6 @@ static void draw_main(lv_event_t * e)
     lv_draw_label(layer, &label_dsc, &txt_area);
 }
 
-static void refresh_size(lv_obj_t * obj)
-{
-    lv_obj_invalidate(obj);
-    lv_obj_refresh_self_size(obj);
-}
-
 static void draw_list(lv_event_t * e)
 {
     lv_obj_t * list_obj = lv_event_get_current_target(e);
@@ -1167,7 +1084,7 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, l
     /*Draw a rectangle under the selected item*/
     const lv_font_t * font    = lv_obj_get_style_text_font(list_obj, LV_PART_SELECTED);
     int32_t line_space = lv_obj_get_style_text_line_space(list_obj,  LV_PART_SELECTED);
-    int32_t font_h         = lv_font_get_line_height_internal(font);
+    int32_t font_h         = lv_font_get_line_height(font);
 
     /*Draw the selected*/
     lv_obj_t * label = get_label(dropdown_obj);
@@ -1215,7 +1132,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;
 
-    int32_t font_h        = lv_font_get_line_height_internal(label_dsc.font);
+    int32_t font_h        = lv_font_get_line_height(label_dsc.font);
 
     lv_area_t area_sel;
     area_sel.y1 = label->coords.y1;
@@ -1272,7 +1189,7 @@ static lv_result_t btn_release_handler(lv_obj_t * obj)
 
 /**
  * Called when a drop down list is released to open it or set new option
- * @param list_obj pointer to the drop down list's list
+ * @param list pointer to the drop down list's list
  * @return LV_RESULT_INVALID if the list is not being deleted in the user callback. Else LV_RESULT_OK
  */
 static lv_result_t list_release_handler(lv_obj_t * list_obj)
@@ -1334,7 +1251,7 @@ static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y)
     y -= label->coords.y1;
 
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
-    int32_t font_h              = lv_font_get_line_height_internal(font);
+    int32_t font_h              = lv_font_get_line_height(font);
     int32_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
 
     y += line_space / 2;
@@ -1348,8 +1265,7 @@ static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y)
 
 /**
  * Set the position of list when it is closed to show the selected item
- * @param dropdown_obj pointer to a drop down list
- * @param anim_en whether to animate the position change
+ * @param ddlist pointer to a drop down list
  */
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en)
 {
@@ -1361,7 +1277,7 @@ static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_
     if(lv_obj_get_height(label) <= lv_obj_get_content_height(dropdown_obj)) return;
 
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
-    int32_t font_h              = lv_font_get_line_height_internal(font);
+    int32_t font_h              = lv_font_get_line_height(font);
     int32_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
     int32_t unit_h = font_h + line_space;
     int32_t line_y1 = dropdown->sel_opt_id * unit_h;

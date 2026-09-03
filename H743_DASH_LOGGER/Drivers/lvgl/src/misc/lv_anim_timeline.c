@@ -6,9 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_anim_private.h"
+#include "lv_assert.h"
 #include "lv_anim_timeline_private.h"
+#include "../stdlib/lv_mem.h"
+#include "../stdlib/lv_string.h"
+#if LV_USE_OBJ_NAME
+    #include "../core/lv_obj_tree.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -47,7 +52,7 @@ lv_anim_timeline_t * lv_anim_timeline_create(void)
 
 void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 {
-    if(at == NULL) return;
+    LV_ASSERT_NULL(at);
 
     lv_anim_timeline_pause(at);
 
@@ -57,8 +62,7 @@ void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 
 void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv_anim_t * a)
 {
-    LV_CHECK_ARG(at != NULL, return);
-    LV_CHECK_ARG(a != NULL, return);
+    LV_ASSERT_NULL(at);
 
     at->anim_dsc_cnt++;
     at->anim_dsc = lv_realloc(at->anim_dsc, at->anim_dsc_cnt * sizeof(lv_anim_timeline_dsc_t));
@@ -69,12 +73,16 @@ void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv
     at->anim_dsc[at->anim_dsc_cnt - 1].start_time = start_time;
 }
 
-
 uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return 0);
+    LV_ASSERT_NULL(at);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
+    uint32_t repeat = at->repeat_count;
+    uint32_t repeat_delay = at->repeat_delay;
+    uint32_t start = at->act_time;
+    uint32_t end = at->reverse ? 0 : playtime;
+    uint32_t duration = end > start ? end - start : start - end;
 
     if((!at->reverse && at->act_time == 0) || (at->reverse && at->act_time == playtime)) {
         for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
@@ -83,80 +91,59 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
         }
     }
 
-    /*Always animate the whole 0..playtime range in `playtime` ms and seek into it if
-     *the timeline is not at its beginning. Starting the animation at `act_time`
-     *instead would shorten it, and as a repeat replays the same values, every later
-     *repeat would keep playing only that remaining part.*/
+    /*Apply the delay only if playing from any ends*/
+    uint32_t delay = 0;
+    if(!at->reverse && at->act_time == 0) delay = at->delay;
+    else if(at->reverse && at->act_time == playtime) delay = at->delay;
+
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, at);
     lv_anim_set_exec_cb(&a, anim_timeline_exec_cb);
-    if(at->reverse) lv_anim_set_values(&a, playtime, 0);
-    else lv_anim_set_values(&a, 0, playtime);
-
-    lv_anim_set_duration(&a, playtime);
+    lv_anim_set_values(&a, start, end);
+    lv_anim_set_duration(&a, duration);
+    lv_anim_set_delay(&a, delay);
     lv_anim_set_path_cb(&a, anim_timeline_path_cb);
-    lv_anim_set_repeat_count(&a, at->repeat_count);
-    lv_anim_set_repeat_delay(&a, at->repeat_delay);
-
-    /*How much of the timeline has already played. A reversed one counts from its end.*/
-    uint32_t elapsed = at->reverse ? playtime - at->act_time : at->act_time;
-    if(elapsed == 0) {
-        /*Apply the delay only if playing from any ends*/
-        lv_anim_set_delay(&a, at->delay);
-    }
-    else {
-        /*`lv_anim_set_delay()` writes act_time as well, so seek after it*/
-        a.act_time = (int32_t)elapsed;
-    }
-
+    lv_anim_set_repeat_count(&a, repeat);
+    lv_anim_set_repeat_delay(&a, repeat_delay);
     lv_anim_start(&a);
-
     return playtime;
-}
-
-uint32_t lv_anim_timeline_restart(lv_anim_timeline_t * at)
-{
-    LV_CHECK_ARG(at != NULL, return 0);
-
-    lv_anim_timeline_set_progress(at, at->reverse ? LV_ANIM_TIMELINE_PROGRESS_MAX : 0);
-    return lv_anim_timeline_start(at);
 }
 
 void lv_anim_timeline_pause(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return);
+    LV_ASSERT_NULL(at);
 
     lv_anim_delete(at, anim_timeline_exec_cb);
 }
 
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)
 {
-    LV_CHECK_ARG(at != NULL, return);
+    LV_ASSERT_NULL(at);
     at->reverse = reverse;
 }
 
 void lv_anim_timeline_set_delay(lv_anim_timeline_t * at, uint32_t delay)
 {
-    LV_CHECK_ARG(at != NULL, return);
+    LV_ASSERT_NULL(at);
     at->delay = delay;
 }
 
 void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt)
 {
-    LV_CHECK_ARG(at != NULL, return);
+    LV_ASSERT_NULL(at);
     at->repeat_count = cnt;
 }
 
 void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay)
 {
-    LV_CHECK_ARG(at != NULL, return);
+    LV_ASSERT_NULL(at);
     at->repeat_delay = delay;
 }
 
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 {
-    LV_CHECK_ARG(at != NULL, return);
+    LV_ASSERT_NULL(at);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     uint32_t act_time = lv_map(progress, 0, LV_ANIM_TIMELINE_PROGRESS_MAX, 0, playtime);
@@ -165,13 +152,13 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 
 void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data)
 {
-    LV_CHECK_ARG(at != NULL, return);
+    LV_ASSERT_NULL(at);
     at->user_data = user_data;
 }
 
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return 0);
+    LV_ASSERT_NULL(at);
 
     uint32_t playtime = 0;
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
@@ -189,46 +176,44 @@ uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 
 bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return false);
+    LV_ASSERT_NULL(at);
     return at->reverse;
 }
 
 
 uint32_t lv_anim_timeline_get_delay(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return 0);
+    LV_ASSERT_NULL(at);
     return at->delay;
 }
 
 uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return 0);
+    LV_ASSERT_NULL(at);
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     return lv_map(at->act_time, 0, playtime, 0, LV_ANIM_TIMELINE_PROGRESS_MAX);
 }
 
 uint32_t lv_anim_timeline_get_repeat_count(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return 0);
+    LV_ASSERT_NULL(at);
     return  at->repeat_count;
 }
 
 uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return 0);
+    LV_ASSERT_NULL(at);
     return  at->repeat_delay;
 }
 
 void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return NULL);
+    LV_ASSERT_NULL(at);
     return at->user_data;
 }
 
 void lv_anim_timeline_merge(lv_anim_timeline_t * dest, const lv_anim_timeline_t * src, int32_t delay)
 {
-    LV_CHECK_ARG(dest != NULL, return);
-    LV_CHECK_ARG(src != NULL, return);
     uint32_t i;
     for(i = 0; i < src->anim_dsc_cnt; i++) {
         uint32_t anim_delay = src->anim_dsc[i].start_time + delay;
@@ -334,12 +319,9 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
     }
 }
 
-
 static int32_t anim_timeline_path_cb(const lv_anim_t * a)
 {
-    /*Map the timestamps directly. The default linear path goes through a
-     *1024 step intermediate, which quantises `act_time` and would stop a
-     *descriptor whose `start_time` falls between two steps from starting.*/
+    /* Directly map original timestamps to avoid loss of accuracy */
     return lv_map(a->act_time, 0, a->duration, a->start_value, a->end_value);
 }
 

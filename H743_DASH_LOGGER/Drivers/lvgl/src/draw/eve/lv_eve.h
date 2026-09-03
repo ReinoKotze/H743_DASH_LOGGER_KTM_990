@@ -24,6 +24,8 @@ extern "C" {
 
 #if LV_USE_DRAW_EVE
 
+#include "../../misc/lv_types.h"
+#include "../../misc/lv_color.h"
 #include "../../libs/FT800-FT813/EVE.h"
 
 /*********************

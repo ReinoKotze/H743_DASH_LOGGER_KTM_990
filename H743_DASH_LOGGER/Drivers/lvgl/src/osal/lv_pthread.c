@@ -10,6 +10,12 @@
 
 #if LV_USE_OS == LV_OS_PTHREAD
 
+#include "../misc/lv_log.h"
+
+#ifndef __linux__
+    #include "../misc/lv_timer.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

@@ -115,7 +115,7 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      && dsc->tile == 0
                      && dsc->blend_mode == LV_BLEND_MODE_NORMAL
                      && dsc->recolor_opa <= LV_OPA_MIN
-                     && dsc->opa >= (lv_opa_t)LV_OPA_MAX
+                     && dsc->opa <= (lv_opa_t)LV_OPA_MAX
                      && dsc->skew_y == 0
                      && dsc->skew_x == 0
                      && dsc->scale_x == 256
@@ -150,10 +150,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_PPA);
     if(!t || t->preferred_draw_unit_id != DRAW_UNIT_ID_PPA) return LV_DRAW_UNIT_IDLE;
-    if(lv_draw_layer_alloc_buf(layer) == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        return LV_DRAW_UNIT_IDLE;
-    }
+    if(lv_draw_layer_alloc_buf(layer) == NULL) return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     u->task_act = t;

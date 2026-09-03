@@ -4,13 +4,7 @@
 #if LV_USE_LIBWEBP
 
 /**
- * @title Decode WebP with libwebp
- * @brief Load a WebP file through the libwebp decoder and center it on the screen.
- *
- * An image widget is created on the active screen with its source set to
- * `A:lvgl/examples/libs/libwebp/rose.webp`, so the libwebp image decoder
- * reads the file through the filesystem driver registered under drive
- * letter `A`.
+ * Load a WEBP image
  */
 void lv_example_libwebp_1(void)
 {

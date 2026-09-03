@@ -6,10 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_text_private.h"
 #include "lv_text_ap.h"
-#include "../font/lv_font_private.h"
+#include "lv_math.h"
+#include "lv_log.h"
+#include "lv_assert.h"
+#include "../stdlib/lv_mem.h"
+#include "../stdlib/lv_string.h"
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -114,7 +118,7 @@ void lv_text_get_size_attributes(lv_point_t * size_res, const char * text, const
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(text);
 
-    letter_height = lv_font_get_line_height_internal(font);
+    letter_height = lv_font_get_line_height(font);
 
     if(attributes->text_flags & LV_TEXT_FLAG_EXPAND) {
         attributes->max_width = LV_COORD_MAX;
@@ -212,7 +216,7 @@ bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
  * @param font pointer to a font
  * @param letter_space letter space
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid line breaks
- * @param flag  settings for the text from 'txt_flag_type' enum
+ * @param flags settings for the text from 'txt_flag_type' enum
  * @param[out] word_w_ptr width (in pixels) of the parsed word. May be NULL.
  * @param cmd_state Pointer to a lv_text_cmd_state_t variable which stored the current state of command processing
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
@@ -521,7 +525,7 @@ char * lv_text_set_text_vfmt(const char * fmt, va_list ap)
     lv_vsnprintf(raw_txt, len + 1, fmt, ap);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = lv_text_ap_strlen(raw_txt);
+    size_t len_ap = lv_text_ap_calc_bytes_count(raw_txt);
     text = lv_malloc(len_ap + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {
@@ -547,18 +551,6 @@ void lv_text_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t
 {
     *letter = lv_text_encoded_next(txt, ofs);
     *letter_next = *letter != '\0' ? lv_text_encoded_next(&txt[*ofs], NULL) : 0;
-}
-
-int32_t lv_font_get_bottom_trim(const lv_font_t * font, lv_text_leading_trim_t trim)
-{
-    LV_CHECK_ARG(font != NULL, return 0);
-    return lv_font_get_bottom_trim_internal(font, trim);
-}
-
-int32_t lv_font_get_top_trim(const lv_font_t * font, lv_text_leading_trim_t trim)
-{
-    LV_CHECK_ARG(font != NULL, return 0);
-    return lv_font_get_top_trim_internal(font, trim);
 }
 
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8

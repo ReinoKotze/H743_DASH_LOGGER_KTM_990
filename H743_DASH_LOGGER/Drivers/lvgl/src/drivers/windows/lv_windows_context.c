@@ -8,13 +8,13 @@
  *********************/
 
 #include "lv_windows_context.h"
-
 #if LV_USE_WINDOWS
 
 #ifdef __GNUC__
     #pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
 
+#include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
 #include "../../osal/lv_os_private.h"
 
@@ -163,8 +163,8 @@ static HDC lv_windows_create_frame_buffer(
 {
     HDC frame_buffer_dc_handle = NULL;
 
-    LV_ASSERT(pixel_buffer != NULL);
-    LV_ASSERT(pixel_buffer_size != NULL);
+    LV_ASSERT_NULL(pixel_buffer);
+    LV_ASSERT_NULL(pixel_buffer_size);
 
     HDC window_dc_handle = GetDC(window_handle);
     if(window_dc_handle) {
@@ -230,7 +230,7 @@ static HDC lv_windows_create_frame_buffer(
 static void lv_windows_display_timer_callback(lv_timer_t * timer)
 {
     lv_windows_window_context_t * context = lv_timer_get_user_data(timer);
-    LV_ASSERT(context != NULL);
+    LV_ASSERT_NULL(context);
 
     if(!context->display_resolution_changed) {
         return;

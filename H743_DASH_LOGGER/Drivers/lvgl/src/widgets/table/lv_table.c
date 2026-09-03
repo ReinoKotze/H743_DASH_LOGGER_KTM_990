@@ -6,19 +6,20 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_table_private.h"
-
-#if LV_USE_TABLE
-
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../lvgl_public.h"
+#if LV_USE_TABLE != 0
+
+#include "../../indev/lv_indev.h"
+#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
+#include "../../misc/lv_math.h"
+#include "../../stdlib/lv_sprintf.h"
 #include "../../draw/lv_draw_private.h"
-#include "../../font/lv_font_private.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -106,7 +107,7 @@ lv_obj_t * lv_table_create(lv_obj_t * parent)
 
 void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const char * txt)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(txt);
 
     lv_table_t * table = (lv_table_t *)obj;
@@ -141,7 +142,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const c
 
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt, ...)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(fmt);
 
     lv_table_t * table = (lv_table_t *)obj;
@@ -185,14 +186,13 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
     lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = lv_text_ap_strlen(raw_txt) + 1;
-    lv_table_cell_t * cell_data = lv_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len_ap);
-    LV_ASSERT_MALLOC(cell_data);
-    if(!cell_data) {
+    size_t len_ap = lv_text_ap_calc_bytes_count(raw_txt);
+    table->cell_data[cell] = lv_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len_ap + 1);
+    LV_ASSERT_MALLOC(table->cell_data[cell]);
+    if(table->cell_data[cell] == NULL) {
         va_end(ap2);
         return;
     }
-    table->cell_data[cell] = cell_data;
     lv_text_ap_proc(raw_txt, table->cell_data[cell]->txt);
 
     lv_free(raw_txt);
@@ -219,7 +219,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
 
 void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -258,7 +258,7 @@ void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt)
 
 void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -313,7 +313,7 @@ void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
 
 void lv_table_set_column_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -326,7 +326,7 @@ void lv_table_set_column_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
 
 void lv_table_set_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -352,7 +352,7 @@ void lv_table_set_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table
 
 void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -377,7 +377,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_tab
 
 void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * user_data)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -402,7 +402,7 @@ void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, voi
 
 void lv_table_set_selected_cell(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -426,7 +426,7 @@ void lv_table_set_selected_cell(lv_obj_t * obj, uint16_t row, uint16_t col)
 
 const char * lv_table_get_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
@@ -442,7 +442,7 @@ const char * lv_table_get_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col)
 
 uint32_t lv_table_get_row_count(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
     return table->row_cnt;
@@ -450,7 +450,7 @@ uint32_t lv_table_get_row_count(lv_obj_t * obj)
 
 uint32_t lv_table_get_column_count(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
     return table->col_cnt;
@@ -458,7 +458,7 @@ uint32_t lv_table_get_column_count(lv_obj_t * obj)
 
 int32_t lv_table_get_column_width(lv_obj_t * obj, uint32_t col)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -472,7 +472,7 @@ int32_t lv_table_get_column_width(lv_obj_t * obj, uint32_t col)
 
 bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
@@ -494,7 +494,7 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint32_t * row, uint32_t * col)
 
 void * lv_table_get_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
@@ -939,7 +939,7 @@ static int32_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t *
 {
     lv_table_t * table = (lv_table_t *)obj;
 
-    int32_t h_max = lv_font_get_line_height_internal(font) + cell_top + cell_bottom;
+    int32_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
     /* Calculate the cell_data index where to start */
     uint32_t row_start = row_id * table->col_cnt;
 
@@ -982,7 +982,7 @@ static int32_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t *
 
         /*When cropping the text we can assume the row height is equal to the line height*/
         if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
-            h_max = LV_MAX(lv_font_get_line_height_internal(font) + cell_top + cell_bottom,
+            h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
                            h_max);
         }
         /*Else we have to calculate the height of the cell text*/
@@ -1074,7 +1074,7 @@ static size_t get_cell_txt_len(const char * txt)
     size_t retval = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    retval = sizeof(lv_table_cell_t) + lv_text_ap_strlen(txt) + 1;
+    retval = sizeof(lv_table_cell_t) + lv_text_ap_calc_bytes_count(txt) + 1;
 #else
     retval = sizeof(lv_table_cell_t) + lv_strlen(txt) + 1;
 #endif

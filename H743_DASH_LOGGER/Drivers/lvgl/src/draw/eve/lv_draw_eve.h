@@ -21,8 +21,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 #if LV_USE_DRAW_EVE
+
+#include "lv_draw_eve_target.h"
 
 /*********************
  *      DEFINES

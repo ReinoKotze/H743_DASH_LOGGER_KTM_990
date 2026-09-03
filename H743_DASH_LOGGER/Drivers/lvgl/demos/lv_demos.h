@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../include/lvgl/lvgl.h"
+#include "../lvgl.h"
 
 typedef struct _lv_demo_args lv_demo_args_t;
 

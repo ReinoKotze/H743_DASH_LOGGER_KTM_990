@@ -6,7 +6,8 @@
  *      INCLUDES
  *********************/
 
-#include "lv_rle_private.h"
+#include "../../stdlib/lv_string.h"
+#include "lv_rle.h"
 
 #if LV_USE_RLE
 

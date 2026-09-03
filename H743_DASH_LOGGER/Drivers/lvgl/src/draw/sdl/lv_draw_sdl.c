@@ -12,6 +12,8 @@
 #include "lv_draw_sdl.h"
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
+#include "../../stdlib/lv_string.h"
+#include "../../drivers/sdl/lv_sdl_window.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_area_private.h"
 
@@ -90,12 +92,6 @@ static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * 
         return lhs->h > rhs->h ? 1 : -1;
     }
 
-    if(lhs->draw_dsc == NULL || rhs->draw_dsc == NULL) {
-        if(lhs->draw_dsc == rhs->draw_dsc) return 0;
-        if(lhs->draw_dsc == NULL) return -1;
-        return 1;
-    }
-
     uint32_t lhs_dsc_size = lhs->draw_dsc->dsc_size;
     uint32_t rhs_dsc_size = rhs->draw_dsc->dsc_size;
 
@@ -153,10 +149,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     SDL_Texture * texture = layer_get_texture(layer);
     if(layer != disp->layer_head && texture == NULL) {
         void * buf = lv_draw_layer_alloc_buf(layer);
-        if(buf == NULL) {
-            t->state = LV_DRAW_TASK_STATE_FAILED;
-            return -1;
-        }
+        if(buf == NULL) return -1;
 
         SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
         int32_t w = lv_area_get_width(&layer->buf_area);
@@ -233,8 +226,8 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     lv_obj_t * obj = ((lv_draw_dsc_base_t *)task->draw_dsc)->obj;
     bool original_send_draw_task_event = false;
     if(obj) {
-        original_send_draw_task_event = lv_obj_is_send_draw_task_events(obj);
-        lv_obj_set_send_draw_task_events(obj, false);
+        original_send_draw_task_event = lv_obj_has_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+        lv_obj_remove_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     }
 
     switch(task->type) {
@@ -341,7 +334,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     cache_data->texture = texture;
 
     if(obj) {
-        lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
+        lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
     }
 
     return true;

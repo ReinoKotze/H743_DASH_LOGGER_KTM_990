@@ -6,11 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
+#include "lv_qnx.h"
 #if LV_USE_QNX
-#include LV_STDBOOL_INCLUDE
+#include <stdbool.h>
+#include "../../core/lv_refr.h"
+#include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
+#include "../../lv_init.h"
 #include <stdlib.h>
 #include <time.h>
 #include <screen/screen.h>
@@ -123,8 +126,6 @@ lv_display_t * lv_qnx_window_create(int32_t hor_res, int32_t ver_res)
 
 void lv_qnx_window_set_title(lv_display_t * disp, const char * title)
 {
-    LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(title != NULL, return);
     lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
     if(!dsc->managed) {
         /*Can't set title if there is no window manager*/
@@ -151,7 +152,6 @@ void lv_qnx_window_set_title(lv_display_t * disp, const char * title)
 
 bool lv_qnx_add_pointer_device(lv_display_t * disp)
 {
-    LV_CHECK_ARG(disp != NULL, return false);
     lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
     if(dsc->pointer != NULL) {
         /*Only one pointer device per display*/
@@ -179,7 +179,6 @@ bool lv_qnx_add_pointer_device(lv_display_t * disp)
 
 bool lv_qnx_add_keyboard_device(lv_display_t * disp)
 {
-    LV_CHECK_ARG(disp != NULL, return false);
     lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
     if(dsc->keyboard != NULL) {
         /*Only one keyboard device per display*/
@@ -207,7 +206,6 @@ bool lv_qnx_add_keyboard_device(lv_display_t * disp)
 
 int lv_qnx_event_loop(lv_display_t * disp)
 {
-    LV_CHECK_ARG(disp != NULL, return 0);
     lv_refr_now(disp);
 
     /*Run the event loop*/

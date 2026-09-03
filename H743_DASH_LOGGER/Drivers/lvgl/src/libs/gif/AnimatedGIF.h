@@ -13,9 +13,11 @@
 #ifndef __ANIMATEDGIF__
 #define __ANIMATEDGIF__
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_GIF
+
+#include "../../misc/lv_fs.h"
 
 //
 // GIF Animator
@@ -53,8 +55,7 @@
 #define MAX_CODE_SIZE 12
 
 #define MAX_COLORS 256
-#define MAX_WIDTH LV_GIF_MAX_WIDTH
-#define MAX_HEIGHT LV_GIF_MAX_HEIGHT
+#define MAX_WIDTH 480
 #define LZW_BUF_SIZE (6*MAX_CHUNK_SIZE)
 #define LZW_HIGHWATER (4*MAX_CHUNK_SIZE)
 // This buffer is used to store the pixel sequence in reverse order
@@ -105,8 +106,7 @@ enum {
 enum {
    GIF_SUCCESS = 0,
    GIF_DECODE_ERROR,
-   GIF_TOO_LARGE,
-   GIF_TOO_WIDE = GIF_TOO_LARGE, // backward-compatible alias; prefer GIF_TOO_LARGE
+   GIF_TOO_WIDE,
    GIF_INVALID_PARAMETER,
    GIF_UNSUPPORTED_FEATURE,
    GIF_FILE_NOT_OPEN,

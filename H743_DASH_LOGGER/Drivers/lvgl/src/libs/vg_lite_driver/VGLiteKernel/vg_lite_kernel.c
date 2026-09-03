@@ -52,7 +52,7 @@
 *
 *****************************************************************************/
 
-#include "../../../lvgl_public.h"
+#include "../../../lv_conf_internal.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include "../lv_vg_lite_hal/vg_lite_platform.h"

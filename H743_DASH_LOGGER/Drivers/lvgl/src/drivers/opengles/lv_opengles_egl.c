@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_opengles_egl.h"
-#include LV_STDBOOL_INCLUDE
+#include <stdint.h>
 
 #if LV_USE_EGL
 
@@ -16,10 +16,15 @@
 #include <string.h>
 #include "lv_opengles_debug.h"
 
-#include "../../lvgl_public.h"
 #include "glad/include/glad/egl.h"
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_log.h"
+#include "../../misc/lv_types.h"
+#include "../../misc/lv_types.h"
+#include "../../stdlib/lv_mem.h"
 #include "lv_opengles_private.h"
 #include "lv_opengles_egl_private.h"
+#include "lv_opengles_driver.h"
 
 /*********************
 *      DEFINES
@@ -434,9 +439,8 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
 
 static EGLSurface create_egl_surface(lv_opengles_egl_t * ctx)
 {
-    LV_ASSERT(ctx != NULL);
-    LV_ASSERT(ctx->egl_display != NULL);
-    LV_ASSERT(ctx->egl_config != NULL);
+    LV_ASSERT_NULL(ctx->egl_display);
+    LV_ASSERT_NULL(ctx->egl_config);
     LV_ASSERT(ctx->native_window != 0);
     return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->native_window, NULL);
 }
@@ -515,7 +519,7 @@ static void * create_native_window(lv_opengles_egl_t * ctx)
 
     void * native_window = ctx->interface.create_window_cb(ctx->interface.driver_data, &properties);
     if(!native_window) {
-        LV_LOG_ERROR("Failed to create window");
+        LV_LOG_ERROR("Faield to create window");
         lv_free(mods);
         return NULL;
     }

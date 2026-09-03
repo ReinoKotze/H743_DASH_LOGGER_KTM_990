@@ -15,9 +15,13 @@
 
 #include "lv_draw_pxp.h"
 
+#if LV_USE_PXP
 #if LV_USE_DRAW_PXP
 
-#include "../../../core/lv_global.h"
+#include "../../../stdlib/lv_string.h"
+#if LV_USE_PARALLEL_DRAW_DEBUG
+    #include "../../../core/lv_global.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -150,3 +154,4 @@ void lv_draw_pxp_layer(lv_draw_task_t * t)
 }
 
 #endif /*LV_USE_DRAW_PXP*/
+#endif /*LV_USE_PXP*/

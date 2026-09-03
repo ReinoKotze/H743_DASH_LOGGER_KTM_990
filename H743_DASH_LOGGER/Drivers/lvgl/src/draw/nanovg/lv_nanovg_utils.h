@@ -14,10 +14,13 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_NANOVG
 
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_matrix.h"
+#include "../../misc/lv_color.h"
 #include "../../libs/nanovg/nanovg.h"
 
 /*********************

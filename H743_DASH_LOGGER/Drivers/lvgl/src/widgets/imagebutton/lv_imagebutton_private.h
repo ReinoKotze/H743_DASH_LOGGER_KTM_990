@@ -14,10 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
+#include "lv_imagebutton.h"
 
 #if LV_USE_IMAGEBUTTON != 0
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES

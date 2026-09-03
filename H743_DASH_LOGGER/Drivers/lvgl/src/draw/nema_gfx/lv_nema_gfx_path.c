@@ -32,7 +32,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
+#include "../../core/lv_refr.h"
 
 #if LV_USE_NEMA_GFX
 #if LV_USE_NEMA_VG

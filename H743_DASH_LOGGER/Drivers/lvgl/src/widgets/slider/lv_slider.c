@@ -7,21 +7,22 @@
  *      INCLUDES
  *********************/
 #include "lv_slider_private.h"
-
-#if LV_USE_SLIDER
-
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../lvgl_public.h"
-#include "../../indev/lv_indev_private.h"
-#include "../../core/lv_observer_private.h"
+#if LV_USE_SLIDER != 0
 
-/*Check dependencies*/
-#if LV_USE_BAR == 0
-    #error "lv_slider: lv_bar is required. Enable it in lv_conf.h (LV_USE_BAR 1)"
-#endif
+#include "../../misc/lv_assert.h"
+#include "../../core/lv_group.h"
+#include "../../indev/lv_indev.h"
+#include "../../indev/lv_indev_private.h"
+#include "../../display/lv_display.h"
+#include "../../draw/lv_draw.h"
+#include "../../stdlib/lv_string.h"
+#include "../../misc/lv_math.h"
+#include "../image/lv_image.h"
+#include "../../core/lv_observer_private.h"
 
 /*********************
  *      DEFINES
@@ -129,7 +130,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent)
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     return slider->dragging;
@@ -155,9 +156,9 @@ void lv_slider_set_min_value(lv_obj_t * obj, int32_t min)
     lv_bar_set_min_value(obj, min);
 }
 
-void lv_slider_set_max_value(lv_obj_t * obj, int32_t max)
+void lv_slider_set_max_value(lv_obj_t * obj, int32_t min)
 {
-    lv_bar_set_max_value(obj, max);
+    lv_bar_set_max_value(obj, min);
 }
 
 void lv_slider_set_mode(lv_obj_t * obj, lv_slider_mode_t mode)
@@ -198,9 +199,9 @@ lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider)
     else return LV_SLIDER_MODE_NORMAL;
 }
 
-lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * obj)
+lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * slider)
 {
-    lv_bar_orientation_t ori = lv_bar_get_orientation(obj);
+    lv_bar_orientation_t ori = lv_bar_get_orientation(slider);
     if(ori == LV_BAR_ORIENTATION_HORIZONTAL) return LV_SLIDER_ORIENTATION_HORIZONTAL;
     else if(ori == LV_BAR_ORIENTATION_VERTICAL) return LV_SLIDER_ORIENTATION_VERTICAL;
     else return LV_SLIDER_ORIENTATION_AUTO;
@@ -243,9 +244,9 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     slider->dragging = 0U;
     slider->left_knob_focus = 0U;
 
-    lv_obj_set_scroll_chain_hor(obj, false);
-    lv_obj_set_scrollable(obj, false);
-    lv_obj_set_scroll_on_focus(obj, true);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_ext_click_area(obj, LV_DPX(8));
 }
 
@@ -316,8 +317,8 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
         else if(indev_type == LV_INDEV_TYPE_POINTER) {
-            if(is_slider_horizontal(obj)) lv_obj_set_scroll_chain_ver(obj, true);
-            else  lv_obj_set_scroll_chain_hor(obj, true);
+            if(is_slider_horizontal(obj)) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            else  lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
         }
     }
     else if(code == LV_EVENT_FOCUSED) {
@@ -328,12 +329,12 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
         if(is_slider_horizontal(obj)) {
-            lv_obj_set_scroll_chain_ver(obj, true);
-            lv_obj_set_scroll_chain_hor(obj, false);
+            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
         }
         else {
-            lv_obj_set_scroll_chain_hor(obj, true);
-            lv_obj_set_scroll_chain_ver(obj, false);
+            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
         }
         lv_obj_refresh_ext_draw_size(obj);
     }
@@ -558,7 +559,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
     lv_indev_t * indev = lv_indev_active();
     if(lv_indev_get_type(indev) != LV_INDEV_TYPE_POINTER)
         return;
-    if(lv_indev_get_scroll_obj(indev) != NULL && !slider->dragging)
+    if(lv_indev_get_scroll_obj(indev) != NULL)
         return;
 
     lv_point_t p;
@@ -602,7 +603,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
             new_value = p.x - (obj->coords.x1 + bg_left);
         }
         if(indic_w) {
-            new_value = (int32_t)(((int64_t)new_value * range + indic_w / 2) / indic_w);
+            new_value = (new_value * range + indic_w / 2) / indic_w;
             new_value += slider->bar.min_value;
         }
     }
@@ -621,7 +622,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
             new_value = p.y - (obj->coords.y2 + bg_bottom);
             new_value = -new_value;
         }
-        new_value = (int32_t)(((int64_t)new_value * range + indic_h / 2) / indic_h);
+        new_value = (new_value * range + indic_h / 2) / indic_h;
         new_value += slider->bar.min_value;
     }
 
@@ -639,9 +640,9 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
     if(*slider->value_to_set != new_value) {
         *slider->value_to_set = new_value;
         if(is_hor)
-            lv_obj_set_scroll_chain_ver(obj, false);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
         else
-            lv_obj_set_scroll_chain_hor(obj, false);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
 
         lv_obj_invalidate(obj);
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);

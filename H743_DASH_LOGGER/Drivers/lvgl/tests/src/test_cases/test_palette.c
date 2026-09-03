@@ -1,4 +1,5 @@
 #if LV_BUILD_TEST
+#include "../../../src/misc/lv_palette.h"
 #include "../lvgl.h"
 
 #include "unity/unity.h"

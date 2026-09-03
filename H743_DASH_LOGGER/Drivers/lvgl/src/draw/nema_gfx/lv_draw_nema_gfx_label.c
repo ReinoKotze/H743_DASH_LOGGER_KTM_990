@@ -39,8 +39,7 @@
 #include "../../misc/lv_bidi_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../lvgl.h"
-#include "../../font/lv_font_private.h"
-#include "../../font/freetype/lv_freetype_private.h"
+#include "../../libs/freetype/lv_freetype_private.h"
 #include "../../core/lv_global.h"
 
 /*********************
@@ -291,19 +290,6 @@ static inline uint8_t _bpp_nema_gfx_format(lv_draw_glyph_dsc_t * glyph_draw_dsc)
     }
 }
 
-static inline void _set_color_blend(uint32_t color, uint8_t alpha)
-{
-    nema_set_tex_color(color);
-
-    if(alpha < 255U) {
-        nema_set_blend_blit(NEMA_BL_SIMPLE | NEMA_BLOP_MODULATE_A);
-        nema_set_const_color(color);
-    }
-    else {
-        nema_set_blend_blit(NEMA_BL_SIMPLE);
-    }
-}
-
 static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                   lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
@@ -317,13 +303,6 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             border_draw_dsc.color = glyph_draw_dsc->color;
             border_draw_dsc.width = 1;
             lv_draw_nema_gfx_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
-
-            /*lv_draw_nema_gfx_border alters the GPU blend state; restore it so
-             *subsequent glyphs are blitted correctly.*/
-            lv_color32_t restore_col32 = lv_color_to_32(glyph_draw_dsc->color, glyph_draw_dsc->opa);
-            uint32_t restore_nema_color = nema_rgba(restore_col32.red, restore_col32.green,
-                                                    restore_col32.blue, restore_col32.alpha);
-            _set_color_blend(restore_nema_color, restore_col32.alpha);
 #endif
         }
         else if(glyph_draw_dsc->format >= LV_FONT_GLYPH_FORMAT_A1 &&
@@ -339,7 +318,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
                 return;
 
             const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
-            const uint8_t * mask_buf;
+            const void * mask_buf;
             uint32_t src_cf;
             lv_area_t mask_area = *glyph_draw_dsc->letter_coords;
 
@@ -373,7 +352,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             if(is_raw_bitmap && (glyph_draw_dsc->format <= LV_FONT_GLYPH_FORMAT_A4)) {
                 nema_bind_src_tex((uintptr_t)(mask_buf), w * h, 1, src_cf, glyph_draw_dsc->g->stride, NEMA_FILTER_PS);
                 nema_matrix3x3_t m = {
-                    {1,    w,   -x - (y * w) - (0.5f * w)},
+                    {1,    w,   -x - (y * w) - (0.5 * w)},
                     {0,    1,                   0},
                     {0,    0,                   1}
                 };
@@ -418,6 +397,19 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
 
 }
 
+static inline void _set_color_blend(uint32_t color, uint8_t alpha)
+{
+    nema_set_tex_color(color);
+
+    if(alpha < 255U) {
+        nema_set_blend_blit(NEMA_BL_SIMPLE | NEMA_BLOP_MODULATE_A);
+        nema_set_const_color(color);
+    }
+    else {
+        nema_set_blend_blit(NEMA_BL_SIMPLE);
+    }
+}
+
 static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
                                            const lv_area_t * coords)
 {
@@ -448,7 +440,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
         attributes.max_width = p.x;
     }
 
-    int32_t line_height_font = lv_font_get_line_height_internal(font);
+    int32_t line_height_font = lv_font_get_line_height(font);
     int32_t line_height = line_height_font + dsc->line_space;
 
     /*Init variables for the first line*/
@@ -777,7 +769,7 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
         return;
 
     LV_PROFILER_DRAW_BEGIN;
-    bool g_ret = lv_font_get_glyph_dsc_internal(font, &g, letter, '\0');
+    bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, '\0');
     if(g_ret == false) {
         /*Add warning if the dsc is not found*/
         LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);

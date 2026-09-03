@@ -20,11 +20,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_conf_internal.h"
 
-#include "../../lvgl_public.h"
+#if LV_USE_TEMPL != 0
 
-#if LV_USE_TEMPL
-
+#include "../core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -47,8 +47,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_templ_class;
 
 /**
  * Create a templ object
- * @param parent    pointer to a parent widget @nullable. When NULL, the widget
- *                  is created as a screen on the default display.
+ * @param parent    pointer to an object, it will be the parent of the new templ
  * @return          pointer to the created bar
  */
 lv_obj_t * lv_templ_create(lv_obj_t * parent);

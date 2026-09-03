@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl_public.h"
+#include "lv_draw_eve_display.h"
 #if LV_USE_DRAW_EVE
 
 #include "../../../draw/eve/lv_eve.h"

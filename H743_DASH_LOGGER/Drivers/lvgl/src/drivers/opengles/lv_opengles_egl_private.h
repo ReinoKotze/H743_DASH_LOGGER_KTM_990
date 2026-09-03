@@ -13,10 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl_public.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_EGL
 
+#include "../../misc/lv_types.h"
+#include "../../misc/lv_color.h"
 #include "lv_opengles_private.h"
 #include "lv_opengles_egl.h"
 

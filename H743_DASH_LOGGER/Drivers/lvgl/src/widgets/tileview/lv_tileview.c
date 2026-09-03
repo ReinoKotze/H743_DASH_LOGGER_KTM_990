@@ -6,13 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_tileview_private.h"
-
-#if LV_USE_TILEVIEW
-
 #include "../../core/lv_obj_class_private.h"
+#include "../../indev/lv_indev.h"
 #include "../../indev/lv_indev_private.h"
+#if LV_USE_TILEVIEW
 
 /*********************
  *      DEFINES
@@ -136,7 +134,7 @@ static void lv_tileview_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     LV_UNUSED(class_p);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_add_event_cb(obj, tileview_event_cb, LV_EVENT_SCROLL_END, NULL);
-    lv_obj_set_scroll_one(obj, true);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_set_scroll_snap_x(obj, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_scroll_snap_y(obj, LV_SCROLL_SNAP_CENTER);
 }

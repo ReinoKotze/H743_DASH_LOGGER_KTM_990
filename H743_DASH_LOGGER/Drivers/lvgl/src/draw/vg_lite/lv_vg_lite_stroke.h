@@ -18,8 +18,6 @@ extern "C" {
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
 
-#include "../../misc/cache/lv_cache_entry.h"
-
 /*********************
  *      DEFINES
  *********************/
@@ -38,8 +36,7 @@ struct _lv_draw_vg_lite_unit_t;
 
 /**
  * Initialize the stroke module
- * @param unit          pointer to the unit
- * @param cache_cnt     maximum amount of entries in the cache at the same time
+ * @param unit pointer to the unit
  */
 void lv_vg_lite_stroke_init(struct _lv_draw_vg_lite_unit_t * unit, uint32_t cache_cnt);
 
@@ -70,7 +67,7 @@ struct _lv_vg_lite_path_t * lv_vg_lite_stroke_get_path(lv_cache_entry_t * cache_
 /**
  * Drop the stroke cache entry
  * @param unit pointer to the unit
- * @param cache_entry pointer to the stroke cache entry
+ * @param stroke pointer to the stroke
  */
 void lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_cache_entry_t * cache_entry);
 

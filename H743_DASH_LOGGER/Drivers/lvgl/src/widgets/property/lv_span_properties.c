@@ -4,7 +4,7 @@
  * @file lv_span_properties.c
  */
 
-#include "../../lvgl_public.h"
+#include "../span/lv_span.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

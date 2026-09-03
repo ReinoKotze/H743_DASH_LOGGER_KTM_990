@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
+#include "lv_calendar.h"
 
 #if LV_USE_CALENDAR
 

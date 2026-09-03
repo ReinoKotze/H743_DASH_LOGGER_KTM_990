@@ -14,11 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../core/lv_obj_private.h"
-#include "../../lvgl_public.h"
-
+#include "../../lv_conf_internal.h"
 #if LV_USE_LOTTIE
 
+#include "lv_lottie.h"
 #include "../canvas/lv_canvas_private.h"
 
 /*********************
@@ -29,10 +28,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-#if LV_USE_THORVG_INTERNAL
-#include "../../libs/thorvg/thorvg_capi.h"
-#else
+#if LV_USE_THORVG_EXTERNAL
 #include <thorvg_capi.h>
+#else
+#include "../../libs/thorvg/thorvg_capi.h"
 #endif
 
 typedef struct {

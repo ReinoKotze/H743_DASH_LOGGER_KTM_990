@@ -4,7 +4,7 @@
  * @file lv_led_properties.c
  */
 
-#include "../../lvgl_public.h"
+#include "../led/lv_led.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 
