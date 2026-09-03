@@ -6,9 +6,9 @@
 #include "../ui.h"
 
 lv_obj_t * ui_Screen1 = NULL;
-lv_obj_t * ui_Spinner1 = NULL;
-lv_obj_t * ui_Label1 = NULL;
-lv_obj_t * ui_Label2 = NULL;
+lv_obj_t * ui_Button1 = NULL;
+lv_obj_t * ui_Panel4 = NULL;
+lv_obj_t * ui_Button2 = NULL;
 // event funtions
 
 // build funtions
@@ -16,33 +16,40 @@ lv_obj_t * ui_Label2 = NULL;
 void ui_Screen1_screen_init(void)
 {
     ui_Screen1 = lv_obj_create(NULL);
-    lv_obj_remove_flag(ui_Screen1, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(ui_Screen1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Screen1, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Screen1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_color(ui_Screen1, lv_color_hex(0x7C090F), LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Spinner1 = lv_spinner_create(ui_Screen1);
-    lv_spinner_set_anim_params(ui_Spinner1, 10000U, 200U);
+    ui_Button1 = lv_button_create(ui_Screen1);
+    lv_obj_set_width(ui_Button1, 213);
+    lv_obj_set_height(ui_Button1, 140);
+    lv_obj_set_x(ui_Button1, 20);
+    lv_obj_set_y(ui_Button1, 183);
+    lv_obj_add_flag(ui_Button1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_remove_flag(ui_Button1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Button1, lv_color_hex(0x130EFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Button1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_width(ui_Spinner1, 80);
-    lv_obj_set_height(ui_Spinner1, 80);
-    lv_obj_set_x(ui_Spinner1, 26);
-    lv_obj_set_y(ui_Spinner1, -46);
-    lv_obj_set_align(ui_Spinner1, LV_ALIGN_CENTER);
-    lv_obj_remove_flag(ui_Spinner1, LV_OBJ_FLAG_CLICKABLE);
+    ui_Panel4 = lv_obj_create(ui_Screen1);
+    lv_obj_set_width(ui_Panel4, 217);
+    lv_obj_set_height(ui_Panel4, 154);
+    lv_obj_set_x(ui_Panel4, -36);
+    lv_obj_set_y(ui_Panel4, -150);
+    lv_obj_set_align(ui_Panel4, LV_ALIGN_CENTER);
+    lv_obj_remove_flag(ui_Panel4, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Panel4, lv_color_hex(0xFF000D), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Panel4, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Label1 = lv_label_create(ui_Screen1);
-    lv_obj_set_width(ui_Label1, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_Label1, LV_SIZE_CONTENT);
-    lv_obj_set_x(ui_Label1, -120);
-    lv_obj_set_y(ui_Label1, -211);
-    lv_obj_set_align(ui_Label1, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label1, "rpm=");
-
-    ui_Label2 = lv_label_create(ui_Screen1);
-    lv_obj_set_width(ui_Label2, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_Label2, LV_SIZE_CONTENT);
-    lv_obj_set_x(ui_Label2, -71);
-    lv_obj_set_y(ui_Label2, -210);
-    lv_obj_set_align(ui_Label2, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label2, "0000");
+    ui_Button2 = lv_button_create(ui_Screen1);
+    lv_obj_set_width(ui_Button2, 208);
+    lv_obj_set_height(ui_Button2, 115);
+    lv_obj_set_x(ui_Button2, 23);
+    lv_obj_set_y(ui_Button2, 339);
+    lv_obj_add_flag(ui_Button2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_remove_flag(ui_Button2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Button2, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Button2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 }
 
@@ -52,8 +59,8 @@ void ui_Screen1_screen_destroy(void)
 
     // NULL screen variables
     ui_Screen1 = NULL;
-    ui_Spinner1 = NULL;
-    ui_Label1 = NULL;
-    ui_Label2 = NULL;
+    ui_Button1 = NULL;
+    ui_Panel4 = NULL;
+    ui_Button2 = NULL;
 
 }

@@ -67,6 +67,8 @@ void lv_port_disp_init(void)
     memset(buf3, 0, DMA2D_SDRAM_BUF3_SIZE );
 
     disp = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
+
+    //lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
 
     lv_display_set_buffers(disp, buf_2_1, buf_2_2, LVGL_DRAW_BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);

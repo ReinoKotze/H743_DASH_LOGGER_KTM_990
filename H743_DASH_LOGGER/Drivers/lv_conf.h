@@ -2456,7 +2456,9 @@
  *    Leave undefined if not using a binding.
  *    e.g. mp_rom_map_elem_t entry = {MP_ROM_QSTR(MP_QSTR_##int_value), MP_ROM_INT(int_value)}
  */
-#define LV_ATTRIBUTE_CUSTOM_INCLUDE ""
+
+
+#define LV_ATTRIBUTE_CUSTOM_INCLUDE "LV_ATTRIBUTE_LARGE_CONST"
 
 #endif /*LV_ATTRIBUTE_USE_CUSTOM_INCLUDE*/
 

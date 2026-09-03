@@ -108,25 +108,29 @@ void LCD_Init()
 	    LCD_IO_WriteData(0x55U); /* RGB565 */
 
 	    LCD_IO_WriteReg(memoryAccesscont);
-	    LCD_IO_WriteData(0x48U);
+	    LCD_IO_WriteData(0x48U);// 48 40
 
-	    LCD_IO_WriteReg(columnAddressSet);
-	    LCD_IO_WriteData(0x00U);
-	    LCD_IO_WriteData(0x00U);
-	    LCD_IO_WriteData(0x01U);
-	    LCD_IO_WriteData(0x3FU);
 
-	    LCD_IO_WriteReg(rowAddressSet);
-	    LCD_IO_WriteData(0x00U);
-	    LCD_IO_WriteData(0x00U);
-	    LCD_IO_WriteData(0x01U);
-	    LCD_IO_WriteData(0xDFU);
 
-	    /*
-	     * Clear all 320 x 480 RGB565 pixels to black before enabling
-	     * the panel output.
-	     */
-	    Fill(BLACK);
+
+
+//	    LCD_IO_WriteReg(columnAddressSet);
+//	    LCD_IO_WriteData(0x00U);
+//	    LCD_IO_WriteData(0x00U);
+//	    LCD_IO_WriteData(0x01U);
+//	    LCD_IO_WriteData(0x3FU);
+//
+//	    LCD_IO_WriteReg(rowAddressSet);
+//	    LCD_IO_WriteData(0x00U);
+//	    LCD_IO_WriteData(0x00U);
+//	    LCD_IO_WriteData(0x01U);
+//	    LCD_IO_WriteData(0xDFU);
+//
+//	    /*
+//	     * Clear all 320 x 480 RGB565 pixels to black before enabling
+//	     * the panel output.
+//	     */
+//	    Fill(BLACK);
 
 	    /*
 	     * TE mode 1: vertical blanking only.
@@ -135,8 +139,10 @@ void LCD_Init()
 	    //LCD_IO_WriteData(0x00U);
 
 	    LCD_IO_WriteReg(DispNormModeOn);
+	    //LCD_IO_WriteReg(0x20U);
+	    LCD_IO_WriteReg(0x21U);
 	    LCD_IO_WriteReg(pwrOn); /* Display ON */
-
+	    LCD_IO_WriteReg(0x38U);
 	    delay(20U);
 }
 

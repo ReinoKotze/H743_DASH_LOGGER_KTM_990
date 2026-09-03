@@ -27,11 +27,11 @@ uint8_t CSP_QSPI_ReadStatusRegister(uint8_t command, uint8_t *status);
 uint8_t CSP_QSPI_DisableMemoryMappedMode(void);
 
 /*W25Q128 memory parameters*/
-#define MEMORY_FLASH_SIZE				0x1000000  /* 128Mbit =>16Mbyte */
+#define MEMORY_FLASH_SIZE				0x1000000U /* 128Mbit =>16Mbyte */
 #define MEMORY_BLOCK_SIZE				0x10000   /*  blocks of 64KBytes */
 #define MEMORY_SECTOR_SIZE				0x1000    /* 4kBytes */
 #define MEMORY_PAGE_SIZE				0x100     /* 256 bytes */
-
+#define QSPI_MEMORY_MAPPED_BASE         0x90000000UL
 
 /*W25Q128 commands */
 #define CHIP_ERASE_CMD 0xC7

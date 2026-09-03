@@ -4,7 +4,7 @@
  *  Created on: 26 Aug 2026
  *      Author: reino
  */
-#include "User_Libs/w25q128.h"
+#include "w25q128.h"
 #include "quadspi.h"
 #include "main.h"
 
@@ -224,52 +224,81 @@ uint8_t CSP_QSPI_EraseBlock(uint32_t flash_address)
 uint8_t CSP_QSPI_EraseSector(uint32_t EraseStartAddress,
                              uint32_t EraseEndAddress)
 {
-    QSPI_CommandTypeDef sCommand = {0};
+	QSPI_CommandTypeDef sCommand = {0};
+	    uint32_t start_offset;
+	    uint32_t end_offset;
 
-    if ((EraseStartAddress >= MEMORY_FLASH_SIZE) ||
-        (EraseEndAddress >= MEMORY_FLASH_SIZE) ||
-        (EraseStartAddress > EraseEndAddress))
-    {
-        return HAL_ERROR;
-    }
+	    /*
+	     * Accept both flash offsets and QSPI memory-mapped addresses.
+	     *
+	     * Offset form:
+	     *   0x00000000 to 0x00FFFFFF
+	     *
+	     * Memory-mapped form:
+	     *   0x90000000 to 0x90FFFFFF
+	     */
+	    if((EraseStartAddress >= QSPI_MEMORY_MAPPED_BASE) &&
+	       (EraseStartAddress < (QSPI_MEMORY_MAPPED_BASE + MEMORY_FLASH_SIZE)) &&
+	       (EraseEndAddress >= QSPI_MEMORY_MAPPED_BASE) &&
+	       (EraseEndAddress < (QSPI_MEMORY_MAPPED_BASE + MEMORY_FLASH_SIZE)))
+	    {
+	        start_offset = EraseStartAddress - QSPI_MEMORY_MAPPED_BASE;
+	        end_offset   = EraseEndAddress - QSPI_MEMORY_MAPPED_BASE;
+	    }
+	    else if((EraseStartAddress < MEMORY_FLASH_SIZE) &&
+	            (EraseEndAddress < MEMORY_FLASH_SIZE))
+	    {
+	        start_offset = EraseStartAddress;
+	        end_offset   = EraseEndAddress;
+	    }
+	    else
+	    {
+	        return HAL_ERROR;
+	    }
 
-    EraseStartAddress &= ~(MEMORY_SECTOR_SIZE - 1U);
+	    if(start_offset > end_offset)
+	    {
+	        return HAL_ERROR;
+	    }
 
-    sCommand.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
-    sCommand.Instruction       = SECTOR_ERASE_CMD; /* 0x20 */
-    sCommand.AddressMode       = QSPI_ADDRESS_1_LINE;
-    sCommand.AddressSize       = QSPI_ADDRESS_24_BITS;
-    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
-    sCommand.DataMode          = QSPI_DATA_NONE;
-    sCommand.DummyCycles       = 0;
-    sCommand.DdrMode           = QSPI_DDR_MODE_DISABLE;
-    sCommand.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
-    sCommand.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
+	    start_offset &= ~(MEMORY_SECTOR_SIZE - 1U);
+	    end_offset   &= ~(MEMORY_SECTOR_SIZE - 1U);
 
-    while (EraseStartAddress <= EraseEndAddress)
-    {
-        if (QSPI_WriteEnable() != HAL_OK)
-        {
-            return HAL_ERROR;
-        }
+	    sCommand.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
+	    sCommand.Instruction       = SECTOR_ERASE_CMD;
+	    sCommand.AddressMode       = QSPI_ADDRESS_1_LINE;
+	    sCommand.AddressSize       = QSPI_ADDRESS_24_BITS;
+	    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+	    sCommand.DataMode          = QSPI_DATA_NONE;
+	    sCommand.DummyCycles       = 0U;
+	    sCommand.DdrMode           = QSPI_DDR_MODE_DISABLE;
+	    sCommand.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
+	    sCommand.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
 
-        sCommand.Address = EraseStartAddress;
+	    while(start_offset <= end_offset)
+	    {
+	        if(QSPI_WriteEnable() != HAL_OK)
+	        {
+	            return HAL_ERROR;
+	        }
 
-        if (HAL_QSPI_Command(&hqspi, &sCommand,
-                             HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-        {
-            return HAL_ERROR;
-        }
+	        sCommand.Address = start_offset;
 
-        if (QSPI_AutoPollingMemReady(W25Q128_READY_TIMEOUT_MS) != HAL_OK)
-        {
-            return HAL_ERROR;
-        }
+	        if(HAL_QSPI_Command(&hqspi, &sCommand,
+	                            HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+	        {
+	            return HAL_ERROR;
+	        }
 
-        EraseStartAddress += MEMORY_SECTOR_SIZE;
-    }
+	        if(QSPI_AutoPollingMemReady(W25Q128_READY_TIMEOUT_MS) != HAL_OK)
+	        {
+	            return HAL_ERROR;
+	        }
 
-    return HAL_OK;
+	        start_offset += MEMORY_SECTOR_SIZE;
+	    }
+
+	    return HAL_OK;
 }
 
 uint8_t CSP_QSPI_WriteMemory(uint8_t *buffer, uint32_t address,

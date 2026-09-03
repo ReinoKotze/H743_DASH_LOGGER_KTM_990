@@ -45,6 +45,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+const uint8_t __attribute__ ((section(".extFlashMem"))) data[]="helo world!";
+
 volatile uint8_t qspi_test_value;
 volatile uint32_t sdram_fail_address;
 volatile uint32_t sdram_expected;
@@ -204,8 +206,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-  //lv_example_spinner_1();
-  //////////////////////////////////////////////////////////////
+
   setup();
 
 
@@ -335,6 +336,16 @@ void MPU_Config(void)
   MPU_InitStruct.BaseAddress = 0xc0000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
   MPU_InitStruct.SubRegionDisable = 0x00;
+
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+  /** Initializes and configures the Region and the memory to be protected
+  */
+  MPU_InitStruct.Number = MPU_REGION_NUMBER3;
+  MPU_InitStruct.BaseAddress = 0x90000000;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_1MB;
+  MPU_InitStruct.SubRegionDisable = 0x0;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */
