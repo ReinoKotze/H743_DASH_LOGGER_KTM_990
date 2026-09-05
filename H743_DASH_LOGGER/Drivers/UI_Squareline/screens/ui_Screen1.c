@@ -12,6 +12,8 @@ lv_obj_t * ui_Panel4 = NULL;
 lv_obj_t * ui_Button2 = NULL;
 lv_obj_t * ui_Image10 = NULL;
 lv_obj_t * ui_Spinner1 = NULL;
+lv_obj_t * ui_rpmVALUE = NULL;
+lv_obj_t * ui_Container1 = NULL;
 // event funtions
 
 // build funtions
@@ -74,11 +76,31 @@ void ui_Screen1_screen_init(void)
 
     ui_Spinner1 = lv_spinner_create(ui_Screen1);
     //lv_spinner_set_anim_params(ui_Spinner1, 1000, 90);
-    lv_obj_set_width(ui_Spinner1, 35);
+    lv_obj_set_width(ui_Spinner1, 67);
     lv_obj_set_height(ui_Spinner1, 47);
-    lv_obj_set_x(ui_Spinner1, 125);
-    lv_obj_set_y(ui_Spinner1, 232);
+    lv_obj_set_x(ui_Spinner1, 143);
+    lv_obj_set_y(ui_Spinner1, 258);
     lv_obj_remove_flag(ui_Spinner1, LV_OBJ_FLAG_CLICKABLE);      /// Flags
+
+    ui_rpmVALUE = lv_label_create(ui_Screen1);
+    lv_obj_set_width(ui_rpmVALUE, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_rpmVALUE, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_rpmVALUE, 25);
+    lv_obj_set_y(ui_rpmVALUE, 173);
+    lv_label_set_text(ui_rpmVALUE, "200000");
+    lv_obj_set_style_bg_color(ui_rpmVALUE, lv_color_hex(0x1F8490), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_rpmVALUE, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Container1 = lv_obj_create(ui_Screen1);
+    lv_obj_remove_style_all(ui_Container1);
+    lv_obj_set_width(ui_Container1, 265);
+    lv_obj_set_height(ui_Container1, 141);
+    lv_obj_set_x(ui_Container1, 18);
+    lv_obj_set_y(ui_Container1, 212);
+    lv_obj_remove_flag(ui_Container1, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_color(ui_Container1, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_Container1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_Container1, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 }
 
@@ -94,5 +116,7 @@ void ui_Screen1_screen_destroy(void)
     ui_Button2 = NULL;
     ui_Image10 = NULL;
     ui_Spinner1 = NULL;
+    ui_rpmVALUE = NULL;
+    ui_Container1 = NULL;
 
 }

@@ -160,6 +160,14 @@ SECTIONS
     __bss_end__ = _ebss;
   } >RAM_D1
 
+  /* Dedicated internal SRAM for LCD draw-buffer isolation. */
+  .lvgl_draw_buffers (NOLOAD) :
+  {
+    . = ALIGN(32);
+    *(.lvgl_draw_buffers)
+    . = ALIGN(32);
+  } >RAM_D2
+
   /* User_heap_stack section, used to check that there is enough RAM left */
   ._user_heap_stack :
   {

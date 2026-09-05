@@ -24,7 +24,6 @@
 #include "mdma.h"
 #include "quadspi.h"
 #include "tim.h"
-#include "usart.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -40,17 +39,20 @@
 #include "ui.h"
 #include "ALTmain.hpp"
 #include "SDRAM_ADD_MANIGMENT.h"
+#include "lvgl.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-const uint8_t __attribute__ ((section(".extFlashMem"))) data[]="helo world!";
+//const uint8_t __attribute__ ((section(".extFlashMem"))) data[]="helo world!";
 
 volatile uint8_t qspi_test_value;
-volatile uint32_t sdram_fail_address;
-volatile uint32_t sdram_expected;
-volatile uint32_t sdram_actual;
+volatile uint32_t rpm = 0U;
+volatile uint8_t lvgl_timer_due = 0U;
+volatile uint8_t LV_HAS_RUN=0;
+
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -58,9 +60,8 @@ volatile uint32_t sdram_actual;
 
 void setup(void);
 void tasks(void);
-
-
-
+float TIMER_CLOCK = 240;
+volatile uint32_t rpm_last_capture_ms = 0U;
 
 
 
@@ -89,39 +90,17 @@ static void MPU_Config(void);
 
 
 
-#ifdef __GNUC__
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif
-PUTCHAR_PROTOTYPE
-{
-    HAL_UART_Transmit(&huart1 , (uint8_t *)&ch, 1, 0xFFFF);
-    return ch;
-}
+//#ifdef __GNUC__
+//#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+//#else
+//#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+//#endif
+//PUTCHAR_PROTOTYPE
+//{
+//    HAL_UART_Transmit(&huart1 , (uint8_t *)&ch, 1, 0xFFFF);
+//    return ch;
+//}
 
-
-static void SDRAM_TestLVGLHeap(void)
-{
-    volatile uint32_t *p = (volatile uint32_t *)0xC0000000U;
-    const uint32_t size = 5U * 1024U * 1024U;
-
-    for (uint32_t offset = 0; offset < size; offset += 0x1000U) {
-        uint32_t expected = 0xA5A50000U ^ offset;
-
-        p[offset / 4U] = expected;
-        __DSB();
-
-        uint32_t actual = p[offset / 4U];  /* Read exactly once */
-
-        if (actual != expected) {
-            sdram_fail_address = 0xC0000000U + offset;
-            sdram_expected = expected;
-            sdram_actual = actual;
-            Error_Handler();
-        }
-    }
-}
 
 static void ReadFlashData(void)
 {
@@ -142,10 +121,35 @@ void lv_example_spinner_1(void)
 }
 
 
-//static uint32_t my_get_millis(void)
-//{
-//    return HAL_GetTick();
-//}
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+
+
+
+HAL_GPIO_WritePin(RPM_OUT_GPIO_Port, RPM_OUT_Pin, RESET);
+
+if ((htim->Instance == TIM1) && (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2))
+	{
+		uint32_t period =HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+		if(period != 0)
+		{
+
+            HAL_GPIO_WritePin(RPM_OUT_GPIO_Port, RPM_OUT_Pin, SET);
+			rpm = ((TIMER_CLOCK*60) /(period));
+			rpm_last_capture_ms = HAL_GetTick();
+		}
+	}
+	HAL_GPIO_WritePin(RPM_OUT_GPIO_Port, RPM_OUT_Pin, RESET);
+
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM6)
+    {
+        lvgl_timer_due = 1U;
+    }
+}
 
 /* USER CODE END PFP */
 
@@ -197,16 +201,26 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_MDMA_Init();
-  MX_USART1_UART_Init();
   MX_FMC_Init();
   MX_CRC_Init();
   MX_TIM1_Init();
   MX_QUADSPI_Init();
   MX_DMA2D_Init();
+  MX_TIM6_Init();
+  /* TE is wired to PD3/EXTI3; TIM2 is not used for refresh. */
   /* USER CODE BEGIN 2 */
-
-
-
+  if (HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK)
+  {
+      Error_Handler();
+  }
+  if (HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2) != HAL_OK)
+  {
+      Error_Handler();
+  }
+  if (HAL_TIM_Base_Start_IT(&htim6) != HAL_OK)
+  {
+      Error_Handler();
+  }
   setup();
 
 
@@ -334,6 +348,11 @@ void MPU_Config(void)
   */
   MPU_InitStruct.Number = MPU_REGION_NUMBER2;
   MPU_InitStruct.BaseAddress = 0xc0000000;
+  /* SDRAM: Normal, non-cacheable, non-bufferable memory for diagnosis.
+     Avoid cache-line bursts/coherency while validating external buffers. */
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
   MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
   MPU_InitStruct.SubRegionDisable = 0x00;
 
@@ -341,6 +360,10 @@ void MPU_Config(void)
 
   /** Initializes and configures the Region and the memory to be protected
   */
+  /* Restore the original cached QSPI attributes for this separate region. */
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
   MPU_InitStruct.Number = MPU_REGION_NUMBER3;
   MPU_InitStruct.BaseAddress = 0x90000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_1MB;

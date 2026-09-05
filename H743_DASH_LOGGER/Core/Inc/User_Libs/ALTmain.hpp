@@ -12,10 +12,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 // Declare flat C-style wrappers for your C++ functionality
-//void print_cpp_message(void);
-//int add_in_cpp(int a, int b);
+
+
+extern volatile uint32_t rpm;
+extern volatile uint32_t rpm_last_capture_ms;
+extern volatile uint8_t lvgl_timer_due;
+extern volatile uint8_t LV_HAS_RUN;
+
+void LV_TIM_UPDATE();
+void RPM_UPDATE ();
+
 
 #ifdef __cplusplus
 }

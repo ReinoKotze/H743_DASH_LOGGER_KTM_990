@@ -20,6 +20,8 @@ extern lv_obj_t * ui_Panel4;
 extern lv_obj_t * ui_Button2;
 extern lv_obj_t * ui_Image10;
 extern lv_obj_t * ui_Spinner1;
+extern lv_obj_t * ui_rpmVALUE;
+extern lv_obj_t * ui_Container1;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

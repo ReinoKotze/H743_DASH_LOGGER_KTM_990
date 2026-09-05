@@ -4,7 +4,7 @@
 
 extern SDRAM_HandleTypeDef hsdram1;
 
-#define SDRAM_REFRESH_COUNT  370U
+#define SDRAM_REFRESH_COUNT  296U
 
 HAL_StatusTypeDef SDRAM_InitSequence(void)
 {
@@ -33,16 +33,17 @@ HAL_StatusTypeDef SDRAM_InitSequence(void)
 
     command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
     command.CommandTarget = FMC_COMMAND_TARGET_BANK;
-    command.AutoRefreshNumber = 4U;
+    command.AutoRefreshNumber = 8U;
     command.ModeRegisterDefinition = 0U;
 
     if (HAL_SDRAM_SendCommand(&hsdram1, &command, SDRAM_TIMEOUT) != HAL_OK) {
         return HAL_ERROR;
     }
 
+    /* Vendor mode: burst length 2 and CAS 3; FMC read burst is disabled. */
     mode_register = SDRAM_MODEREG_BURST_LENGTH_2 |
                     SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL |
-					SDRAM_MODEREG_CAS_LATENCY_2 |
+					SDRAM_MODEREG_CAS_LATENCY_3 |
                     SDRAM_MODEREG_OPERATING_MODE_STANDARD |
                     SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
 
@@ -56,9 +57,10 @@ HAL_StatusTypeDef SDRAM_InitSequence(void)
     }
 
     /*
-     * FMC kernel clock: 100 MHz
-     * SDRAM clock period: 2 -> 50 MHz SDRAM clock
-     * Refresh count = (50 MHz * 7.8125 us) - 20 = 370.625
+     * FMC kernel clock: 121.6 MHz; SDCLK = FMC / 3 = 40.533 MHz. 
+     * W9825G6KH: 8192 refreshes / 64 ms up to 85 C.
+     * floor(40.533 MHz * 7.8125 us) - 20 = 296.
+     * Above 85 C the datasheet requires 16 ms / 8192 refresh.
      */
     if (HAL_SDRAM_ProgramRefreshRate(&hsdram1,
                                      SDRAM_REFRESH_COUNT) != HAL_OK) {
@@ -67,3 +69,4 @@ HAL_StatusTypeDef SDRAM_InitSequence(void)
 
     return HAL_OK;
 }
+

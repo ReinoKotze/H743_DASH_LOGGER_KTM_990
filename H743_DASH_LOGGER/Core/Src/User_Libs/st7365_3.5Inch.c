@@ -11,33 +11,61 @@
 #include "dma.h"
 #include <stdbool.h>
 #include <string.h>
+#include "User_Libs/LVGL_LCD_LINK.h"
+#include "tim.h"
+
 
 extern MDMA_HandleTypeDef hmdma_mdma_channel0_sw_0;
+static uint32_t te_wait_start_ms;
+static uint32_t te_wait_timeout_ms;
+static uint8_t te_wait_active = 0U;
 
+extern volatile uint8_t TEFLAG ;
 
-static volatile uint8_t TEFLAG = 0U;
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void LCD_TE_BeginWait(uint32_t timeout_ms)
 {
-  /* Prevent unused argument(s) compilation warning */
-  if(GPIO_Pin == TE_LCD_Pin)
-  {
-	  TEFLAG=1U;
-  }
+    uint32_t primask = __get_PRIMASK();
 
-  /* NOTE: This function Should not be modified, when the callback is needed,
-           the HAL_GPIO_EXTI_Callback could be implemented in the user file
-   */
+    __disable_irq();
+
+    TEFLAG = 0U;
+    te_wait_start_ms = HAL_GetTick();
+    te_wait_timeout_ms = timeout_ms;
+    te_wait_active = 1U;
+
+    __set_PRIMASK(primask);
 }
 
+bool LCD_TE_IsReady(void)
+{
+//    if (te_wait_active == 0U)
+//    {
+//        return true;
+//    }
+
+    if (TEFLAG != 0U)
+    {
+        te_wait_active = 0U;
+        return true;
+    }
+
+    if ((uint32_t)(HAL_GetTick() - te_wait_start_ms) >=
+        te_wait_timeout_ms)
+    {
+        te_wait_active = 0U;
+        return true; /* Timeout: proceed without TE. */
+    }
+
+    return false;
+}
 
 void LCD_WaitForTE(uint32_t timeout_ms)
 {
 
 	/*for TE pin interrup
-	 * PIN PD3 set as GPIO_EXTI3 and named TE_LCD
+	 * PD3 is configured as EXTI3 and named TE_LCD
 	 *
-	 * EXTI line 3 is enabled in the NVIC.
+	 * The rising-edge callback signals TEFLAG.
 	 *
 	 *
 	 *
@@ -65,7 +93,7 @@ void LCD_IO_WriteReg(uint16_t Reg)
 {
 	FMC_BANK1_REG = Reg;
 
-	//__DSB();
+	__DSB();
 
 }
 
@@ -73,7 +101,7 @@ void LCD_IO_WriteData(uint16_t RegValue)
 {
 	FMC_BANK1_DATA = RegValue;
 
-	//__DSB();
+	__DSB();
 
 }
 
@@ -130,16 +158,16 @@ void LCD_Init()
 	     * Clear all 320 x 480 RGB565 pixels to black before enabling
 	     * the panel output.
 	     */
-	   // Fill(BLACK);
+	    Fill(BLACK);
 
 	    /*
 	     * TE mode 1: vertical blanking only.
 	     */
-//	    LCD_IO_WriteReg(tearingEffect);
-//	    LCD_IO_WriteData(0x00U);
-
-
 	    LCD_IO_WriteReg(tearingEffect);
+	    LCD_IO_WriteData(0x00U);
+
+
+	   // LCD_IO_WriteReg(tearingEffectOff);
 
 
 	    LCD_IO_WriteReg(DispNormModeOn);
@@ -240,14 +268,180 @@ void Fill(uint16_t color)
 void LCD_CleanDCacheForMDMA(const void *address, uint32_t size)
 {
     /*
-     * Required only if SDRAM is configured as cacheable.
-     * MDMA reads SDRAM, not the CPU D-cache.
+     * Clean cacheable source memory, including the internal D2 draw buffers.
+     * MDMA reads physical memory, not the CPU D-cache.
      */
     uint32_t start = (uint32_t)address & ~31UL;
     uint32_t end   = ((uint32_t)address + size + 31UL) & ~31UL;
 
     SCB_CleanDCache_by_Addr((uint32_t *)start, (int32_t)(end - start));
 }
+
+
+
+
+
+
+
+
+typedef struct
+{
+    const uint16_t *source;
+    uint32_t bytes_remaining;
+    uint32_t current_chunk_bytes;
+
+    volatile bool busy;
+    volatile HAL_StatusTypeDef status;
+} lcd_mdma_transfer_t;
+
+static lcd_mdma_transfer_t lcd_mdma_transfer = {
+    .source = NULL,
+    .bytes_remaining = 0U,
+    .current_chunk_bytes = 0U,
+    .busy = false,
+    .status = HAL_OK
+};
+
+static HAL_StatusTypeDef LCD_MDMA_StartNextChunk(void);
+
+static void LCD_MDMA_FinishFromISR(bool success)
+{
+    lcd_mdma_transfer.busy = false;
+    if(!success && lcd_mdma_transfer.status == HAL_OK)
+        lcd_mdma_transfer.status = HAL_ERROR;
+    __DSB();
+    lv_port_disp_mdma_complete_isr(success);
+}
+static void LCD_MDMA_ChunkCompleteCallback(MDMA_HandleTypeDef *hmdma)
+{
+    HAL_StatusTypeDef status;
+
+    if(hmdma != &hmdma_mdma_channel0_sw_0) {
+        return;
+    }
+
+    if(!lcd_mdma_transfer.busy) {
+        return;
+    }
+
+    lcd_mdma_transfer.source +=
+        lcd_mdma_transfer.current_chunk_bytes / sizeof(uint16_t);
+
+    lcd_mdma_transfer.bytes_remaining -=
+        lcd_mdma_transfer.current_chunk_bytes;
+
+    if(lcd_mdma_transfer.bytes_remaining == 0U) {
+        lcd_mdma_transfer.status = HAL_OK;
+        LCD_MDMA_FinishFromISR(true);
+        return;
+    }
+
+    /*
+     * HAL_MDMA_IRQHandler has already changed the channel state to READY
+     * before it calls this callback, so the next chunk can start here.
+     */
+    status = LCD_MDMA_StartNextChunk();
+
+    if(status != HAL_OK) {
+        lcd_mdma_transfer.status = status;
+        LCD_MDMA_FinishFromISR(false);
+    }
+}
+
+static void LCD_MDMA_ErrorCallback(MDMA_HandleTypeDef *hmdma)
+{
+    if(hmdma != &hmdma_mdma_channel0_sw_0) {
+        return;
+    }
+
+    lcd_mdma_transfer.status = HAL_ERROR;
+    LCD_MDMA_FinishFromISR(false);
+}
+
+static HAL_StatusTypeDef LCD_MDMA_StartNextChunk(void)
+{
+    HAL_StatusTypeDef status;
+
+    if(lcd_mdma_transfer.bytes_remaining == 0U) {
+        return HAL_ERROR;
+    }
+
+    lcd_mdma_transfer.current_chunk_bytes =
+        lcd_mdma_transfer.bytes_remaining;
+
+    if(lcd_mdma_transfer.current_chunk_bytes > LCD_MDMA_MAX_BYTES) {
+        lcd_mdma_transfer.current_chunk_bytes = LCD_MDMA_MAX_BYTES;
+    }
+
+    status = HAL_MDMA_Start_IT(
+        &hmdma_mdma_channel0_sw_0,
+        (uint32_t)lcd_mdma_transfer.source,
+        (uint32_t)&FMC_BANK1_DATA,
+        lcd_mdma_transfer.current_chunk_bytes,
+        1U
+    );
+
+    return status;
+}
+
+HAL_StatusTypeDef LCD_StartBitmapMDMA_IT(uint16_t x0, uint16_t y0,
+                                         uint16_t x1, uint16_t y1,
+                                         const uint16_t *pixels)
+{
+    uint32_t byte_count;
+    HAL_StatusTypeDef status;
+
+    if((pixels == NULL) ||
+       (x1 < x0) || (y1 < y0) ||
+       (x1 >= LCD_WIDTH) || (y1 >= LCD_HEIGHT) ||
+       lcd_mdma_transfer.busy) {
+        return HAL_ERROR;
+    }
+
+    byte_count = (uint32_t)(x1 - x0 + 1U) *
+                 (uint32_t)(y1 - y0 + 1U) *
+                 sizeof(uint16_t);
+
+    LCD_CleanDCacheForMDMA(pixels, byte_count);
+
+    LCD_SetWindow(x0, y0, x1, y1);
+    LCD_IO_WriteReg(memoryWrite);
+    __DSB();
+
+    lcd_mdma_transfer.source = pixels;
+    lcd_mdma_transfer.bytes_remaining = byte_count;
+    lcd_mdma_transfer.current_chunk_bytes = 0U;
+    lcd_mdma_transfer.status = HAL_OK;
+    lcd_mdma_transfer.busy = true;
+
+    hmdma_mdma_channel0_sw_0.XferCpltCallback =
+        LCD_MDMA_ChunkCompleteCallback;
+
+    hmdma_mdma_channel0_sw_0.XferErrorCallback =
+        LCD_MDMA_ErrorCallback;
+
+    status = LCD_MDMA_StartNextChunk();
+
+    if(status != HAL_OK) {
+        lcd_mdma_transfer.busy = false;
+        lcd_mdma_transfer.status = status;
+    }
+
+    return status;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 HAL_StatusTypeDef LCD_WriteBitmapDMA(uint16_t x0, uint16_t y0,
                                      uint16_t x1, uint16_t y1,
@@ -257,16 +451,12 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA(uint16_t x0, uint16_t y0,
 	    uint32_t chunk_bytes;
 	    HAL_StatusTypeDef status;
 
-//	    if ((pixels == NULL) ||
-//	        (x1 < x0) || (y1 < y0) ||
-//	        (x1 >= LCD_WIDTH) || (y1 >= LCD_HEIGHT)) {
-//	        return HAL_ERROR;
-//	    }
+	    if((pixels == NULL) ||
+	       (x1 < x0) || (y1 < y0) ||
+	       (x1 >= LCD_WIDTH) || (y1 >= LCD_HEIGHT)) {
+	        return HAL_ERROR;
+	    }
 
-	    /*
-	     * TE synchronization occurs once in the LVGL flush callback.
-	     * Do not wait for TE in this function.
-	     */
 	    LCD_SetWindow(x0, y0, x1, y1);
 	    LCD_IO_WriteReg(memoryWrite);
 
@@ -274,19 +464,15 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA(uint16_t x0, uint16_t y0,
 	                      (uint32_t)(y1 - y0 + 1U) *
 	                      sizeof(uint16_t);
 
-	    /*
-	     * Your SDRAM is currently MPU non-cacheable, so this is not required.
-	     * It is harmless and makes the function safe if SDRAM becomes cacheable.
-	     */
 	    LCD_CleanDCacheForMDMA(pixels, bytes_remaining);
+	    __DSB();
 
-	    while (bytes_remaining != 0U) {
+	    while(bytes_remaining != 0U) {
+	        chunk_bytes = bytes_remaining;
 
-	        /*
-	         * Limit each transfer to one display line, or the remaining tail.
-	         */
-	        chunk_bytes = (bytes_remaining > LCD_MDMA_MAX_BYTES) ?
-	                      LCD_MDMA_MAX_BYTES : bytes_remaining;
+	        if(chunk_bytes > LCD_MDMA_MAX_BYTES) {
+	            chunk_bytes = LCD_MDMA_MAX_BYTES;
+	        }
 
 	        status = HAL_MDMA_Start(&hmdma_mdma_channel0_sw_0,
 	                                (uint32_t)pixels,
@@ -294,140 +480,85 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA(uint16_t x0, uint16_t y0,
 	                                chunk_bytes,
 	                                1U);
 
-//	        if (status != HAL_OK) {
-//	            return status;
-//	        }
+	        if(status != HAL_OK) {
+	            return status;
+	        }
 
 	        status = HAL_MDMA_PollForTransfer(&hmdma_mdma_channel0_sw_0,
 	                                          HAL_MDMA_FULL_TRANSFER,
 	                                          100U);
 
-//	        if (status != HAL_OK) {
-//	            return status;
-//	        }
+	        if(status != HAL_OK) {
+	            return status;
+	        }
 
 	        pixels += chunk_bytes / sizeof(uint16_t);
 	        bytes_remaining -= chunk_bytes;
 	    }
 
-	   // __DSB();
+	    __DSB();
 	    return HAL_OK;
 }
 
 HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
-                                      uint16_t x1, uint16_t y1,
-                                      const uint16_t *pixels)
+                                    uint16_t x1, uint16_t y1,
+                                    const uint16_t *pixels)
 {
-	 uint32_t pixels_remaining;
-	    uint32_t chunk_pixels;
-	   uint32_t byte_count;                 /* Remove the // */
-	    HAL_StatusTypeDef status;
-
-	    if((pixels == NULL) ||
-	       (x1 < x0) || (y1 < y0) ||
-	       (x1 >= LCD_WIDTH) || (y1 >= LCD_HEIGHT)) {
-	        return HAL_ERROR;
-	    }
-
-	    pixels_remaining = (uint32_t)(x1 - x0 + 1U) *
-	                       (uint32_t)(y1 - y0 + 1U);
-
-	    byte_count = pixels_remaining * sizeof(uint16_t);  /* Add this */
-
-	   LCD_CleanDCacheForMDMA(pixels, byte_count);        /* Remove the // */
-	  //  __DSB();
-	 //  __NOP();
-	    LCD_SetWindow(x0, y0, x1, y1);
-	    LCD_IO_WriteReg(memoryWrite);
-       // __NOP();
-	    while(pixels_remaining != 0U) {
-	        chunk_pixels = (pixels_remaining > 65535U) ?
-	                       65535U : pixels_remaining;
-
-	        status = HAL_DMA_Start(&hdma_memtomem_dma2_stream0,
-	                               (uint32_t)pixels,
-	                               (uint32_t)&FMC_BANK1_DATA,
-	                               chunk_pixels);
-
-//	        if(status != HAL_OK) {
-//	            return status;
-//	        }
-
-	        status = HAL_DMA_PollForTransfer(&hdma_memtomem_dma2_stream0,
-	                                         HAL_DMA_FULL_TRANSFER,
-	                                         100U);
-
-//	        if(status != HAL_OK) {
-//	            return status;
-//	        }
-
-	        pixels += chunk_pixels;
-	        pixels_remaining -= chunk_pixels;
-	    }
-
-	   // __DSB();
-	  //  __NOP();
-	    return HAL_OK;
-}
-
-HAL_StatusTypeDef LCD_WriteBitmapDMA2Strided(uint16_t x0, uint16_t y0,
-                                             uint16_t x1, uint16_t y1,
-                                             const uint16_t *framebuffer,
-                                             uint32_t source_stride_pixels)
-{
-    uint32_t width;
-    uint32_t height;
-    uint32_t row;
-    uint32_t source_span_bytes;
-    const uint16_t *source_line;
-    HAL_StatusTypeDef status;
-
-    if((framebuffer == NULL) ||
-       (source_stride_pixels < LCD_WIDTH) ||
-       (x1 < x0) || (y1 < y0) ||
+    if((pixels == NULL) || (x1 < x0) || (y1 < y0) ||
        (x1 >= LCD_WIDTH) || (y1 >= LCD_HEIGHT)) {
         return HAL_ERROR;
     }
 
-    width  = (uint32_t)x1 - (uint32_t)x0 + 1U;
-    height = (uint32_t)y1 - (uint32_t)y0 + 1U;
-
-    /*
-     * LVGL DIRECT mode passes the start of the complete framebuffer.
-     * Clean the full memory range DMA will read.
-     */
-    source_span_bytes =
-        (((height - 1U) * source_stride_pixels) + width) * sizeof(uint16_t);
-
-    LCD_CleanDCacheForMDMA(framebuffer, source_span_bytes);
-    __DSB();
-
+    uint32_t remaining = (uint32_t)(x1 - x0 + 1U) *
+                         (uint32_t)(y1 - y0 + 1U);
+    LCD_CleanDCacheForMDMA(pixels, remaining * sizeof(uint16_t));
     LCD_SetWindow(x0, y0, x1, y1);
     LCD_IO_WriteReg(memoryWrite);
 
-    for(row = 0U; row < height; row++) {
-        source_line = framebuffer +
-                      (((uint32_t)y0 + row) * source_stride_pixels) +
-                      (uint32_t)x0;
+    while(remaining != 0U) {
+        uint32_t count = (remaining > 65535U) ? 65535U : remaining;
+        HAL_StatusTypeDef status = HAL_DMA_Start(
+            &hdma_memtomem_dma2_stream0, (uint32_t)pixels,
+            (uint32_t)&FMC_BANK1_DATA, count);
 
-        status = HAL_DMA_Start(&hdma_memtomem_dma2_stream0,
-                               (uint32_t)source_line,
-                               (uint32_t)&FMC_BANK1_DATA,
-                               width);
-
-        if(status != HAL_OK) {
-            return status;
+        if(status == HAL_OK) {
+            status = HAL_DMA_PollForTransfer(&hdma_memtomem_dma2_stream0,
+                                             HAL_DMA_FULL_TRANSFER, 100U);
         }
-
-        status = HAL_DMA_PollForTransfer(&hdma_memtomem_dma2_stream0,
-                                         HAL_DMA_FULL_TRANSFER,
-                                         100U);
-
         if(status != HAL_OK) {
-            return status;
+            /* Poll may already have attempted an abort. Check hardware too:
+               never release an LVGL buffer while DMA can still read it. */
+            if(HAL_DMA_GetState(&hdma_memtomem_dma2_stream0) == HAL_DMA_STATE_BUSY) {
+                (void)HAL_DMA_Abort(&hdma_memtomem_dma2_stream0);
+            }
+            if((DMA2_Stream0->CR & DMA_SxCR_EN) != 0U) {
+                Error_Handler();
+                while(1) {}
+            }
+            __DSB();
+            /* Restart the entire window: the failed chunk may be partial.
+               Source buffer is still owned by this blocking flush. */
+            const uint16_t *retry = pixels -
+                ((uint32_t)(x1 - x0 + 1U) * (y1 - y0 + 1U) - remaining);
+            uint32_t total = (uint32_t)(x1 - x0 + 1U) * (y1 - y0 + 1U);
+            LCD_SetWindow(x0, y0, x1, y1);
+            LCD_IO_WriteReg(memoryWrite);
+            while(total-- != 0U) {
+                FMC_BANK1_DATA = *retry++;
+            }
+            __DSB();
+            return HAL_OK;
         }
+        pixels += count;
+        remaining -= count;
     }
 
     __DSB();
     return HAL_OK;
+}
+void HAL_GPIO_EXTI_Callback(uint16_t pin)
+{
+    if(pin == TE_LCD_Pin) {
+        lv_port_disp_te_isr();
+    }
 }

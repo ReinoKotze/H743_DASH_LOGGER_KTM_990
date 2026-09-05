@@ -8,15 +8,17 @@
 #ifndef INC_ST7365_3_5INCH_H_
 #define INC_ST7365_3_5INCH_H_
 #include "main.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define LCD_MDMA_MAX_BYTES  (LCD_WIDTH * sizeof(uint16_t))
+#define LCD_MDMA_MAX_BYTES  (32768U)//(LCD_WIDTH * sizeof(uint16_t))
 //#define LCD_MDMA_MAX_BYTES  (65534U) /* Even number: RGB565 pixels */
 #define FMC_BANK1_REG  *(volatile uint16_t *)((uint32_t)0x60000000)  // Register Address for A0
 #define FMC_BANK1_DATA *(volatile uint16_t *)((uint32_t)0x60000002) // Data Address for A0 -> A0<<1 -> 0010
+
 
 
 
@@ -39,10 +41,12 @@ void LCD_CleanDCacheForMDMA(const void *address, uint32_t size);
 HAL_StatusTypeDef LCD_DMA2_Init(void);
 HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,uint16_t x1, uint16_t y1,const uint16_t *pixels);
 HAL_StatusTypeDef LCD_WriteBitmapDMA2Strided(uint16_t x0, uint16_t y0,uint16_t x1, uint16_t y1,const uint16_t *framebuffer,uint32_t source_stride_pixels);
+void LCD_TE_BeginWait(uint32_t timeout_ms);
+bool LCD_TE_IsReady(void);
+HAL_StatusTypeDef LCD_StartBitmapMDMA_IT(uint16_t x0, uint16_t y0,uint16_t x1, uint16_t y1, const uint16_t *pixels);
+
 
 //command list
-
-
 #define swReset 0x01
 #define sleepOut 0x11
 #define commandSetcont 0xf0
