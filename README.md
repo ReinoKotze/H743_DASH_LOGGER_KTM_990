@@ -32,4 +32,7 @@ The main controller will also datalog all information onto an sdcard for tunning
 
 NOTE: I am not getting any senor data from the ecu's canbus (KWP2000 SEA ISO 2014230-2 protocol), I am reading voltages directly and calculating the variables in the controllers. I will be datalogging every 10ms and I can guarantee the log rate and sensor data. Basically I know nothing about the ktm 990's keihin ecu's canbus and I can find very little information on the pid's for each value I am interested in. The learning curve is immense with this project and I don't want to get stuck down with reverse engineering the motorcycles canbus communication. 
 
+Please refer to my very very bad drawing. The UI controller might change but this is the general outline. 
+
+<img width="1369" height="552" alt="Untitled" src="https://github.com/user-attachments/assets/ef356905-a8f0-4110-bcfb-a7cc5d9c2616" />
 
