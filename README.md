@@ -34,5 +34,6 @@ NOTE: I am not getting any senor data from the ecu's canbus (KWP2000 SEA ISO 201
 
 Please refer to my very very bad drawing. The UI controller might change but this is the general outline. 
 
-<img width="1369" height="552" alt="Untitled" src="https://github.com/user-attachments/assets/ef356905-a8f0-4110-bcfb-a7cc5d9c2616" />
+<img width="1319" height="853" alt="Untitled" src="https://github.com/user-attachments/assets/2bd62d3e-e8a1-4775-8b09-47493140a396" />
+
 
