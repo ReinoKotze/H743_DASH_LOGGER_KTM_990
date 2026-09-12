@@ -16,8 +16,19 @@
  *
  */
 
+
+
 // SDRAM address list
+
+
+
+// if 1 its external sdram, 0 is internal RRAM_D2
+#if 0
 #define SDRAM_START_ADD 0xc0000000U
+#else
+#define SDRAM_START_ADD 0x30000000U
+#endif
+
 
 //lv_conf.h file, #if=1 if external sdram is used for lvgl heap
 #if  0
@@ -28,8 +39,8 @@
 
 #else
 
-#define LVGL_HEAP_ADD 0x0 // define not used here, seprate define used in lv_conf. 5mb for lvgl heap
-#define LVGL_HEAP_SIZE (1024*10)
+#define LVGL_HEAP_ADD 0 // define not used here, seprate define used in lv_conf. 5mb for lvgl heap
+#define LVGL_HEAP_SIZE (1024*100)
 #define USE_START_ADD SDRAM_START_ADD
 
 #endif
@@ -38,7 +49,7 @@
 //sizes
 #define MY_DISP_HOR_RES       320U
 #define MY_DISP_VER_RES       480U
-#define MY_DISP_ROWS          (MY_DISP_VER_RES/4)
+#define MY_DISP_ROWS          (MY_DISP_VER_RES/8)
 #define BYTE_PER_PIXEL       (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565))
 
 #define LVGL_DRAW_BUFFER_SIZE (MY_DISP_HOR_RES * MY_DISP_ROWS * BYTE_PER_PIXEL)

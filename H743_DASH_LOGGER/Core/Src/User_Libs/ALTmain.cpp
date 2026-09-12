@@ -5,11 +5,17 @@
 #include "User_Libs/LVGL_LCD_LINK.h"
 #include "ALTmain.hpp"
 #include "ui.h"
+#include "Buttons.hpp"
+
+////might use a STM32H743VIT6 in final board
 
 extern "C" {
 volatile uint32_t lcd_refresh_count;
 volatile uint32_t lcd_fallback_count;
 volatile uint32_t lcd_last_refresh_ms;
+uint8_t screen_state=0;
+uint8_t screen_stateNUM=1;
+
 
 void setup()
 {
@@ -26,9 +32,106 @@ void setup()
 
 void tasks()
 {
-    static uint32_t last_refresh_ms;
-    RPM_UPDATE();
+
+
     LV_TIM_UPDATE();
+    NON_BLOCKING_VSYNC();
+////////////////////////////
+//UI interaction prototype
+
+
+
+    UP_Event();
+    DOWN_Event();
+
+    const bool upEvent = (UP_Event() == 1);
+    const bool downEvent = (DOWN_Event() == 1);
+
+    if (upEvent) {
+        screen_state = (screen_state >= screen_stateNUM)
+            ? 0
+            : screen_state + 1;
+
+        UP_State = 0;
+    }
+
+    if (downEvent) {
+        screen_state = (screen_state == 0)
+            ? screen_stateNUM
+            : screen_state - 1;
+
+        DOWN_State = 0;
+    }
+
+
+
+
+
+
+switch (screen_state)
+{
+case 0:
+
+    if (ui_Normal == nullptr) {
+        ui_Normal_screen_init();
+    }
+
+    if (lv_screen_active() != ui_Normal) {
+        lv_screen_load(ui_Normal);
+    }
+
+    if (ui_RAWsensor != nullptr) {
+        ui_RAWsensor_screen_destroy();
+    }
+
+
+
+
+
+
+
+
+
+    break;
+
+case 1:
+
+    if (ui_RAWsensor == nullptr) {
+        ui_RAWsensor_screen_init();
+    }
+
+    if (lv_screen_active() != ui_RAWsensor) {
+        lv_screen_load(ui_RAWsensor);
+    }
+
+    if (ui_Normal != nullptr) {
+        ui_Normal_screen_destroy();
+    }
+
+    RPM_UPDATE();
+    break;
+
+default:
+
+    break;
+
+
+}
+
+
+
+
+
+
+///////////////////////////
+}
+
+
+void NON_BLOCKING_VSYNC()
+
+{
+
+    static uint32_t last_refresh_ms;
     if(lv_port_disp_busy()) return;
     bool te_due = lv_port_disp_service();
     uint32_t now = HAL_GetTick();
@@ -42,8 +145,11 @@ void tasks()
         lcd_last_refresh_ms = last_refresh_ms - before;
         /* Wait for a fresh edge on the next iteration, without blocking. */
         (void)lv_port_disp_service();
+
     }
+
 }
+
 void LV_TIM_UPDATE()
 {
     static uint32_t last_timer_ms;
@@ -59,18 +165,5 @@ void LV_TIM_UPDATE()
     }
 }
 
-void RPM_UPDATE()
-{
-    static uint32_t last_update;
-    static uint32_t previous = UINT32_MAX;
-    uint32_t now = HAL_GetTick();
-    if((uint32_t)(now - last_update) < 16U) return;
-    last_update = now;
-    uint32_t value = rpm;
-    if((uint32_t)(now - rpm_last_capture_ms) > 30U) value = 0U;
-    if(value != previous) {
-        lv_label_set_text_fmt(ui_rpmVALUE, "rpm= %04lu", (unsigned long)value);
-        previous = value;
-    }
-}
+
 }

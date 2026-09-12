@@ -20,9 +20,18 @@ extern volatile uint32_t rpm_last_capture_ms;
 extern volatile uint8_t lvgl_timer_due;
 extern volatile uint8_t LV_HAS_RUN;
 
-void LV_TIM_UPDATE();
-void RPM_UPDATE ();
 
+void NON_BLOCKING_VSYNC();
+void LV_TIM_UPDATE();
+
+//used in RAW DATA,
+void RPM_UPDATE ();
+extern volatile uint32_t rpm;
+extern volatile uint32_t rpm_last_capture_ms;
+
+
+//RAW data file
+void Raw_Data();
 
 #ifdef __cplusplus
 }

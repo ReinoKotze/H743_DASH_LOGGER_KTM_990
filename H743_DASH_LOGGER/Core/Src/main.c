@@ -18,11 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "crc.h"
 #include "dma.h"
-#include "dma2d.h"
+#include "i2c.h"
 #include "mdma.h"
 #include "quadspi.h"
+#include "rng.h"
+#include "spi.h"
 #include "tim.h"
 #include "gpio.h"
 #include "fmc.h"
@@ -85,6 +88,7 @@ uint32_t non_blocking_task(uint32_t last_tick, const uint32_t delay_interval) ;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void PeriphCommonClock_Config(void);
 static void MPU_Config(void);
 /* USER CODE BEGIN PFP */
 
@@ -111,20 +115,24 @@ static void ReadFlashData(void)
 }
 
 
-void lv_example_spinner_1(void)
-{
-    /*Create a spinner*/
-    lv_obj_t * spinner = lv_spinner_create(lv_screen_active());
-    lv_obj_set_size(spinner, 100, 100);
-    lv_obj_center(spinner);
-    lv_spinner_set_anim_params(spinner, 10000, 200);
-}
 
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
 
 
+	/*RPM callback
+	 * timer settings
+	 * 1. TIM 1 clock source: internal clock
+	 * 2. combined channels: PWM input on CH2 for pin PA9
+	 * 3. prescaller 999
+	 * 4. best filter is 8
+	 * 5. CH1 falling edge,indirect, no division
+	 * 6. CH2 rising edge, direct, no division
+	 * 7. RPM defined as extern in ALTmain
+	 * 8. RPM initial value is set to 0 in main
+	 *
+	 */
 
 HAL_GPIO_WritePin(RPM_OUT_GPIO_Port, RPM_OUT_Pin, RESET);
 
@@ -143,8 +151,14 @@ if ((htim->Instance == TIM1) && (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2))
 
 }
 
+
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+	/*
+	 * this is an timer set to trigger every 5ms to replace the HAL_Delay(5)
+	 * you are supposed to use after lv_timer_handler()
+	 */
     if (htim->Instance == TIM6)
     {
         lvgl_timer_due = 1U;
@@ -193,6 +207,9 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
+  /* Configure the peripherals common clocks */
+  PeriphCommonClock_Config();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -205,9 +222,14 @@ int main(void)
   MX_CRC_Init();
   MX_TIM1_Init();
   MX_QUADSPI_Init();
-  MX_DMA2D_Init();
   MX_TIM6_Init();
-  /* TE is wired to PD3/EXTI3; TIM2 is not used for refresh. */
+  MX_I2C1_Init();
+  MX_SPI1_Init();
+  MX_RNG_Init();
+  MX_ADC1_Init();
+  MX_I2C2_Init();
+  MX_SPI2_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
   if (HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK)
   {
@@ -267,15 +289,16 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_DIV1;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 4;
   RCC_OscInitStruct.PLL.PLLN = 60;
   RCC_OscInitStruct.PLL.PLLP = 2;
-  RCC_OscInitStruct.PLL.PLLQ = 8;
+  RCC_OscInitStruct.PLL.PLLQ = 5;
   RCC_OscInitStruct.PLL.PLLR = 2;
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
@@ -299,6 +322,33 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief Peripherals Common Clock Configuration
+  * @retval None
+  */
+void PeriphCommonClock_Config(void)
+{
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+  /** Initializes the peripherals clock
+  */
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FMC|RCC_PERIPHCLK_ADC;
+  PeriphClkInitStruct.PLL2.PLL2M = 4;
+  PeriphClkInitStruct.PLL2.PLL2N = 14;
+  PeriphClkInitStruct.PLL2.PLL2P = 4;
+  PeriphClkInitStruct.PLL2.PLL2Q = 4;
+  PeriphClkInitStruct.PLL2.PLL2R = 2;
+  PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
+  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
+  PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+  PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_PLL2;
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
@@ -348,27 +398,24 @@ void MPU_Config(void)
   */
   MPU_InitStruct.Number = MPU_REGION_NUMBER2;
   MPU_InitStruct.BaseAddress = 0xc0000000;
-  /* SDRAM: Normal, non-cacheable, non-bufferable memory for diagnosis.
-     Avoid cache-line bursts/coherency while validating external buffers. */
+  MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
+  MPU_InitStruct.SubRegionDisable = 0x00;
   MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
   MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
   MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
-  MPU_InitStruct.SubRegionDisable = 0x00;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
   /** Initializes and configures the Region and the memory to be protected
   */
-  /* Restore the original cached QSPI attributes for this separate region. */
-  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
   MPU_InitStruct.Number = MPU_REGION_NUMBER3;
   MPU_InitStruct.BaseAddress = 0x90000000;
   MPU_InitStruct.Size = MPU_REGION_SIZE_1MB;
   MPU_InitStruct.SubRegionDisable = 0x0;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */

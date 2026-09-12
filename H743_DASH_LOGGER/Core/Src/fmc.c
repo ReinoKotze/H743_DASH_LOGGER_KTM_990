@@ -62,10 +62,10 @@ void MX_FMC_Init(void)
   hsram1.Init.ContinuousClock = FMC_CONTINUOUS_CLOCK_SYNC_ONLY;
   hsram1.Init.WriteFifo = FMC_WRITE_FIFO_DISABLE;
   hsram1.Init.PageSize = FMC_PAGE_SIZE_NONE;
-  /* Diagnostic LCD bus timing: extra margin at 121.6 MHz FMC clock. */
-  Timing.AddressSetupTime = 4;
+  /* Timing */
+  Timing.AddressSetupTime = 6;
   Timing.AddressHoldTime = 8;
-  Timing.DataSetupTime = 15;
+  Timing.DataSetupTime = 30;
   Timing.BusTurnAroundDuration = 1;
   Timing.CLKDivision = 16;
   Timing.DataLatency = 17;
@@ -121,23 +121,6 @@ static void HAL_FMC_MspInit(void){
     return;
   }
   FMC_Initialized = 1;
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-
-  /** Initializes the peripherals clock
-  */
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FMC;
-    PeriphClkInitStruct.PLL2.PLL2M = 5;
-    PeriphClkInitStruct.PLL2.PLL2N = 38;
-    PeriphClkInitStruct.PLL2.PLL2P = 2;
-    PeriphClkInitStruct.PLL2.PLL2Q = 4;
-    PeriphClkInitStruct.PLL2.PLL2R = 4;
-    PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
-    PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
-    PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_PLL2;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-    {
-      Error_Handler();
-    }
 
   /* Peripheral clock enable */
   __HAL_RCC_FMC_CLK_ENABLE();

@@ -18,7 +18,8 @@ extern "C" {
 
 ///////////////////// SCREENS ////////////////////
 
-#include "screens/ui_Screen1.h"
+#include "screens/ui_Normal.h"
+#include "screens/ui_RAWsensor.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -28,6 +29,10 @@ extern "C" {
 extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
+LV_IMG_DECLARE(ui_img_rear_wheel_png);    // assets/REAR_Wheel.png
+LV_IMG_DECLARE(ui_img_front_wheel_png);    // assets/FRONT_Wheel.png
+LV_IMG_DECLARE(ui_img_ecu_warning__1_png);    // assets/ECU_warning  1.png
+LV_IMG_DECLARE(ui_img_fi_orange_png);    // assets/FI_Orange.png
 LV_IMG_DECLARE(ui_img_1414997601);    // assets/Adobe Express - file (1).png
 LV_IMG_DECLARE(ui_img_pngegg_png);    // assets/pngegg.PNG
 

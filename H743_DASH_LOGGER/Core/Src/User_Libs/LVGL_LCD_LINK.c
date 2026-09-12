@@ -4,10 +4,15 @@
 #include <string.h>
 
 /* Internal D2 SRAM. Explicitly clear these NOLOAD buffers before use. */
-static uint8_t draw1[LVGL_DRAW_BUFFER_SIZE]
-    __attribute__((section(".lvgl_draw_buffers"), aligned(32)));
-static uint8_t draw2[LVGL_DRAW_BUFFER_SIZE]
-    __attribute__((section(".lvgl_draw_buffers"), aligned(32)));
+
+static uint8_t * const draw1 =
+    (uint8_t *)LVGL_SDRAM_BUF1_ADDRESS;
+
+static uint8_t * const draw2 =
+    (uint8_t *)LVGL_SDRAM_BUF2_ADDRESS;
+
+
+
 static bool updates_enabled = true;
 static lv_display_t * volatile flushing_display;
 volatile uint32_t lcd_mdma_flush_count;
@@ -18,6 +23,10 @@ volatile uint8_t TEFLAG;
 volatile uint32_t lcd_te_count;
 volatile uint32_t lcd_te_period_ms;
 static volatile uint32_t last_te_ms;
+
+
+
+
 
 static void disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *pixels)
 {
@@ -81,12 +90,12 @@ void lv_port_disp_mdma_complete_isr(bool success)
 }
 void lv_port_disp_init(void)
 {
-    memset(draw1, 0, sizeof(draw1));
-    memset(draw2, 0, sizeof(draw2));
+	memset(draw1, 0, LVGL_DRAW_BUFFER_SIZE);
+	memset(draw2, 0, LVGL_DRAW_BUFFER_SIZE);
+
     lv_display_t *disp = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
-    lv_display_set_buffers(disp, draw1, draw2, LVGL_DRAW_BUFFER_SIZE,
-                           LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(disp, draw1, draw2, LVGL_DRAW_BUFFER_SIZE,LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(disp, disp_flush);
     lv_display_delete_refr_timer(disp);
     lv_display_set_default(disp);

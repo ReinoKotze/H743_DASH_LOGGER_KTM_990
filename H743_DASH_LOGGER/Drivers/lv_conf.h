@@ -22,7 +22,7 @@
 #if  0 && defined(__ASSEMBLY__)
 #include "my_include.h"
 #endif
-
+#include "../Core/Inc/User_Libs/SDRAM_ADD_MANIGMENT.h"
 /*====================
    COLOR SETTINGS
  *====================*/
@@ -70,13 +70,13 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /** Size of memory available for `lv_malloc()` in bytes (>= 2kB) */
-    #define LV_MEM_SIZE (500 * 1024U) //LVGL_HEAP_SIZE          /**< [bytes] */
+    #define LV_MEM_SIZE LVGL_HEAP_SIZE //LVGL_HEAP_SIZE          /**< [bytes] */
 
     /** Size of the memory expand for `lv_malloc()` in bytes */
     #define LV_MEM_POOL_EXPAND_SIZE 0
 
     /** Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too. */
-    #define LV_MEM_ADR  0 //LVGL_HEAP_ADD     /**< 0: unused*/
+    #define LV_MEM_ADR LVGL_HEAP_ADD //LVGL_HEAP_ADD     /**< 0: unused*/
     /* Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc */
     #if LV_MEM_ADR == 0
         #undef LV_MEM_POOL_INCLUDE
@@ -394,7 +394,7 @@
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
-#define LV_USE_DRAW_DMA2D 0
+#define LV_USE_DRAW_DMA2D 1
 #if LV_USE_DRAW_DMA2D
     #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
@@ -656,7 +656,7 @@
 #define LV_FONT_MONTSERRAT_12 0
 #define LV_FONT_MONTSERRAT_14 1
 #define LV_FONT_MONTSERRAT_16 0
-#define LV_FONT_MONTSERRAT_18 0
+#define LV_FONT_MONTSERRAT_18 1
 #define LV_FONT_MONTSERRAT_20 0
 #define LV_FONT_MONTSERRAT_22 0
 #define LV_FONT_MONTSERRAT_24 0
@@ -1122,7 +1122,7 @@
     /** 1: Show used memory and memory fragmentation.
      *     - Requires `LV_USE_STDLIB_MALLOC = LV_STDLIB_BUILTIN`
      *     - Requires `LV_USE_SYSMON = 1`*/
-    #define LV_USE_MEM_MONITOR 0
+    #define LV_USE_MEM_MONITOR 1
     #if LV_USE_MEM_MONITOR
         #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
     #endif
