@@ -69,7 +69,7 @@ void SPEED_UPDATE()
 
 	    uint32_t value = SPEED;
 
-	    if ((uint32_t)(now - SPEED_last_capture_ms) > 1000U) {
+	    if ((uint32_t)(now - SPEED_last_capture_ms) > 200U) {
 	        value = 0U;
 	    }
 
