@@ -31,6 +31,7 @@ extern lv_obj_t * ui_fuelLevelVALUE1;
 extern lv_obj_t * ui_Labelone2;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_RAW_sensor;
+extern lv_obj_t * uic_speedVALUE;
 
 #ifdef __cplusplus
 } /*extern "C"*/

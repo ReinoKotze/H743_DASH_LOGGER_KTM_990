@@ -36,16 +36,27 @@ void tasks()
 
     LV_TIM_UPDATE();
     NON_BLOCKING_VSYNC();
-////////////////////////////
-//UI interaction prototype
+    UI_Logic();
 
 
 
+
+
+
+
+
+///////////////////////////
+}
+
+
+void UI_Logic()
+{
     UP_Event();
     DOWN_Event();
 
     const bool upEvent = (UP_Event() == 1);
     const bool downEvent = (DOWN_Event() == 1);
+/////////////
 
     if (upEvent) {
         screen_state = (screen_state >= screen_stateNUM)
@@ -63,11 +74,7 @@ void tasks()
         DOWN_State = 0;
     }
 
-
-
-
-
-
+////////////
 switch (screen_state)
 {
 case 0:
@@ -83,14 +90,6 @@ case 0:
     if (ui_RAWsensor != nullptr) {
         ui_RAWsensor_screen_destroy();
     }
-
-
-
-
-
-
-
-
 
     break;
 
@@ -109,13 +108,11 @@ case 1:
     }
 
     RPM_UPDATE();
+    SPEED_UPDATE();
     break;
-
 default:
-
     break;
-
-
+}
 }
 
 
@@ -123,8 +120,18 @@ default:
 
 
 
-///////////////////////////
-}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void NON_BLOCKING_VSYNC()
