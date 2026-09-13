@@ -59,21 +59,4 @@ void RPM_UPDATE()
         ui_rpmVALUE, "rpm= %04lu", (unsigned long)value);
 }
 
-void SPEED_UPDATE()
-{
-	 static uint32_t last_update;
-	    const uint32_t now = HAL_GetTick();
-
-	    if ((uint32_t)(now - last_update) < 16U) return;
-	    last_update = now;
-
-	    uint32_t value = SPEED;
-
-	    if ((uint32_t)(now - SPEED_last_capture_ms) > 1000U) {
-	        value = 0U;
-	    }
-
-	    lv_label_set_text_fmt(
-	    ui_speedVALUE, "km/h= %04lu", (unsigned long)value);
-
-}
+void SPEED_UPDATE();

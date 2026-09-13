@@ -65,8 +65,6 @@ void Error_Handler(void);
 #define EXIT_GPIO_Port GPIOE
 #define DOWN_Pin GPIO_PIN_5
 #define DOWN_GPIO_Port GPIOE
-#define SPEED_IN_Pin GPIO_PIN_0
-#define SPEED_IN_GPIO_Port GPIOA
 #define RPM_Pin GPIO_PIN_9
 #define RPM_GPIO_Port GPIOA
 #define RPM_OUT_Pin GPIO_PIN_10

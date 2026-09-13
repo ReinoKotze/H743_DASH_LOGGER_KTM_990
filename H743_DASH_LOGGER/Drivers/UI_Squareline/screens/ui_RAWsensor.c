@@ -5,7 +5,6 @@
 
 #include "../ui.h"
 
-lv_obj_t * uic_speedVALUE;
 lv_obj_t * uic_RAW_sensor;
 lv_obj_t * ui_RAWsensor = NULL;
 lv_obj_t * ui_Image12 = NULL;
@@ -181,7 +180,6 @@ void ui_RAWsensor_screen_init(void)
     lv_obj_set_style_text_font(ui_Labelone2, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     uic_RAW_sensor = ui_RAWsensor;
-    uic_speedVALUE = ui_speedVALUE;
 
 }
 
@@ -196,7 +194,6 @@ void ui_RAWsensor_screen_destroy(void)
     ui_Image10 = NULL;
     ui_Spinner1 = NULL;
     ui_rpmVALUE = NULL;
-    uic_speedVALUE = NULL;
     ui_speedVALUE = NULL;
     ui_engineTempVALUE = NULL;
     ui_Labelone = NULL;
