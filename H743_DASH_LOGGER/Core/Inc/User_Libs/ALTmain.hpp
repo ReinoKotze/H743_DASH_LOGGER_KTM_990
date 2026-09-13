@@ -17,6 +17,12 @@ extern "C" {
 
 extern volatile uint32_t rpm;
 extern volatile uint32_t rpm_last_capture_ms;
+extern volatile uint32_t SPEED;
+extern volatile uint32_t SPEED_last_capture_ms ;
+extern volatile uint32_t Pulse_Per_Rotation;
+extern volatile uint32_t Wheel_Circumfrance;
+
+
 extern volatile uint8_t lvgl_timer_due;
 extern volatile uint8_t LV_HAS_RUN;
 
@@ -26,9 +32,10 @@ void LV_TIM_UPDATE();
 
 //used in RAW DATA,
 void RPM_UPDATE ();
+void SPEED_UPDATE();
 extern volatile uint32_t rpm;
 extern volatile uint32_t rpm_last_capture_ms;
-
+void UI_Logic();
 
 //RAW data file
 void Raw_Data();
