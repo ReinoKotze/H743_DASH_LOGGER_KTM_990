@@ -37,10 +37,10 @@ void setup()
 
 void tasks()
 {
-    ADS1115::Service();
     LV_TIM_UPDATE();
     NON_BLOCKING_VSYNC();
     UI_Logic();
+    ADS1115::Service();
 
 
 

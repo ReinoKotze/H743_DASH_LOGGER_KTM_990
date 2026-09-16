@@ -70,6 +70,11 @@ void Error_Handler(void);
 #define ADS1115_alert_ready_EXTI_IRQn EXTI0_IRQn
 #define SPEED_IN_Pin GPIO_PIN_0
 #define SPEED_IN_GPIO_Port GPIOA
+#define CAN_INT_Pin GPIO_PIN_1
+#define CAN_INT_GPIO_Port GPIOA
+#define CAN_INT_EXTI_IRQn EXTI1_IRQn
+#define CAN_CS_Pin GPIO_PIN_4
+#define CAN_CS_GPIO_Port GPIOA
 #define RPM_Pin GPIO_PIN_9
 #define RPM_GPIO_Port GPIOA
 #define RPM_OUT_Pin GPIO_PIN_10

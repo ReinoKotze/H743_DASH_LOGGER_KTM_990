@@ -16,6 +16,30 @@
 #include "ALTmain.hpp"
 #include "ui.h"
 #include "User_Libs/ADS1115.hpp"
+#include <stdio.h>
+#include <string.h>
+
+static void setLabelIfChanged(lv_obj_t *label, const char *text)
+{
+    if (label != nullptr && strcmp(lv_label_get_text(label), text) != 0) {
+        lv_label_set_text(label, text);
+    }
+}
+
+static void formatAdcUnavailable(char *text, size_t length, const char *name)
+{
+    if (strcmp(name, "Engine") == 0) {
+        snprintf(text, length, "ADC W:%04lX R:%04lX",
+                 (unsigned long)ads1115_last_config_written,
+                 (unsigned long)ads1115_last_config_read);
+    } else {
+        snprintf(text, length, "I:%lu S:%02lX H:%lu E:%02lX",
+                 (unsigned long)ads1115_i2c_error_count,
+                 (unsigned long)ads1115_last_error_stage,
+                 (unsigned long)ads1115_last_hal_status,
+                 (unsigned long)ads1115_last_hal_error);
+    }
+}
 
 void Raw_Data()
 {
@@ -26,24 +50,6 @@ void Raw_Data()
 
 void RPM_UPDATE()
 {
-
-//    static uint32_t last_update;
-//    static uint32_t previous = UINT32_MAX;
-//    uint32_t now = HAL_GetTick();
-//    if((uint32_t)(now - last_update) < 16U) return;
-//    last_update = now;
-//    uint32_t value = rpm;
-//
-//   // lv_label_set_text_fmt(ui_rpmVALUE, "rpm= %04lu", (unsigned long)value);
-//
-//    if((uint32_t)(now - rpm_last_capture_ms) > 30U) value = 0U;
-//    if(value != previous) {
-//        lv_label_set_text_fmt(ui_rpmVALUE, "rpm= %04lu", (unsigned long)value);
-//        previous = value;
-//    }
-
-
-
     static uint32_t last_update;
     const uint32_t now = HAL_GetTick();
 
@@ -56,8 +62,9 @@ void RPM_UPDATE()
         value = 0U;
     }
 
-    lv_label_set_text_fmt(
-        ui_rpmVALUE, "rpm= %04lu", (unsigned long)value);
+    char text[32];
+    snprintf(text, sizeof(text), "rpm= %04lu", (unsigned long)value);
+    setLabelIfChanged(ui_rpmVALUE, text);
 }
 
 void SPEED_UPDATE()
@@ -74,8 +81,9 @@ void SPEED_UPDATE()
 	        value = 0U;
 	    }
 
-	    lv_label_set_text_fmt(
-	    ui_speedVALUE, "km/h= %04lu", (unsigned long)value);
+    char text[32];
+    snprintf(text, sizeof(text), "km/h= %04lu", (unsigned long)value);
+    setLabelIfChanged(ui_speedVALUE, text);
 
 }
 
@@ -87,19 +95,20 @@ void TEMP_VOLTAGE_UPDATE()
     last_update = now;
 
     int32_t millivolts = 0;
+    char text[32];
     if (ADS1115::ReadMillivolts(ADS1115::EngineChannel, &millivolts)) {
-        lv_label_set_text_fmt(ui_engineTempVALUE, "Engine: %ld.%03ld V",
-                              (long)(millivolts / 1000),
-                              (long)(millivolts >= 0 ? millivolts % 1000 : -(millivolts % 1000)));
+        snprintf(text, sizeof(text), "Engine: %ld.%03ld V",
+                 (long)(millivolts / 1000), (long)(millivolts % 1000));
     } else {
-        lv_label_set_text(ui_engineTempVALUE, "Engine: ---.--- V");
+        formatAdcUnavailable(text, sizeof(text), "Engine");
     }
+    setLabelIfChanged(ui_engineTempVALUE, text);
 
     if (ADS1115::ReadMillivolts(ADS1115::AmbientChannel, &millivolts)) {
-        lv_label_set_text_fmt(ui_AmbientTempVALUE, "Ambient: %ld.%03ld V",
-                              (long)(millivolts / 1000),
-                              (long)(millivolts >= 0 ? millivolts % 1000 : -(millivolts % 1000)));
+        snprintf(text, sizeof(text), "Ambient: %ld.%03ld V",
+                 (long)(millivolts / 1000), (long)(millivolts % 1000));
     } else {
-        lv_label_set_text(ui_AmbientTempVALUE, "Ambient: ---.--- V");
+        formatAdcUnavailable(text, sizeof(text), "Ambient");
     }
+    setLabelIfChanged(ui_AmbientTempVALUE, text);
 }
