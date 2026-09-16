@@ -556,9 +556,3 @@ HAL_StatusTypeDef LCD_WriteBitmapDMA2(uint16_t x0, uint16_t y0,
     __DSB();
     return HAL_OK;
 }
-void HAL_GPIO_EXTI_Callback(uint16_t pin)
-{
-    if(pin == TE_LCD_Pin) {
-        lv_port_disp_te_isr();
-    }
-}

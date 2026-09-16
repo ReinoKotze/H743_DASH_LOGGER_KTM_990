@@ -52,8 +52,7 @@
 
 volatile uint8_t qspi_test_value;
 
-volatile uint8_t lvgl_timer_due = 0U;
-volatile uint8_t LV_HAS_RUN=0;
+
 
 
 
@@ -112,92 +111,6 @@ static void ReadFlashData(void)
 	        (const volatile uint8_t *)0x90000000U;
 
 	    qspi_test_value = flash[0x100U];
-}
-
-volatile uint32_t rpm = 0U;
-float TIMER_CLOCK = 240;
-volatile uint32_t rpm_last_capture_ms = 0U;
-
-volatile uint32_t SPEED = 0U;
-volatile uint32_t SPEED_last_capture_ms = 0U;
-volatile uint32_t Pulse_Per_Rotation=6;
-volatile uint32_t Wheel_Circumfrance=2100; //mm
-
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
-
-
-	/*RPM callback
-	 * timer settings
-	 * 1. TIM 1 clock source: internal clock
-	 * 2. combined channels: PWM input on CH2 for pin PA9
-	 * 3. prescaller 999
-	 * 4. best filter is 8
-	 * 5. CH1 falling edge,indirect, no division
-	 * 6. CH2 rising edge, direct, no division
-	 * 7. RPM defined as extern in ALTmain
-	 * 8. RPM initial value is set to 0 in main
-	 *
-	 */
-
-//HAL_GPIO_WritePin(RPM_OUT_GPIO_Port, RPM_OUT_Pin, RESET);
-
-if ((htim->Instance == TIM1) && (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2))
-	{
-		uint32_t period =HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-		if(period != 0)
-		{
-
-            //HAL_GPIO_WritePin(RPM_OUT_GPIO_Port, RPM_OUT_Pin, SET);
-			rpm = ((TIMER_CLOCK*60) /(period));
-			rpm_last_capture_ms = HAL_GetTick();
-		}
-	}
-	//HAL_GPIO_WritePin(RPM_OUT_GPIO_Port, RPM_OUT_Pin, RESET);
-
-
-
-if ((htim->Instance == TIM2) && (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1))
-{
-    static uint8_t first_capture_seen = 0U;
-
-    const uint32_t period = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-
-    // The first capture is time since startup, not a full pulse period.
-    if (!first_capture_seen)
-    {
-        first_capture_seen = 1U;
-        return;
-    }
-
-    const uint32_t pulses = Pulse_Per_Rotation;
-    const uint32_t circumference = Wheel_Circumfrance;
-
-    if ((period != 0U) && (pulses != 0U))
-    {
-        const uint64_t numerator = (uint64_t)circumference * 240000ULL * 3600ULL;
-
-        const uint64_t denominator = (uint64_t)period * pulses * 1000000ULL;
-
-        SPEED = (uint32_t)(numerator / denominator);
-        SPEED_last_capture_ms = HAL_GetTick();
-    }
-}
-
-}
-
-
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	/*
-	 * this is an timer set to trigger every 5ms to replace the HAL_Delay(5)
-	 * you are supposed to use after lv_timer_handler()
-	 */
-    if (htim->Instance == TIM6)
-    {
-        lvgl_timer_due = 1U;
-    }
 }
 
 /* USER CODE END PFP */
@@ -267,24 +180,6 @@ int main(void)
   MX_SPI3_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  if (HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK)
-  {
-      Error_Handler();
-  }
-  if (HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2) != HAL_OK)
-  {
-      Error_Handler();
-  }
-  if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK)
-  {
-      Error_Handler();
-  }
-  if (HAL_TIM_Base_Start_IT(&htim6) != HAL_OK)
-  {
-      Error_Handler();
-  }
-
-
   setup();
 
 

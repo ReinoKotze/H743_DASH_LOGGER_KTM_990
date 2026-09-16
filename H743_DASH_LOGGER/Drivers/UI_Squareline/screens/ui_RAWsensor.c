@@ -22,6 +22,7 @@ lv_obj_t * ui_throttleVALUE = NULL;
 lv_obj_t * ui_mapCyl1VALUE = NULL;
 lv_obj_t * ui_mapCyl2VALUE = NULL;
 lv_obj_t * ui_fuelLevelVALUE1 = NULL;
+lv_obj_t * ui_fuelLevelVALUE2 = NULL;
 lv_obj_t * ui_Labelone2 = NULL;
 // event funtions
 
@@ -163,18 +164,28 @@ void ui_RAWsensor_screen_init(void)
     ui_fuelLevelVALUE1 = lv_label_create(ui_RAWsensor);
     lv_obj_set_width(ui_fuelLevelVALUE1, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_fuelLevelVALUE1, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_fuelLevelVALUE1, 18);
-    lv_obj_set_y(ui_fuelLevelVALUE1, 110);
-    lv_label_set_text(ui_fuelLevelVALUE1, "fuel Level");
+    lv_obj_set_x(ui_fuelLevelVALUE1, 21);
+    lv_obj_set_y(ui_fuelLevelVALUE1, 283);
+    lv_label_set_text(ui_fuelLevelVALUE1, "fuel Level 1\n");
     lv_obj_set_style_text_color(ui_fuelLevelVALUE1, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_fuelLevelVALUE1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_fuelLevelVALUE1, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_fuelLevelVALUE2 = lv_label_create(ui_RAWsensor);
+    lv_obj_set_width(ui_fuelLevelVALUE2, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_fuelLevelVALUE2, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_fuelLevelVALUE2, 22);
+    lv_obj_set_y(ui_fuelLevelVALUE2, 311);
+    lv_label_set_text(ui_fuelLevelVALUE2, "fuel Level 2");
+    lv_obj_set_style_text_color(ui_fuelLevelVALUE2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_fuelLevelVALUE2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_fuelLevelVALUE2, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     ui_Labelone2 = lv_label_create(ui_RAWsensor);
     lv_obj_set_width(ui_Labelone2, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Labelone2, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Labelone2, 13);
-    lv_obj_set_y(ui_Labelone2, 296);
+    lv_obj_set_x(ui_Labelone2, 12);
+    lv_obj_set_y(ui_Labelone2, 352);
     lv_label_set_text(ui_Labelone2, "bluetooth wheel state");
     lv_obj_set_style_text_color(ui_Labelone2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_Labelone2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -207,6 +218,7 @@ void ui_RAWsensor_screen_destroy(void)
     ui_mapCyl1VALUE = NULL;
     ui_mapCyl2VALUE = NULL;
     ui_fuelLevelVALUE1 = NULL;
+    ui_fuelLevelVALUE2 = NULL;
     ui_Labelone2 = NULL;
 
 }

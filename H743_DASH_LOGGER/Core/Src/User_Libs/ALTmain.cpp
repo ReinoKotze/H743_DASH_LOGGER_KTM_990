@@ -6,6 +6,9 @@
 #include "ALTmain.hpp"
 #include "ui.h"
 #include "Buttons.hpp"
+#include "User_Libs/interrupts.h"
+#include "User_Libs/ADS1115.hpp"
+#include "i2c.h"
 
 ////might use a STM32H743VIT6 in final board
 
@@ -19,6 +22,8 @@ uint8_t screen_stateNUM=1;
 
 void setup()
 {
+    Interrupts_StartTimers();
+    (void)ADS1115::Setup(&hi2c1);
     HAL_Delay(5U);
     CSP_QUADSPI_Init();
     CSP_QSPI_EnableMemoryMappedMode();
@@ -32,8 +37,7 @@ void setup()
 
 void tasks()
 {
-
-
+    ADS1115::Service();
     LV_TIM_UPDATE();
     NON_BLOCKING_VSYNC();
     UI_Logic();
@@ -57,6 +61,19 @@ void UI_Logic()
     const bool upEvent = (UP_Event() == 1);
     const bool downEvent = (DOWN_Event() == 1);
 /////////////
+
+    /*
+     * if (screen_state == 0) {
+    screen_state = screen_stateNUM;
+    } else {
+    screen_state = screen_state - 1;
+    }
+
+    condition ? value_if_true : value_if_false
+
+    this is absically how the code below works
+     */
+
 
     if (upEvent) {
         screen_state = (screen_state >= screen_stateNUM)
@@ -109,6 +126,7 @@ case 1:
 
     RPM_UPDATE();
     SPEED_UPDATE();
+    TEMP_VOLTAGE_UPDATE();
     break;
 default:
     break;

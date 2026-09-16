@@ -28,6 +28,7 @@ extern lv_obj_t * ui_throttleVALUE;
 extern lv_obj_t * ui_mapCyl1VALUE;
 extern lv_obj_t * ui_mapCyl2VALUE;
 extern lv_obj_t * ui_fuelLevelVALUE1;
+extern lv_obj_t * ui_fuelLevelVALUE2;
 extern lv_obj_t * ui_Labelone2;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_RAW_sensor;
