@@ -5,10 +5,8 @@
  *      Author: reino
  */
 
-#include "main.h"
-#include "ALTmain.hpp"
-#include "Buttons.hpp"
 
+#include "INCLUDES.hpp"
 
 
 
