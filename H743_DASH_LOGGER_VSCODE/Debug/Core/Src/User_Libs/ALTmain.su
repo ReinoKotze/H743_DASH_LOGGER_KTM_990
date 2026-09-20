@@ -1,0 +1,5 @@
+../Core/Src/User_Libs/ALTmain.cpp:23:6:void setup()	8	static
+../Core/Src/User_Libs/ALTmain.cpp:38:6:void tasks()	8	static
+../Core/Src/User_Libs/ALTmain.cpp:56:6:void UI_Logic()	16	static
+../Core/Src/User_Libs/ALTmain.cpp:155:6:void NON_BLOCKING_VSYNC()	24	static
+../Core/Src/User_Libs/ALTmain.cpp:178:6:void LV_TIM_UPDATE()	32	static,ignoring_inline_asm

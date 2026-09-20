@@ -1,0 +1,8 @@
+../Core/Src/User_Libs/LVGL_LCD_LINK.c:31:13:disp_flush	64	static
+../Core/Src/User_Libs/LVGL_LCD_LINK.c:75:6:lv_port_disp_busy	4	static
+../Core/Src/User_Libs/LVGL_LCD_LINK.c:77:6:lv_port_disp_mdma_complete_isr	24	static
+../Core/Src/User_Libs/LVGL_LCD_LINK.c:91:6:lv_port_disp_init	24	static
+../Core/Src/User_Libs/LVGL_LCD_LINK.c:104:6:disp_enable_update	4	static
+../Core/Src/User_Libs/LVGL_LCD_LINK.c:105:6:disp_disable_update	4	static
+../Core/Src/User_Libs/LVGL_LCD_LINK.c:108:6:lv_port_disp_te_isr	16	static
+../Core/Src/User_Libs/LVGL_LCD_LINK.c:118:6:lv_port_disp_service	24	static,ignoring_inline_asm

@@ -1,0 +1,4 @@
+../Drivers/lvgl/demos/../src/stdlib/lv_string.h:73:20:lv_memzero	1
+../Drivers/lvgl/demos/lv_demos.c:74:6:lv_demo_args_init	2
+../Drivers/lvgl/demos/lv_demos.c:81:6:lv_demos_create	9
+../Drivers/lvgl/demos/lv_demos.c:116:6:lv_demos_show_help	3

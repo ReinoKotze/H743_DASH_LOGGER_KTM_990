@@ -1,0 +1,6 @@
+../Core/Src/User_Libs/RAW_DATA_SCREEN.cpp:22:13:void setLabelIfChanged(lv_obj_t*, const char*)	4
+../Core/Src/User_Libs/RAW_DATA_SCREEN.cpp:29:13:void formatAdcUnavailable(char*, size_t, const char*)	2
+../Core/Src/User_Libs/RAW_DATA_SCREEN.cpp:44:6:void Raw_Data()	1
+../Core/Src/User_Libs/RAW_DATA_SCREEN.cpp:51:6:void RPM_UPDATE()	3
+../Core/Src/User_Libs/RAW_DATA_SCREEN.cpp:70:6:void SPEED_UPDATE()	3
+../Core/Src/User_Libs/RAW_DATA_SCREEN.cpp:90:6:void TEMP_VOLTAGE_UPDATE()	4

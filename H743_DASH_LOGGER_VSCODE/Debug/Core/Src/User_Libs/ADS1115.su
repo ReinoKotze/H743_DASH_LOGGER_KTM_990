@@ -1,0 +1,8 @@
+../Core/Src/User_Libs/ADS1115.cpp:44:5:int ADS1115::{anonymous}::indexForChannel(uint8_t)	16	static
+../Core/Src/User_Libs/ADS1115.cpp:51:6:void ADS1115::{anonymous}::recordI2cFailure(HAL_StatusTypeDef, uint32_t)	16	static
+../Core/Src/User_Libs/ADS1115.cpp:61:6:bool ADS1115::ReadRegister(uint8_t, uint16_t*)	40	static
+../Core/Src/User_Libs/ADS1115.cpp:76:6:bool ADS1115::WriteRegister(uint8_t, uint16_t)	40	static
+../Core/Src/User_Libs/ADS1115.cpp:92:6:bool ADS1115::Setup(I2C_HandleTypeDef*)	24	static
+../Core/Src/User_Libs/ADS1115.cpp:122:6:bool ADS1115::StartConversion(uint8_t)	24	static
+../Core/Src/User_Libs/ADS1115.cpp:144:6:void ADS1115::Service()	32	static
+../Core/Src/User_Libs/ADS1115.cpp:218:6:bool ADS1115::ReadMillivolts(uint8_t, int32_t*)	24	static

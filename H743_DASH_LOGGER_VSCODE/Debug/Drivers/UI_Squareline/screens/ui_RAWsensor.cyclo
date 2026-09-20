@@ -1,0 +1,2 @@
+../Drivers/UI_Squareline/screens/ui_RAWsensor.c:31:6:ui_RAWsensor_screen_init	1
+../Drivers/UI_Squareline/screens/ui_RAWsensor.c:199:6:ui_RAWsensor_screen_destroy	2

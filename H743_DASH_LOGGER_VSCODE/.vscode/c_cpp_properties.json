@@ -1,0 +1,37 @@
+{
+    "configurations": [
+        {
+            "name": "STM32",
+            "compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json",
+            "compilerPath": "${env:LOCALAPPDATA}/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-g++.exe",
+            "intelliSenseMode": "windows-gcc-arm",
+            "compilerArgs": [
+                "-mcpu=cortex-m7",
+                "-mfpu=fpv5-d16",
+                "-mfloat-abi=hard",
+                "-mthumb"
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14",
+            "defines": [
+                "DEBUG",
+                "STM32H743xx",
+                "USE_HAL_DRIVER",
+                "USE_PWR_LDO_SUPPLY"
+            ],
+            "includePath": [
+                "${workspaceFolder}/Core/Inc",
+                "${workspaceFolder}/Core/Inc/User_Libs",
+                "${workspaceFolder}/Core/Src/UI_LOGIC",
+                "${workspaceFolder}/Core/Src/User_Libs",
+                "${workspaceFolder}/Drivers/lvgl",
+                "${workspaceFolder}/Drivers/UI_Squareline",
+                "${workspaceFolder}/Drivers/STM32H7xx_HAL_Driver/Inc",
+                "${workspaceFolder}/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy",
+                "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
+                "${workspaceFolder}/Drivers/CMSIS/Include"
+            ]
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,5 @@
+../Core/Src/UI_LOGIC/Buttons.cpp:29:9:uint8_t UP_Event()	6
+../Core/Src/UI_LOGIC/Buttons.cpp:61:9:uint8_t DOWN_Event()	6
+../Core/Src/UI_LOGIC/Buttons.cpp:93:9:uint8_t ENTER_Event()	6
+../Core/Src/UI_LOGIC/Buttons.cpp:125:9:uint8_t EXIT_Event()	6
+../Core/Src/UI_LOGIC/Buttons.cpp:157:6:void EVENT_Reset()	1

@@ -1,0 +1,9 @@
+{
+  "device": "STM32H743IIT6",
+  "core": "Cortex-M7",
+  "order": 0,
+  "toolchain": "GCC",
+  "source": {
+    "sourceType": "STM32CubeIDE"
+  }
+}

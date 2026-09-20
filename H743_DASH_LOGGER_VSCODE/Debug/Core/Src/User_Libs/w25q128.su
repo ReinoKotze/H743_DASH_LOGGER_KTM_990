@@ -1,0 +1,13 @@
+../Core/Src/User_Libs/w25q128.c:26:9:CSP_QUADSPI_Init	8	static
+../Core/Src/User_Libs/w25q128.c:43:9:CSP_QSPI_Erase_Chip	64	static
+../Core/Src/User_Libs/w25q128.c:71:16:QSPI_WriteEnable	88	static
+../Core/Src/User_Libs/w25q128.c:111:16:QSPI_Configuration	72	static
+../Core/Src/User_Libs/w25q128.c:186:9:CSP_QSPI_EraseBlock	72	static
+../Core/Src/User_Libs/w25q128.c:224:9:CSP_QSPI_EraseSector	80	static
+../Core/Src/User_Libs/w25q128.c:304:9:CSP_QSPI_WriteMemory	88	static
+../Core/Src/User_Libs/w25q128.c:372:9:CSP_QSPI_DisableMemoryMappedMode	8	static
+../Core/Src/User_Libs/w25q128.c:377:9:CSP_QSPI_EnableMemoryMappedMode	72	static
+../Core/Src/User_Libs/w25q128.c:414:16:QSPI_ResetChip	64	static
+../Core/Src/User_Libs/w25q128.c:445:9:CSP_QSPI_Read	80	static
+../Core/Src/User_Libs/w25q128.c:486:9:QSPI_AutoPollingMemReady	96	static
+../Core/Src/User_Libs/w25q128.c:517:9:CSP_QSPI_ReadStatusRegister	72	static

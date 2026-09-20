@@ -1,0 +1,2 @@
+../Drivers/UI_Squareline/screens/ui_Normal.c:19:6:ui_Normal_screen_init	1
+../Drivers/UI_Squareline/screens/ui_Normal.c:76:6:ui_Normal_screen_destroy	2

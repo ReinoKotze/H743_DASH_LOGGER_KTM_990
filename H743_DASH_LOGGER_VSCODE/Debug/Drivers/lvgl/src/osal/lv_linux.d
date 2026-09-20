@@ -1,0 +1,19 @@
+Drivers/lvgl/src/osal/lv_linux.o: ../Drivers/lvgl/src/osal/lv_linux.c \
+ ../Drivers/lvgl/src/osal/lv_os_private.h \
+ ../Drivers/lvgl/src/osal/../lv_conf_internal.h \
+ ../Drivers/lvgl/src/osal/../lv_conf_kconfig.h \
+ ../Drivers/lvgl/src/osal/../../../lv_conf.h \
+ ../Drivers/lvgl/src/osal/../../../../Core/Inc/User_Libs/SDRAM_ADD_MANIGMENT.h \
+ ../Drivers/lvgl/src/osal/lv_os.h \
+ ../Drivers/lvgl/src/osal/../misc/lv_types.h \
+ ../Drivers/lvgl/src/osal/../misc/../lv_conf_internal.h \
+ ../Drivers/lvgl/src/osal/lv_os_none.h
+../Drivers/lvgl/src/osal/lv_os_private.h:
+../Drivers/lvgl/src/osal/../lv_conf_internal.h:
+../Drivers/lvgl/src/osal/../lv_conf_kconfig.h:
+../Drivers/lvgl/src/osal/../../../lv_conf.h:
+../Drivers/lvgl/src/osal/../../../../Core/Inc/User_Libs/SDRAM_ADD_MANIGMENT.h:
+../Drivers/lvgl/src/osal/lv_os.h:
+../Drivers/lvgl/src/osal/../misc/lv_types.h:
+../Drivers/lvgl/src/osal/../misc/../lv_conf_internal.h:
+../Drivers/lvgl/src/osal/lv_os_none.h:
