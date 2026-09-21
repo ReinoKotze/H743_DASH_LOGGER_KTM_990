@@ -13,6 +13,7 @@ void setup()
 {
     Interrupts_StartTimers();
     (void)ADS1115::Setup(&hi2c1);
+    (void)MCP2518FD::Setup(&hspi1); // Result available in MCP2518FD::setup_status.
     HAL_Delay(5U);
     CSP_QUADSPI_Init();
     CSP_QSPI_EnableMemoryMappedMode();
@@ -30,6 +31,7 @@ void tasks()
     NON_BLOCKING_VSYNC();
     UI_Logic();
     ADS1115::Service();
+    MCP2518FD::Service();
 
 
 

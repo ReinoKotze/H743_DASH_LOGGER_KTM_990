@@ -15,7 +15,7 @@ extern volatile uint32_t Pulse_Per_Rotation;
 extern volatile uint32_t Wheel_Circumfrance;
 extern volatile uint8_t lvgl_timer_due;
 extern volatile uint8_t ADS1115_alert_ready_due;
-
+extern volatile uint8_t CAN_int_due;
 void Interrupts_StartTimers(void);
 
 #ifdef __cplusplus

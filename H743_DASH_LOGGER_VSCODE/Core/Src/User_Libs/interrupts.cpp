@@ -10,6 +10,7 @@ volatile uint32_t Pulse_Per_Rotation = 6U;
 volatile uint32_t Wheel_Circumfrance = 2100U; /* mm */
 volatile uint8_t lvgl_timer_due = 0U;
 volatile uint8_t ADS1115_alert_ready_due = 0U;
+volatile uint8_t CAN_int_due = 0U;
 
 #define TIMER_CAPTURE_CLOCK_KHZ 240U
 
@@ -76,4 +77,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t pin)
     {
         ADS1115_alert_ready_due = 1U;
     }
+    else if (pin == CAN_INT_Pin)
+    {
+        CAN_int_due = 1U;
+    }   
 }

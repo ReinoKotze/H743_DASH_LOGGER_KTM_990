@@ -1,0 +1,302 @@
+#include <stdint.h>
+#include <stddef.h>
+#include <stdio.h>
+
+namespace LambdaMaps {
+
+// Example axis centres.
+constexpr uint16_t rpmAxis[] = {
+    800, 1000, 1200, 1400, 1500, 1800, 2000,
+    2250, 2500, 2750, 3000, 3250, 3500, 3750,
+    4000, 4500, 5000, 5500, 6000, 6500, 7000,
+    7500, 8000, 8500, 9000, 9500, 10000, 10500
+};
+
+constexpr uint16_t mapAxis[] = {
+    230, 330, 400, 460, 480, 500, 510, 520,
+    530, 540, 550, 560, 570, 580, 600, 620,
+    650, 700, 800, 976
+}; // Absolute pressure in hPa.
+
+// Throttle stored in tenths of a percent:
+// 25 = 2.5%, 100 = 10%, 1000 = 100%.
+constexpr uint16_t throttleAxis[] = {
+    0, 10, 25, 50, 100, 150, 200,
+    300, 400, 500, 600, 800, 1000
+};
+
+constexpr size_t RpmRows =
+    sizeof(rpmAxis) / sizeof(rpmAxis[0]);
+
+constexpr size_t MapColumns =
+    sizeof(mapAxis) / sizeof(mapAxis[0]);
+
+constexpr size_t ThrottleColumns =
+    sizeof(throttleAxis) / sizeof(throttleAxis[0]);
+
+// Returns the nearest axis index.
+//
+// Policy:
+// - Values outside the first/last axis centre are rejected.
+// - Exactly halfway between centres goes to the higher centre.
+// - Axis must contain at least one value and be strictly ascending.
+template <size_t N>
+int FindNearestIndex(const uint16_t (&axis)[N], uint16_t value)
+{
+    static_assert(N > 0, "Axis cannot be empty");
+
+    if (value < axis[0] || value > axis[N - 1]) {
+        return -1;
+    }
+
+    // Binary search: find the first centre >= value.
+    size_t low = 0;
+    size_t high = N - 1;
+
+    while (low < high) {
+        const size_t middle = low + (high - low) / 2;
+
+        if (axis[middle] < value) {
+            low = middle + 1;
+        } else {
+            high = middle;
+        }
+    }
+
+    if (low == 0) {
+        return 0;
+    }
+
+    const uint32_t distanceBelow =
+        static_cast<uint32_t>(value) - axis[low - 1];
+
+    const uint32_t distanceAbove =
+        static_cast<uint32_t>(axis[low]) - value;
+
+    return static_cast<int>(
+        distanceBelow < distanceAbove ? low - 1 : low
+    );
+}
+
+// Store lambda as an integer scaled by 1000:
+// 980 = lambda 0.980.
+//
+// Integer accumulation avoids progressively losing precision
+// when repeatedly adding small floating-point values.
+template <size_t Columns>
+struct Map {
+    uint64_t sum[RpmRows][Columns] = {};
+    uint32_t count[RpmRows][Columns] = {};
+
+    bool Add(int row, int column, uint16_t lambdaMilli)
+    {
+        if (row < 0 || column < 0 ||
+            static_cast<size_t>(row) >= RpmRows ||
+            static_cast<size_t>(column) >= Columns) {
+            return false;
+        }
+
+        // Avoid wrapping the sample count.
+        if (count[row][column] == UINT32_MAX) {
+            return false;
+        }
+
+        sum[row][column] += lambdaMilli;
+        ++count[row][column];
+        return true;
+    }
+
+    bool Average(size_t row, size_t column, double &lambda) const
+    {
+        if (row >= RpmRows || column >= Columns ||
+            count[row][column] == 0) {
+            return false;
+        }
+
+        lambda = static_cast<double>(sum[row][column]) /
+                 static_cast<double>(count[row][column]) /
+                 1000.0;
+
+        return true;
+    }
+
+    void Clear()
+    {
+        for (size_t row = 0; row < RpmRows; ++row) {
+            for (size_t column = 0; column < Columns; ++column) {
+                sum[row][column] = 0;
+                count[row][column] = 0;
+            }
+        }
+    }
+};
+
+// Four sum arrays and four count arrays.
+// Static storage: these do not go on the function stack.
+static Map<ThrottleColumns> frontThrottle;
+static Map<ThrottleColumns> rearThrottle;
+static Map<MapColumns> frontMap;
+static Map<MapColumns> rearMap;
+
+struct Sample {
+    uint16_t rpm;
+    uint16_t throttleTenthsPercent;
+    uint16_t frontMapHpa;
+    uint16_t rearMapHpa;
+    uint16_t frontLambdaMilli;
+    uint16_t rearLambdaMilli;
+
+    // Set false for missing, stale, warming-up or faulty readings.
+    bool rpmValid;
+    bool throttleValid;
+    bool frontMapValid;
+    bool rearMapValid;
+    bool frontLambdaValid;
+    bool rearLambdaValid;
+};
+
+void Reset()
+{
+    frontThrottle.Clear();
+    rearThrottle.Clear();
+    frontMap.Clear();
+    rearMap.Clear();
+}
+
+// Call from the main loop once per selected logging event.
+// Do not call concurrently from an interrupt.
+void AddSample(const Sample &sample)
+{
+    if (!sample.rpmValid) {
+        return;
+    }
+
+    // Calculate this row once for all four maps.
+    const int row = FindNearestIndex(rpmAxis, sample.rpm);
+
+    if (row < 0) {
+        return;
+    }
+
+    const int throttleColumn = sample.throttleValid
+        ? FindNearestIndex(throttleAxis, sample.throttleTenthsPercent)
+        : -1;
+
+    if (sample.frontLambdaValid) {
+        frontThrottle.Add(
+            row, throttleColumn, sample.frontLambdaMilli
+        );
+
+        if (sample.frontMapValid) {
+            const int column =
+                FindNearestIndex(mapAxis, sample.frontMapHpa);
+
+            frontMap.Add(row, column, sample.frontLambdaMilli);
+        }
+    }
+
+    if (sample.rearLambdaValid) {
+        rearThrottle.Add(
+            row, throttleColumn, sample.rearLambdaMilli
+        );
+
+        if (sample.rearMapValid) {
+            const int column =
+                FindNearestIndex(mapAxis, sample.rearMapHpa);
+
+            rearMap.Add(row, column, sample.rearLambdaMilli);
+        }
+    }
+}
+
+// CSV output callback.
+// Implement this using your SD-card filesystem.
+// Return false if the write fails.
+using CsvWriter = bool (*)(const char *text, size_t length, void *context);
+
+template <size_t Columns>
+bool ExportMap(
+    const char *name,
+    const char *loadUnit,
+    const uint16_t (&loadAxis)[Columns],
+    const Map<Columns> &map,
+    CsvWriter writer,
+    void *context)
+{
+    char line[160];
+
+    for (size_t row = 0; row < RpmRows; ++row) {
+        for (size_t column = 0; column < Columns; ++column) {
+            const uint32_t samples = map.count[row][column];
+            int length;
+
+            if (samples == 0) {
+                // Empty lambda field means no measurements.
+                length = snprintf(
+                    line, sizeof(line),
+                    "%s,%u,%u,%s,,0\n",
+                    name,
+                    static_cast<unsigned>(rpmAxis[row]),
+                    static_cast<unsigned>(loadAxis[column]),
+                    loadUnit
+                );
+            } else {
+                // Rounded average in thousandths of lambda.
+                // No floating-point printf support is required.
+                const uint64_t averageMilli =
+                    (map.sum[row][column] + samples / 2U) / samples;
+
+                length = snprintf(
+                    line, sizeof(line),
+                    "%s,%u,%u,%s,%lu.%03lu,%lu\n",
+                    name,
+                    static_cast<unsigned>(rpmAxis[row]),
+                    static_cast<unsigned>(loadAxis[column]),
+                    loadUnit,
+                    static_cast<unsigned long>(averageMilli / 1000U),
+                    static_cast<unsigned long>(averageMilli % 1000U),
+                    static_cast<unsigned long>(samples)
+                );
+            }
+
+            if (length < 0 ||
+                static_cast<size_t>(length) >= sizeof(line)) {
+                return false;
+            }
+
+            if (!writer(line, static_cast<size_t>(length), context)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+// Export at session end with accumulation paused.
+// One CSV contains all four maps, identified by the first column.
+bool ExportCsv(CsvWriter writer, void *context)
+{
+    if (writer == nullptr) {
+        return false;
+    }
+
+    static const char header[] =
+        "map,rpm,load,load_unit,lambda_average,count\n";
+
+    if (!writer(header, sizeof(header) - 1, context)) {
+        return false;
+    }
+
+    return
+        ExportMap("front_tps", "0.1_percent", throttleAxis,
+                  frontThrottle, writer, context) &&
+        ExportMap("rear_tps", "0.1_percent", throttleAxis,
+                  rearThrottle, writer, context) &&
+        ExportMap("front_map", "hPa", mapAxis,
+                  frontMap, writer, context) &&
+        ExportMap("rear_map", "hPa", mapAxis,
+                  rearMap, writer, context);
+}
+
+} // namespace LambdaMaps
