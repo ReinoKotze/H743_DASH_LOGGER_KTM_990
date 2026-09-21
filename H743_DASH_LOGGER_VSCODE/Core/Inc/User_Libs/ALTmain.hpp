@@ -8,7 +8,7 @@
 #ifndef INC_USER_LIBS_ALTMAIN_HPP_
 #define INC_USER_LIBS_ALTMAIN_HPP_
 
-#include "User_Libs/interrupts.h"
+#include "User_Libs/interrupts.hpp"
 
 // If compiled by a C++ compiler, use C-linkage for these functions
 #ifdef __cplusplus

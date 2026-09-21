@@ -1,5 +1,5 @@
 /*
- * st7365_3.5Inch.c
+ * st7365_3.5Inch.cpp
  *
  *  Created on: 26 Aug 2026
  *      Author: reino
@@ -101,11 +101,11 @@ void LCD_IO_WriteData(uint16_t RegValue)
 
 void hardRst()
 {
-	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, 1);
+	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
     delay(20);
-    HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, 0);
+    HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_RESET);
     delay(20);
-    HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, 1);
+    HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
     delay(20);
     LCD_IO_WriteReg(swReset) ;
     delay(120);

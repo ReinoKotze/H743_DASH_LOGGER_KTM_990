@@ -1,5 +1,5 @@
 /*
- * st7365_3.5Inch.h
+ * st7365_3.5Inch.hpp
  *
  *  Created on: 26 Aug 2026
  *      Author: reino

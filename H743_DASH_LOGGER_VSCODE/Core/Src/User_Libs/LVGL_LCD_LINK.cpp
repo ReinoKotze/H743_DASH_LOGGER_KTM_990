@@ -33,8 +33,8 @@ static void disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *pixel
         return;
     }
     if(pixels == NULL || area->x1 < 0 || area->y1 < 0 ||
-       area->x2 < area->x1 || area->y2 < area->y1 ||
-       area->x2 >= MY_DISP_HOR_RES || area->y2 >= MY_DISP_VER_RES) {
+      area->x2 >= static_cast<int32_t>(MY_DISP_HOR_RES) ||
+      area->y2 >= static_cast<int32_t>(MY_DISP_VER_RES)) {
         Error_Handler();
         return;
     }

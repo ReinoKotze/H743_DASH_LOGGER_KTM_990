@@ -1,5 +1,5 @@
 /*
- * w25q128.h
+ * w25q128.hpp
  *
  *  Created on: 26 Aug 2026
  *      Author: reino

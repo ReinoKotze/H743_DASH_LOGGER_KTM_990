@@ -16,13 +16,13 @@
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
-//#include "SDRAM_ADD_MANIGMENT.h"
+//#include "SDRAM_ADD_MANIGMENT.hpp"
 
 /* If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
 #if  0 && defined(__ASSEMBLY__)
 #include "my_include.h"
 #endif
-#include "../Core/Inc/User_Libs/SDRAM_ADD_MANIGMENT.h"
+#include "../Core/Inc/User_Libs/SDRAM_ADD_MANIGMENT.hpp"
 /*====================
    COLOR SETTINGS
  *====================*/

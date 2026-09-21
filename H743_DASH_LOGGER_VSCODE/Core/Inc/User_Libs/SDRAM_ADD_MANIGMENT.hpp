@@ -1,5 +1,5 @@
 /*
- * SDRAM_ADD_MANIGMENT.h
+ * SDRAM_ADD_MANIGMENT.hpp
  *
  *  Created on: 2 Sept 2026
  *      Author: reino

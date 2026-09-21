@@ -2,7 +2,7 @@
 
 #include "INCLUDES.hpp"
 
-extern SDRAM_HandleTypeDef hsdram1;
+#include "fmc.h"
 
 #define SDRAM_REFRESH_COUNT  296U
 
