@@ -20,10 +20,12 @@
 #include "main.h"
 #include "crc.h"
 #include "dma.h"
+#include "fatfs.h"
 #include "i2c.h"
 #include "mdma.h"
 #include "quadspi.h"
 #include "rng.h"
+#include "sdmmc.h"
 #include "spi.h"
 #include "tim.h"
 #include "gpio.h"
@@ -163,6 +165,8 @@ int main(void)
   MX_SPI2_Init();
   MX_SPI3_Init();
   MX_TIM2_Init();
+  MX_SDMMC2_SD_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   setup();
 

@@ -66,6 +66,7 @@ void I2C1_ER_IRQHandler(void);
 void FMC_IRQHandler(void);
 void TIM6_DAC_IRQHandler(void);
 void MDMA_IRQHandler(void);
+void SDMMC2_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 void DMA2D_IRQHandler(void);
 /* USER CODE END EFP */

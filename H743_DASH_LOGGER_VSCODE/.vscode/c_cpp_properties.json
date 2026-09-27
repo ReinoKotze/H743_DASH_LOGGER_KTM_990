@@ -29,7 +29,10 @@
                 "${workspaceFolder}/Drivers/STM32H7xx_HAL_Driver/Inc",
                 "${workspaceFolder}/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy",
                 "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
-                "${workspaceFolder}/Drivers/CMSIS/Include"
+                "${workspaceFolder}/Drivers/CMSIS/Include",
+                "${workspaceFolder}/FATFS/App",
+                "${workspaceFolder}/FATFS/Target",
+                "${workspaceFolder}/Middlewares/Third_Party/FatFs/src"
             ]
         }
     ],

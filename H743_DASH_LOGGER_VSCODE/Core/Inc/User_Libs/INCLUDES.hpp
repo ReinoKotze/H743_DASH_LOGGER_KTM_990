@@ -13,6 +13,8 @@
 #include "tim.h"
 #include "i2c.h"
 #include "quadspi.h"
+#include "sdmmc.h"
+#include "fatfs.h"
 
 // C++ interfaces are only available to .cpp files.
 #ifdef __cplusplus

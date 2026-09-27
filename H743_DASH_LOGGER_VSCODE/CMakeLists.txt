@@ -35,12 +35,26 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY SOURCES "${FIRMWARE_SOURCES}")
 
 # Add sources to executable/library
 target_sources(${PROJECT_NAME} PRIVATE
-  # User defined sources
+  # CubeMX generated SDMMC2 sources are not currently included by
+  # cmake/files.cmake, so keep them in the editable project section.
+  ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/sdmmc.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/FATFS/App/fatfs.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/FATFS/Target/bsp_driver_sd.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/FATFS/Target/sd_diskio.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FatFs/src/diskio.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FatFs/src/ff.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FatFs/src/ff_gen_drv.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FatFs/src/option/syscall.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.c
 )
 
 # Add include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
-  # User defined include directories
+  ${CMAKE_CURRENT_SOURCE_DIR}/FATFS/App
+  ${CMAKE_CURRENT_SOURCE_DIR}/FATFS/Target
+  ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FatFs/src
 )
 
 # Compiler options
