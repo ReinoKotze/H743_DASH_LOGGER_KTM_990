@@ -37,6 +37,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY SOURCES "${FIRMWARE_SOURCES}")
 target_sources(${PROJECT_NAME} PRIVATE
   # CubeMX generated SDMMC2 sources are not currently included by
   # cmake/files.cmake, so keep them in the editable project section.
+  ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/User_Libs/sd_card_writer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/sdmmc.c
   ${CMAKE_CURRENT_SOURCE_DIR}/FATFS/App/fatfs.c
   ${CMAKE_CURRENT_SOURCE_DIR}/FATFS/Target/bsp_driver_sd.c

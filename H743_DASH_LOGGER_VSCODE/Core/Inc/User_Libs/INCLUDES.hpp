@@ -18,6 +18,7 @@
 
 // C++ interfaces are only available to .cpp files.
 #ifdef __cplusplus
+#include "sd_card_writer.hpp"
 #include "Buttons.hpp"
 #include "ADS1115.hpp"
 #include "MCP2518FD.hpp"
