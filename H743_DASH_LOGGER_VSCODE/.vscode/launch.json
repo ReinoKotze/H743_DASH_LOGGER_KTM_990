@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug STM32H743 with QSPI assets",
+            "type": "stlinkgdbtarget",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "preBuild": "${command:st-stm32-ide-debug-launch.build}",
+            "runEntry": "main",
+            "imagesAndSymbols": [
+                {
+                    "imageFileName": "${workspaceFolder}/build/Debug/H743_DASH_LOGGER_VSCODE.elf",
+                    "symbolFileName": "${workspaceFolder}/build/Debug/H743_DASH_LOGGER_VSCODE.elf"
+                }
+            ],
+            "serverInterface": "SWD",
+            "serverVerify": true,
+            "serverExtLoader": [
+                {
+                    "loader": "${workspaceFolder}/XIP.stldr",
+                    "initialize": false
+                }
+            ]
+        }
+    ]
+}

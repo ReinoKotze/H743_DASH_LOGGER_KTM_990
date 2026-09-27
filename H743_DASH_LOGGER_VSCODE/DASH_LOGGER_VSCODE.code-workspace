@@ -1,0 +1,19 @@
+{
+    "folders":  [
+        {
+            "path": "."
+        },
+        {
+            "path": "../../SENSOR_HUB_KTM_990/SENSOR_HUB"
+        }
+    ],
+    "settings":  {
+                     "stm32cube-ide-clangd.path":  "cube",
+                     "stm32cube-ide-clangd.arguments":  [
+                        "starm-clangd",
+                        "--query-driver=C:/Users/reino/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-gcc*,C:/Users/reino/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-g++*"
+                    ],
+                     "cmake.cmakePath":  "C:/Users/reino/.vscode/extensions/stmicroelectronics.stm32cube-ide-build-cmake-1.46.0-win32-x64/resources/cube-cmake/win32/x86_64/cube-cmake.exe",
+                     "cmake.sourceDirectory":  "${workspaceFolder}"
+                 }
+}

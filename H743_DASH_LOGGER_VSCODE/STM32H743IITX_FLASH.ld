@@ -84,6 +84,21 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
+  /*
+   * Keep SquareLine-generated image pixel arrays in memory-mapped QSPI.
+   * This must precede the general .rodata wildcard below, otherwise
+   * .rodata* will consume these input sections first.
+   * The small lv_image_dsc_t descriptors remain in internal FLASH.
+   */
+  .extFlashMem :
+  {
+    . = ALIGN(4);
+    __qspi_assets_start__ = .;
+    KEEP(*(.rodata.ui_img_*_map))
+    . = ALIGN(4);
+    __qspi_assets_end__ = .;
+  } >QSPIFLASH
+
   /* Constant data goes into FLASH */
   .rodata :
   {
@@ -187,12 +202,9 @@ SECTIONS
     libgcc.a ( * )
   }
   
-  /* Define the section for your assets */
-.extFlashMem : 
-{
-*(.extFlahMem)
-}>QSPIFLASH
-  
+
+
+
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
