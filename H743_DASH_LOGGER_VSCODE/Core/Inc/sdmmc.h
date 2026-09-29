@@ -36,6 +36,10 @@ extern SD_HandleTypeDef hsd2;
 
 /* USER CODE BEGIN Private defines */
 
+extern volatile uint32_t sdmmc2_init_status;
+extern volatile uint32_t sdmmc2_init_error;
+extern volatile uint32_t sdmmc2_init_state;
+
 /* USER CODE END Private defines */
 
 void MX_SDMMC2_SD_Init(void);

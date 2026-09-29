@@ -13,14 +13,104 @@ static uint8_t * const draw2 =
 
 static bool updates_enabled = true;
 static lv_display_t * volatile flushing_display;
-volatile uint32_t lcd_mdma_flush_count;
-volatile uint32_t lcd_mdma_complete_count;
-volatile uint32_t lcd_mdma_errors;
 static volatile uint8_t refresh_pending;
 volatile uint8_t TEFLAG;
-volatile uint32_t lcd_te_count;
 volatile uint32_t lcd_te_period_ms;
 static volatile uint32_t last_te_ms;
+static volatile bool te_time_valid;
+
+/* A 60 Hz TE pulse arrives every 16-17 ms. Edges closer than this are
+   electrical glitches/ringing and must not start another refresh. */
+static constexpr uint32_t LCD_TE_MIN_PERIOD_MS = 12U;
+
+#if USE_EXTERNAL_SDRAM
+/* MDMA reads this internal AXI SRAM scanline instead of reading SDRAM while
+   simultaneously writing the LCD through the same FMC controller. */
+alignas(32) static uint8_t lcd_internal_stage[MY_DISP_HOR_RES * 2U];
+#if LCD_SDRAM_VERIFY_READS
+alignas(32) static uint8_t lcd_internal_verify[MY_DISP_HOR_RES * 2U];
+#endif
+
+struct LcdStagedFlush {
+    const uint8_t *source;
+    uint32_t row_bytes;
+    uint16_t x0;
+    uint16_t x1;
+    uint16_t next_y;
+    uint16_t rows_remaining;
+    uint8_t write_passes_remaining;
+    bool active;
+};
+
+static LcdStagedFlush staged_flush = {};
+
+static inline void settle_shared_fmc_bus(void)
+{
+    __DSB();
+    for(volatile uint32_t cycle = 0U;
+        cycle < LCD_FMC_SETTLE_CYCLES;
+        ++cycle) {
+        __NOP();
+    }
+    __DSB();
+}
+
+static HAL_StatusTypeDef start_next_staged_row(void)
+{
+    if(!staged_flush.active || staged_flush.rows_remaining == 0U ||
+       staged_flush.row_bytes > sizeof(lcd_internal_stage)) {
+        return HAL_ERROR;
+    }
+
+    /* The previous MDMA completion ended an LCD write. Leave the shared data
+       bus idle before changing direction and reading the SDRAM scanline. */
+#if LCD_SDRAM_VERIFY_READS
+    bool verified = false;
+    for(uint32_t attempt = 0U;
+        attempt < LCD_SDRAM_READ_RETRIES;
+        ++attempt) {
+        settle_shared_fmc_bus();
+        memcpy(lcd_internal_stage,
+               staged_flush.source,
+               staged_flush.row_bytes);
+
+        settle_shared_fmc_bus();
+        memcpy(lcd_internal_verify,
+               staged_flush.source,
+               staged_flush.row_bytes);
+
+        if(memcmp(lcd_internal_stage,
+                  lcd_internal_verify,
+                  staged_flush.row_bytes) == 0) {
+            verified = true;
+            break;
+        }
+
+    }
+
+    if(!verified) {
+        memcpy(lcd_internal_stage,
+               lcd_internal_verify,
+               staged_flush.row_bytes);
+    }
+#else
+    settle_shared_fmc_bus();
+    memcpy(lcd_internal_stage, staged_flush.source, staged_flush.row_bytes);
+#endif
+
+    /* Complete the SDRAM read, then leave another idle interval before MDMA
+       changes the shared FMC pins back to LCD writes. */
+    settle_shared_fmc_bus();
+    staged_flush.write_passes_remaining = LCD_SCANLINE_WRITE_PASSES;
+
+    return LCD_StartBitmapMDMA_IT(staged_flush.x0,
+                                  staged_flush.next_y,
+                                  staged_flush.x1,
+                                  staged_flush.next_y,
+                                  reinterpret_cast<const uint16_t *>(
+                                      lcd_internal_stage));
+}
+#endif
 
 
 
@@ -47,7 +137,6 @@ static void disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *pixel
         return;
     }
     if(flushing_display != NULL) {
-        ++lcd_mdma_errors;
         Error_Handler();
         return;
     }
@@ -59,14 +148,32 @@ static void disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *pixel
             memmove(pixels + y * row_bytes, pixels + y * stride, row_bytes);
     }
     flushing_display = disp;
-    ++lcd_mdma_flush_count;
-    /* Driver cleans source D-cache and splits transfers into bounded chunks. */
-    if(LCD_StartBitmapMDMA_IT((uint16_t)area->x1, (uint16_t)area->y1,
-                             (uint16_t)area->x2, (uint16_t)area->y2,
-                             (const uint16_t *)pixels) != HAL_OK) {
-        ++lcd_mdma_errors;
+
+#if USE_EXTERNAL_SDRAM
+    staged_flush.source = pixels;
+    staged_flush.row_bytes = row_bytes;
+    staged_flush.x0 = static_cast<uint16_t>(area->x1);
+    staged_flush.x1 = static_cast<uint16_t>(area->x2);
+    staged_flush.next_y = static_cast<uint16_t>(area->y1);
+    staged_flush.rows_remaining = static_cast<uint16_t>(rows);
+    staged_flush.active = true;
+
+    if(start_next_staged_row() != HAL_OK) {
+        staged_flush.active = false;
+        flushing_display = NULL;
         Error_Handler();
     }
+#else
+    /* Internal RAM_D2 can feed the LCD MDMA directly. */
+    if(LCD_StartBitmapMDMA_IT(static_cast<uint16_t>(area->x1),
+                             static_cast<uint16_t>(area->y1),
+                             static_cast<uint16_t>(area->x2),
+                             static_cast<uint16_t>(area->y2),
+                             reinterpret_cast<const uint16_t *>(pixels)) != HAL_OK) {
+        flushing_display = NULL;
+        Error_Handler();
+    }
+#endif
     /* Only the final completion IRQ releases this buffer to LVGL. */
 }
 
@@ -75,13 +182,49 @@ bool lv_port_disp_busy(void) { return flushing_display != NULL; }
 void lv_port_disp_mdma_complete_isr(bool success)
 {
     if(!success) {
-        ++lcd_mdma_errors;
+#if USE_EXTERNAL_SDRAM
+        staged_flush.active = false;
+#endif
         Error_Handler();
         return;
     }
+
+#if USE_EXTERNAL_SDRAM
+    if(staged_flush.active) {
+        if(staged_flush.write_passes_remaining > 1U) {
+            --staged_flush.write_passes_remaining;
+            settle_shared_fmc_bus();
+
+            if(LCD_StartBitmapMDMA_IT(
+                   staged_flush.x0,
+                   staged_flush.next_y,
+                   staged_flush.x1,
+                   staged_flush.next_y,
+                   reinterpret_cast<const uint16_t *>(lcd_internal_stage)) != HAL_OK) {
+                staged_flush.active = false;
+                Error_Handler();
+            }
+            return;
+        }
+
+        --staged_flush.rows_remaining;
+        staged_flush.source += staged_flush.row_bytes;
+        ++staged_flush.next_y;
+
+        if(staged_flush.rows_remaining != 0U) {
+            if(start_next_staged_row() != HAL_OK) {
+                staged_flush.active = false;
+                Error_Handler();
+            }
+            return;
+        }
+
+        staged_flush.active = false;
+    }
+#endif
+
     lv_display_t *disp = flushing_display;
     if(disp != NULL) {
-        ++lcd_mdma_complete_count;
         lv_display_flush_ready(disp);
         flushing_display = NULL;
     }
@@ -106,9 +249,19 @@ void disp_disable_update(void) { updates_enabled = false; }
 void lv_port_disp_te_isr(void)
 {
     uint32_t now = HAL_GetTick();
-    if(lcd_te_count != 0U) lcd_te_period_ms = now - last_te_ms;
+
+    if(te_time_valid)
+    {
+        uint32_t elapsed_ms = now - last_te_ms;
+        if(elapsed_ms < LCD_TE_MIN_PERIOD_MS)
+        {
+            return;
+        }
+        lcd_te_period_ms = elapsed_ms;
+    }
+
     last_te_ms = now;
-    ++lcd_te_count;
+    te_time_valid = true;
     refresh_pending = 1U;
     TEFLAG = 1U;
 }

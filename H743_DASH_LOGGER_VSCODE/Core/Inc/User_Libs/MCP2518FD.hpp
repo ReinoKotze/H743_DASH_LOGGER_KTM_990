@@ -30,8 +30,7 @@ bool Send(const Frame &frame);
 void Service(); // Call frequently; drains up to 4 frames to an 8-frame software queue.
 bool Receive(Frame &frame); // Pops oldest; consume regularly to avoid dropped frames.
 
-extern volatile uint32_t rx_count, rx_dropped, rx_overflows;
-extern volatile uint32_t tx_queued, last_trec;
+extern volatile uint32_t last_trec;
 // Diagnostics: inspect setup_status and SPI status if setup or service fails.
 extern volatile SetupStatus setup_status;
 extern volatile uint32_t last_hal_status;

@@ -15,6 +15,7 @@
 #include "quadspi.h"
 #include "sdmmc.h"
 #include "fatfs.h"
+#include "fmc.h"
 
 // C++ interfaces are only available to .cpp files.
 #ifdef __cplusplus

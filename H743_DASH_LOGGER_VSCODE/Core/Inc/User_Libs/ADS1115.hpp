@@ -6,9 +6,6 @@
 
 // Plain C symbols are easy to watch from any CubeIDE debugger stack frame.
 extern "C" {
-extern volatile uint32_t ads1115_i2c_error_count;
-extern volatile uint32_t ads1115_conversion_timeout_count;
-extern volatile uint32_t ads1115_sample_count;
 extern volatile uint32_t ads1115_last_hal_status;
 extern volatile uint32_t ads1115_last_hal_error;
 
@@ -16,7 +13,6 @@ extern volatile uint32_t ads1115_last_hal_error;
 extern volatile uint32_t ads1115_last_error_stage;
 extern volatile uint32_t ads1115_last_config_written;
 extern volatile uint32_t ads1115_last_config_read;
-extern volatile uint32_t ads1115_config_read_count;
 
 }
 

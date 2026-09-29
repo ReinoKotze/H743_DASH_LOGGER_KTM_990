@@ -54,6 +54,11 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+extern volatile uint32_t startup_init_stage;
+extern volatile uint32_t startup_error_stage;
+extern volatile uint32_t startup_error_return_address;
+extern volatile uint32_t startup_error_exception;
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

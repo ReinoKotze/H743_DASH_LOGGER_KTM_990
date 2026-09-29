@@ -14,8 +14,8 @@
 extern "C" {
 #endif
 
-#define LCD_MDMA_MAX_BYTES  (32768U)//(LCD_WIDTH * sizeof(uint16_t))
-//#define LCD_MDMA_MAX_BYTES  (65534U) /* Even number: RGB565 pixels */
+/* Limit every MDMA block to one 320-pixel RGB565 scanline. */
+#define LCD_MDMA_MAX_BYTES  (LCD_WIDTH * sizeof(uint16_t))
 #define FMC_BANK1_REG  *(volatile uint16_t *)((uint32_t)0x60000000)  // Register Address for A0
 #define FMC_BANK1_DATA *(volatile uint16_t *)((uint32_t)0x60000002) // Data Address for A0 -> A0<<1 -> 0010
 

@@ -1,0 +1,1413 @@
+
+===== PAGE 1 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                 LCD   MODULE                                     
+                                                                                  
+                           SPECIFICATION                                          
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                    Model:    UEED035HV-RX40-L001A                                
+                                                                                  
+                                                                                  
+                    Version:  V1.0                                                
+                                                                                  
+                    Date:     2023.12.04                                          
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      Customer Confirmation 客户确认                                                  
+                                                                                  
+                                                                                  
+                 Approved by                          Notes                       
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+         Please return one of the copies of the specification with your signature to us within two weeks after you receive this
+      document. If it is not returned, we will assume that you agree to the entire contents of this specification document.
+                                                                                  
+         请贵司在收到规格书的两周内，将签好字的规格书原件或者复印件寄回.如果没有返回，我司将会认为贵司已经                        
+      默认接受产品规格书中的全部资料和规范.                                                         
+                                                                                  
+                                                                                  
+      VIEWE  Confirmation 优奕确认                                                    
+                                                                                  
+            Prepared by            Reviewed by           Approved by              
+                                                                                  
+                                                                                  
+                                                                                  
+            Ham  Luo                 Yoyo Liu             Andy Liu                
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 1 / 18          
+                                                                                  
+
+===== PAGE 2 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                        REVISION          HISTORY                                 
+                                                                                  
+                                                                                  
+        Revision       Date          Contents of Revision Change  Remark          
+         版本号           日期                   修改内容                   备注             
+                                                                                  
+         V1.0        2023.12.04 Preliminary release                               
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 2 / 18          
+                                                                                  
+
+===== PAGE 3 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                              TABLE     of CONTENTS                               
+                                                                                  
+                                                                                  
+      1. GENERAL   INFORMATION............................................................................ 4
+                                                                                  
+         1.1 Features ............................................................................................................. 4
+                                                                                  
+         1.2 Mechanical Specification ................................................................................. 4
+                                                                                  
+      2. ABSOLUTE   MAXIMUM     RATINGS  ............................................................... 5
+                                                                                  
+      3. MECHANICAL    DRAWING    ............................................................................. 6
+                                                                                  
+      4. I/O CONNECTION   &  BLOCK   DIAGRAM    ................................................... 7
+                                                                                  
+         4.1 I/O Connection ................................................................................................. 7
+                                                                                  
+         4.2 Block Diagram .................................................................................................. 8
+                                                                                  
+      5. ELECTRICAL   CHARACTERISTICS      ............................................................ 9
+                                                                                  
+         5.1 TFT-LCD Panel Driving Section ...................................................................... 9
+                                                                                  
+         5.2 Back Light Driving Section .............................................................................. 9
+                                                                                  
+         5.3 Power On/Off ................................................................................................. 10
+         5.4 Timing Characteristics .................................................................................... 12
+                                                                                  
+         5.5 Display Serial Interface Timing Characteristics ( SPI system ) ..................... 13
+                                                                                  
+      6. OPTICAL  CHARACTERISTICS      .................................................................. 14
+                                                                                  
+         6.1 Optical Specification (Reflective mode) ........................................................ 14
+                                                                                  
+         6.2 Optical Specification (Transmittance mode) ................................................ 15
+                                                                                  
+      7. RELIABILITY  ................................................................................................. 17
+                                                                                  
+      8. PACKAGE   DRAWING    ................................................................................... 18
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 3 / 18          
+                                                                                  
+
+===== PAGE 4 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      1. GENERAL     INFORMATION                                                  
+                                                                                  
+      1.1 Features                                                                
+      1) Pixel Arrangement：RGB Vertical Stripe                                    
+                                                                                  
+      2) Interface Mode：MCU 8/16BIT/SPI                                           
+      3) Driver IC：ST7365 or Compatible                                           
+      4) Operation Temperature：-20~70℃                                            
+      5) Storage Temperature：-30~80℃                                              
+      6) Backlight Type：White LED                                                 
+                                                                                  
+      7) Display mode：Transflective Normally BLACK                                
+      8) LED life time：30,000 Hours                                               
+                                                                                  
+                                                                                  
+      1.2 Mechanical Specification                                                
+                                                                                  
+              Item                 Specification        Unit      Remark          
+              项目                      规格               单位          备注             
+        Pixel Driving element          TFT               -          -             
+                                                                                  
+            Screen Size                3.47             Inch      Diagonal        
+            Resolution          320(H)*3(RGB)*480(V)    Dots        -             
+                                                                                  
+             Interface            MCU 8/16BIT/SPI        -        40PIN           
+                                                                                  
+                                       0.07                    Reflective Mode    
+      Module Power Consumption                          Watt                      
+                                       0.42                   Transmissive Mode   
+                              12%*Surrounding illumination cd/m² Reflective Mode  
+            Luminance                                                             
+                            150+12%*Surrounding illumination cd/m² Transmissive Mode
+                                                                                  
+                                                                                  
+            Active Area           48.96(W)*73.44(H)     mm          -             
+                                                                                  
+          Pixel pitch (W*H)       0.153(W)*0.153(H)     mm          -             
+                                                                                  
+                                                                                  
+        Module Size (W*H*D)    52.26(W)*80.6(H)*2.21(D) mm         Typ            
+                                                                                  
+           Display Color              16.7M            Colors      18bits         
+                                                                                  
+                                                                                  
+      Applicate Suggestion:                                                       
+          Backlight off in Reflective mode @ Surrounding illumination > 1500 cd/m²
+          Backlight on in Transmissive mode @ Surrounding illumination ≤ 1500 cd/m²
+                                                                                  
+          Please contact Viewe for Surrounding illumination (lx) detail information
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 4 / 18          
+                                                                                  
+
+===== PAGE 5 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      2. ABSOLUTE      MAXIMUM       RATINGS                                      
+                                                                                  
+              Item         Symbol   Min.     Max.      Unit       Remark          
+             项目             符号     最小值      最大值       单位           备注             
+                                                                                  
+        Power supply voltage1 IOVCC  -0.5     4.6       V          Note1          
+        Power supply voltage2 VCI    -0.5     4.6       V          Note1          
+        LED forward current  I      -0.001    120      mA      For each led,Note1 
+                              F                                                   
+        LED Reverse Voltage  V        -       3.4       V      For each led,Note1 
+                              R                                                   
+        Operating temperature T      -20      70       °C         Note1,2         
+                              op                                                  
+         Storage temperature T       -30      80       °C         Note1,2         
+                              st                                                  
+            Humidity         H       10       90      %RH         Note1,3         
+                              st                                                  
+      (Ta=+25°C,GND=0V)                                                           
+      Note1:If the module exceeds the absolute maximum ratings, it may be damaged permanently. Also
+          if the module operates with the absolute maximum ratings for a long time, the reliability may drop.
+      Note2: In case of temperature below 0℃,the response time of liquid crystal (LC) becomes slower and the
+          color of panel darker than normal one.                                  
+      Note3: Temp. ≤ 60℃ , 90% RH MAX.                                            
+           Temp. ＞60℃ , Absolute humidity shall be less than 90% RH at 60℃.       
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 5 / 18          
+                                                                                  
+
+===== PAGE 6 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      3. MECHANICAL        DRAWING                                                
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+            M                                                                     
+            A                                                                     
+            4 0 .1 1 .3 2 0 2 :ecafretnI                                          
+                      MCL                                                         
+                       EMAN N                                                     
+                       :                                                          
+                       I                                                          
+                       o                                                          
+                       P                                                          
+                       N                                                          
+                        LCS-PTC/LX                                                
+                        1                                                         
+                         ADS_PTC/UY                                               
+                         23                                                       
+                          TSR_PTC/RX TNI_PTC/DY                                   
+                           4                                                      
+                            DNG                                                   
+                            56                                                    
+                             V3.3~8.1CCVOI V3.3~8.2CCV                            
+                              7                                                   
+                               ET                                                 
+                               89011121                                           
+                                   DR_UCM                                         
+                                    31                                            
+                                    ADS_IPS ODS_IPS                               
+                                     4151                                         
+                                      TESER                                       
+                                       61                                         
+                                       DNG                                        
+                                        71                                        
+                                        0BD 1BD                                   
+                                         8191                                     
+                                          2BD                                     
+                                           02                                     
+                                           3BD                                    
+                                            12                                    
+                                            4BD                                   
+                                             22                                   
+                                             5BD                                  
+                                              32                                  
+                                              6BD 7BD                             
+                                               4252                               
+                                                8BD                               
+                                                 62                               
+                                                 9BD                              
+                                                  72                              
+                                                  01BD                            
+                                                   82                             
+                                                   11BD                           
+                                                    92                            
+                                                    21BD                          
+                                                     03                           
+                                                     31BD                         
+                                                      13                          
+                                                      41BD                        
+                                                       23                         
+                                                       51BD                       
+                                                        33                        
+                                                        A-DEL                     
+                                                         43                       
+                                                         K-DEL K-DEL              
+                                                          53                      
+                                                           K-DEL                  
+                                                           6373                   
+                                                            DNG                   
+                                                             83                   
+                                                             0MI                  
+                                                              93                  
+                                                              1MI 2MI             
+                                                               04   MAH           
+                                                                       1/1        
+            H                                                                     
+            eu ssI tsriF                                                          
+            A                                                                     
+                w e i V k                                                         
+                w                                                                 
+                c                                                                 
+                e                                                                 
+                a                                                                 
+                i                                                                 
+                B                                                                 
+                V                                                                 
+                k c a                                                             
+                B                                                                 
+                 ） e lp m a xe g                                                  
+                 ）                                                                
+                 n                                                                
+                 g                                                                
+                 id                                                               
+                 n                                                                
+                 n                                                                
+                 ip                                                               
+                 e                                                                
+                 p                                                                
+                 B                                                                
+                 i h                                                              
+                 C                                                                
+                 s                                                                
+                 P                                                                
+                 d                                                                
+                 F                                                                
+                 l                                                                
+                 （                                                                
+                 o fn u                                                           
+                 C                                                                
+                   ） 货 出 开 展 C P F （                                              
+                    edoc                                                          
+                    gniyarps                                                      
+                    tcudo rP                                                      
+                       .oN traP U LB                                              
+                       .oN traP                                                   
+                       U LB                                                       
+                       rebm uN TO L U                                             
+                       re                                                         
+                       L                                                          
+                       b                                                          
+                       B                                                          
+                       m uN TO                                                    
+                       L U LB                                                     
+                        etad noitcudor                                            
+                        e                                                         
+                        P                                                         
+                        ta d                                                      
+                        A                                                         
+                        n                                                         
+                        1                                                         
+                        o                                                         
+                        0                                                         
+                        i                                                         
+                        0                                                         
+                        tc                                                        
+                        L                                                         
+                        udorP                                                     
+                        A100L                                                     
+                             5.0± 09.41                                           
+                                  5.0±41.34                                       
+                                     H:0.85MAX COMPONENT 1 6 GND                  
+                                        AAKK                                      
+                                          XAM08.0                                 
+                                               DNG ot detcennoC                   
+                                               TSD                                
+                                               evitcudnoC                         
+                                               50.0                               
+                                                3.0±00.4                          
+                                                         :ecneuqes                
+                                                         NIP                      
+                                                         PTC                      
+                                                          EMAN                    
+                                                          N                       
+                                                          :                       
+                                                          I                       
+                                                          o                       
+                                                          P                       
+                                                          N                       
+                                                          edom ecafretni          
+                                                          U CM eht                
+                                                          tceleS                  
+                                                           1                      
+                                                           DNG                    
+                                                           ]0~ 2[M I: stnem eriuq er rem
+                                                           o tsuc o t g nid       
+                                                           ro                     
+                                                           cca                    
+                                                           TSR_PTC/RX             
+                                                           2                      
+                                                           epyT ecafretni         
+                                                            esu                   
+                                                            ni sniP 0             
+                                                            1                     
+                                                            M                     
+                                                            M                     
+                                                            I                     
+                                                            e I pyT 2MI           
+                                                            O/I                   
+                                                            ]0:8[D sub tib-9 UCM 0808 1
+                                                            0 0                   
+                                                            TNI_PTC/DY            
+                                                            3                     
+                                                             0                    
+                                                             1 0                  
+                                                             sub tib- ] 6 0 1 : 5 U 1 C [ M D 0808
+                                                             LCS-PTC/LX           
+                                                             4                    
+                                                              sub tib-8 ] 0 U : C 7 M [ D 0808 1
+                                                              1 0 DNG/CCVOI       
+                                                              I                   
+                                                              ADS_PTC/UY          
+                                                              5                   
+                                                              laires atad tib-9 eriw-3 1
+                                                              0 1                 
+                                                              TUO/nI              
+                                                              :ADS                
+                                                               6                  
+                                                               V3.3~8.2CCV        
+                                                               laires atad tib-8 eriw-4 1
+                                                               1 1                
+                                                               TUO/nI :ADS        
+                                                                    A 100L-04XR-V 
+                                                                    H 530D EEU -M C L M C L
+                 P F                            :klis etihW                       
+                 （                              3.0±00.5                          
+                                               DN :reneffitS IP                   
+                                               G                                  
+                w                                                                 
+                e i                                                               
+                V                                                                 
+                e                                                                 
+                   )M CL(51.0±                                                    
+                   12.2                                                           
+                   *                                                              
+                                                30.0±21.0                         
+                                                     30.0±03.0                    
+                                                     *                            
+                                                     )reneffitS                   
+                                                     IP+CPF(                      
+                d                                                                 
+                i                                                                 
+                S                                                                 
+                w e i V t n o r F 51. DO M CL 51.0±62.25 * 0±                     
+                   51.                                                            
+                   D                                                              
+                   0±                                                             
+                   O                                                              
+                   5                                                              
+                   D                                                              
+                   1                                                              
+                   C                                                              
+                   .0                                                             
+                   L 69.15 5 5 1 6 . . AA                                         
+                    5                                                             
+                    D                                                             
+                    6                                                             
+                    C                                                             
+                    .1                                                            
+                    L 69.84 0 1 DO A A M D T F T A G V H " 7 4 . 3 O D C C L D L 5 C 0 8 4 x B G R x 0 2 3 1 4 L . 4 0 2 . ± 3 2 7 0 .0 6 8 .08 *
+                                       noitcetorp                                 
+                                       eulg                                       
+                                       eulB                                       
+                                         区折弯层单 KKAA                               
+                                            epat                                  
+                                            gnitalusni                            
+                                            w olleY                               
+                                            DNG                                   
+                                            XAM                                   
+                                            54.0:H                                
+                                            redloS                                
+                                             6 1 TNENOPMOC XAM58.0:H 5.0±         
+                                               aera tnenopm                       
+                                               oC 26.                             
+                                               XAM                                
+                                               58.0=H 54 03.0±00.4 30.0±03.0=W * 70. 1 0 . ± 0± 5. 0 9 5 1 . = 0 93*5.0P* 5.0± 1 2 .0 6 ± .7 0 1 5.02 * :S E T O N M C
+                                                          L                       
+                                                           D C L T F T )0 8 4 * 0 2 3 (" 7 4 .3 :e p y T y a lp siD
+                                                           .1                     
+                                                            e v itce              
+                                                            lfe R -sn arT ,K C A L B Y L L A M R O N E V S S IM S N A R T
+                                                             )E                   
+                                                             V S S IM             
+                                                             S N A R T (0 6 /0 6 /0 5 /0 5 :)D /U /R /L (E L G N A G N IW E I V
+                                                             .2                   
+                                                              ;e lb ita p m o C ro 5 6 3 7 T S :C I re v irD
+                                                              .3                  
+                                                               ;C° 0 7 O T C° 0 2 -:.p m eT g n ita re p O
+                                                               .4                 
+                                                                ,C° 0 8 O T C° 0 3 -:.p m e T e g aro tS
+                                                                 ).p y t(V        
+                                                                 9 .2 = fV ,A m 0 2 1 = fI ,S D E L E T IH W S C P 6 :e p y T L B
+                                                                 .5               
+                                                                  ;m m 2 .0± :ec n are lo T d e ifice p sn U
+                                                                  .6              
+                                                                    n o isn e m id n o itce p sn i fo su c o f e h t si " * " h tiW
+                                                                    .7            
+                                                                     ec n erefer e ra ") (" k ra m h tiw sn o isn e m iD
+                                                                     .8           
+                                                                      tn a ilp m o C e b tsu m 0 .2 S H o R
+                                                                      .9          
+      www.chinasunyee.com          电话：400-660-3306          Page: 6 / 18          
+
+===== PAGE 7 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      4. I/O CONNECTION        & BLOCK     DIAGRAM                                
+                                                                                  
+      4.1 I/O Connection                                                          
+                                                                                  
+       Pin   Symbol   I/O                    Description                          
+       No.    符号                               描述                                 
+       序                                                                          
+               XL         I2C clock signals for CTP;                              
+      号1               I                                                          
+             /CTP-SCL     Option XL for RTP                                       
+               YU         I2C data signal for CTP,                                
+        2              I                                                          
+             /CTP-SDA     Option YU for RTP                                       
+               XR         The signal will reset the CTP,Signal is active low,     
+        3              I                                                          
+             /CTP-RST     Option XR for RTP                                       
+               YD         Interrupt signals for CTP,                              
+        4              I/O                                                        
+             /CTP-INT     Option YD for RTP                                       
+        5      GND     P  Power Ground                                            
+        6     IOVCC    P  Power supply for I/O system                             
+        7      VCI     P  Power supply for analog circuits                        
+        8      TE      O  Tearing effect signal is used to synchronize MCU to frame memory
+              SPI_CS                                                              
+        9              I  Chip selection pin. Low-active                          
+             /MCU_CS                                                              
+             SPI_SCL      Write enable in MCU parallel interface                  
+       10              I                                                          
+             /MCU_WR      In SPI mode, this pin is used as SCL                    
+              SPI_RS      Display data/command selection pin in MCU interface     
+       11              I                                                          
+             /MCU_RS      RS=1 display data or parameter;RS=0 register index / command
+       12    MCU_RD    I  Read enable in 8080 MCU parallel interface. Low-active. 
+       13    SPI_SDA   I/O Serial communication data input and output, internal pull low.
+       14    SPI_SDO   O  SPI interface output pin                                
+       15     RESET    I  The signal will reset the LCM, Signal is active low.    
+       16     GND      P  Power Ground                                            
+      17-32  DB0-DB15  I/O data bus for MCU                                       
+       33     LED-A    P  Power supply for backlight anode                        
+      34-36   LED-K    P  Power supply for backlight cathode                      
+       37      GND     P  Power Ground                                            
+       38      IM0     I  The MCU interface mode select.                          
+       39      IM1     I  The MCU interface mode select.                          
+       40      IM2     I  The MCU interface mode select.                          
+      I：Input；O：Output；P：Power                                                    
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 7 / 18          
+                                                                                  
+
+===== PAGE 8 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      4.2 Block Diagram                                                           
+                                                                                  
+        MCU and Display Module Interface Configuration                            
+                 MCU                                    Display Module            
+                                                                                  
+                                                                                  
+                                    GND                                           
+                                    VCI                                           
+                                    LEDA                                          
+                                                        Power Block               
+               Power Block                                                        
+                                    LEDK                                          
+                                    IOVCC                                         
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                    DB[0:15]                                      
+                                    RESET                                         
+                                    SPI_CS / MCU_CS                               
+                                    SPI_SCL / MCU_WR                              
+               Interface Block                          Interface Block           
+                                    SPI_RS / MCU_RS                               
+                                    MCU_RD                                        
+                                    SPI_SDA                                       
+                                    SPI_SDO                                       
+                                    TE                                            
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                    XL / CTP-SCL                                  
+                                                                                  
+                                    YU/CTP_SDA                                    
+                  TP                                      I2C                     
+                                    XR/CTP_RST                                    
+               (WITHOUT)                                                          
+                                    YD/CTP_INT                                    
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 8 / 18          
+                                                                                  
+
+===== PAGE 9 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      5. ELECTRICAL       CHARACTERISTICS                                         
+                                                                                  
+      5.1 TFT-LCD   Panel Driving Section                                         
+                                                                                  
+                                                                                  
+              Item         Symbol   Min.    Typ.    Max.    Unit   Remark         
+              项目            符号     最小值     典型值     最大值      单位       备注           
+                                                                                  
+        Power Supply Voltage1 IOVCC  1.65    1.8     3.6      V       -           
+                                                                                  
+        Power Supply Voltage2 VCC    2.5     3.3     3.6      V       -           
+        Power Supply Current1 I       -       1       -      mA     Note1         
+                             iovcc                                                
+        Power Supply Current2 Ivcc    -      20       -      mA     Note1         
+                                                                                  
+       Logic Input High Voltage V  0.7VDD     -      VDD      V       -           
+                              IH                                                  
+       Logic Input Low Voltage V      0       -    0.3VDD     V       -           
+                              IL                                                  
+       Panel Power Consumption P      -      0.07     -      Watt   Note1         
+                              VDD                                                 
+      Module Power Consumption P      -      0.42     -      Watt   Note1,2       
+                              LCM                                                 
+      (Ta=+25°C,GND=0V)                                                           
+      Note1:Measurement Conditions (Video Mode): Full Screen Red Pattern,VDD=3.3V,60Hz Refresh.
+      Note2: P = P + P ，About P information, inference to 5.2 Back Light Driving Section.
+            LCM VDD  BL      BL                                                   
+      5.2 Back Light Driving Section                                              
+               Item         Symbol   Min.    Typ.    Max.   Unit   Remark         
+              项目             符号     最小值     典型值     最大值     单位       备注           
+           Forward Voltage     -       -      2.9      -      V     Note1         
+                                                                                  
+           Forward Current     I       -      120      -     mA     Note1         
+                               F                                                  
+      Backlight Power consumption P    -      0.35     -     Watt   Note1         
+                               BL                                                 
+            LED life time      -     30000     -       -     Hrs    Note2         
+               LED Quantity                    6             PCS                  
+      (Ta=+25°C,GND=0V)                                                           
+      Note1: The LED driving condition is defined for each LED module             
+      Note2:The “LED life time” is defined as the module brightness decrease to 50% of original brightness at
+                                                                                  
+           I =20mA(Per Led). The LED life time could be decreased if operating    
+           LED                                                                    
+           I  is larger than 20mA.                                                
+           LED                                                                    
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 9 / 18          
+                                                                                  
+
+===== PAGE 10 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      5.3 Power On/Off                                                            
+                                                                                  
+                                                                                  
+      5.3.1 Case 1 – RESX Line is Held High or Unstable by Host at Power ON       
+         If the RESX line is held High or unstable by the host during Power On, then Hardware Reset must be
+                                                                                  
+      applied after both VCI and IOVCC have been applied. Otherwise, the correct functionality is not
+      guaranteed. There is no timing restriction upon this hardware reset.        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 10 / 18         
+                                                                                  
+
+===== PAGE 11 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      5.3.1.2 Case 2 – RESX Line is Held Low by Host at Power ON                  
+                                                                                  
+         If the RESX line is held Low (and stable) by the host during Power On, then the RESX must be held
+      low for a minimum of 10μsec after both VCI and IOVCC have been applied.     
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 11 / 18         
+                                                                                  
+
+===== PAGE 12 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      5.4 Timing Characteristics                                                  
+                                                                                  
+         8080 Series MCU Parallel Interface Timing Characteristics: 16/8-bit Bus  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 12 / 18         
+                                                                                  
+
+===== PAGE 13 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      5.5 Display Serial Interface Timing Characteristics  ( SPI system  )        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 13 / 18         
+                                                                                  
+
+===== PAGE 14 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      6. OPTICAL     CHARACTERISTICS                                              
+                                                                                  
+      6.1 Optical Specification (Reflective mode)                                 
+                                                                                  
+                                                                                  
+                                                                                  
+                              Conditi                                             
+         Parameter    Symbol           Min.   Typ.    Max.   Unit    Remark       
+                                on                                                
+           参数          符号             最小值    典型值     最大值     单位       备注          
+                               条件                                                 
+       White Reflectance                                                          
+                      Rw (%)    = 0    10     12      -      %                   
+        (with Polarizer)                                                          
+        Contrast Ratio  C/R     = 0   -     10 : 1   -       -                  
+         NTSC Ratio      S      =0    13     16      -      %                   
+                                                                                  
+                                                                    设备：DMS        
+        Response Time  T                                                          
+                        R                                                         
+                        + T                                                       
+                           F                                                      
+                                25 C   -       -      30     ms                  
+                                                                      Tr+Tf       
+                                                                   W90%/B10%      
+                        θL              -      60      -                          
+                                                                    设备：DMS        
+                        θR              -      60      -            Source pad    
+        Viewing Angle          C/R2                        Degree    Down        
+                        θU              -      60      -                          
+                                                                      CR>2        
+                        θD              -      60      -                          
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 14 / 18         
+                                                                                  
+
+===== PAGE 15 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      6.2 Optical Specification (Transmittance mode)                              
+                                                                                  
+         Parameter  Symbol  Condition Min.    Typ.    Max.    Unit  Remark        
+           参数        符号       条件     最小值     典型值     最大值     单位      备注           
+                                                                                  
+                                                                                  
+        Contrast Ratio C/R    = 0    30:1    45:1     -      -                  
+                                                                    SR-UL1        
+        Color Gamut                                                   R           
+                      S        =0    15      18              %                  
+         （NTSC）                                                                   
+         Luminance    L        =0    125     150      -    cd/m2                
+                                                                                  
+         Luminance                                                                
+                      U        =0    80       -       -          Note(1)       
+                       W                                                          
+         uniformity                                                               
+       Response Time T                                                            
+                     R                                                            
+                      + T                                                         
+                        F                                                         
+                             25 C      -       -      30     ms    Note(2)       
+                      W                        0.29                               
+                       X                                                          
+        White Color            =0                                               
+                                      -+0.04          +0.04  (x,y)  Note(3)       
+        Coordination                                                              
+                      W                                                           
+                       Y                                                          
+                                               0.28                               
+                     θL                 -      50       -                         
+                                                                    设备：           
+                                                                     DMS          
+                     θR                 -      50       -                         
+       Viewing Angle           -                             Degree               
+                                                                    source        
+                     θU                 -      60       -                         
+                                                                     pad          
+                                                                    down          
+                     θD                 -      60       -                         
+      Test Conditions:                                                            
+      1. the ambient temperature is+25℃.                                          
+      2. The test systems refer to Note 1~4.                                      
+      Definition of Viewing Angle: The viewing angle range that the CR2          
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 15 / 18         
+                                                                                  
+
+===== PAGE 16 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      Note 1: Definition of Luminance Uniformity: Active area is divided into 9 measuring areas,
+           every measuring point is placed at the center of each measuring area.  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      Note2: Definition of Response time: Sum of T R and T F                      
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      Note 3:                                                                     
+                                                                                  
+      Definition of Color Chromaticity (CIE 1931)                                 
+      Color coordinates of white & red, green, blue measured at center point of LCD.
+                                                                                  
+      Note 4: Definition of NTSC ratio:                                           
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 16 / 18         
+                                                                                  
+
+===== PAGE 17 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      7. RELIABILITY                                                              
+                                                                                  
+                 Item                      Test Condition         Remark          
+                 项目                          测试条件                  备注             
+          High Temperature Storage       Ta = +80°C / 96Hours     Note1,2,3       
+          Low Temperature Storage        Ta = -30°C / 96Hours     Note1,2,3       
+                                                                                  
+         High Temperature Operating      Ta = +70°C / 96Hours     Note1,2,3       
+         Low Temperature Operating       Ta = -20°C / 96Hours     Note1,2,3       
+        Temperature Cycle storage Test -30°C/30min +80°C /30min for Note2,3      
+                                                                                  
+                                    30cycles,Transfer time less than 5min         
+         Thermal humidity storage Test  60°C x 90%RH / 96Hours     Note2,3        
+                                                                                  
+           Package Vibration Test Frequency: 10Hz~55Hz,Amplitude:1.5mm, 1 Note2   
+                                      hrs for each direction of X, Y, Z           
+                                                                                  
+             Packing shock test      Drop to the ground from 1m height, Note2     
+                                       1 corner, 3 edges, 6 surfaces.             
+      Inspection after Test:                                                      
+      Note1:Ta is the ambient temperature of samples.                             
+      Note 2: In the standard condition, there shall be no practical problem that may affect the display
+                                                                                  
+      function. After the reliability test, the product only guarantees operation, but doesn’t guarantee all the
+      cosmetic specification.                                                     
+      Note 3: Before cosmetic and function tests , the product must have enough recovery time, at least 2
+      hours at room temperature.                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 17 / 18         
+                                                                                  
+
+===== PAGE 18 =====
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      8. PACKAGE      DRAWING                                                     
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      www.chinasunyee.com          电话：400-660-3306          Page: 18 / 18         
+                                                                                  

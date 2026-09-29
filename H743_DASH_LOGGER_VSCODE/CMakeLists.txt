@@ -6,6 +6,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_C_COMPILER_FORCED TRUE)
 set(CMAKE_CXX_COMPILER_FORCED TRUE)
 
+# VS Code CMake Tools can configure build/Debug without forwarding the preset's
+# build type. The generated flags.cmake attaches the MCU definitions, compiler
+# flags, and linker script to the Debug configuration, so keep that configuration
+# as the fallback for single-config generators such as Ninja.
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+endif()
+
 # Set target definition variables required by the toolchain file
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/target.cmake)
 

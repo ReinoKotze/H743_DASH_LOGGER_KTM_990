@@ -24,8 +24,7 @@ static void formatAdcUnavailable(char *text, size_t length, const char *name)
                  (unsigned long)ads1115_last_config_written,
                  (unsigned long)ads1115_last_config_read);
     } else {
-        snprintf(text, length, "I:%lu S:%02lX H:%lu E:%02lX",
-                 (unsigned long)ads1115_i2c_error_count,
+        snprintf(text, length, "S:%02lX H:%lu E:%02lX",
                  (unsigned long)ads1115_last_error_stage,
                  (unsigned long)ads1115_last_hal_status,
                  (unsigned long)ads1115_last_hal_error);

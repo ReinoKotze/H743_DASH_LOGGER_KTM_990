@@ -9,8 +9,7 @@ volatile uint32_t last_hal_error = 0U;
 volatile uint32_t last_osc = 0U;
 volatile uint32_t last_cicon = 0U;
 volatile uint32_t device_id = 0U;
-volatile uint32_t rx_count = 0U, rx_dropped = 0U, rx_overflows = 0U;
-volatile uint32_t tx_queued = 0U, last_trec = 0U;
+volatile uint32_t last_trec = 0U;
 
 namespace {
 constexpr uint16_t CiCon = 0x000U;
@@ -142,7 +141,7 @@ bool Setup(SPI_HandleTypeDef *spi)
 {
     setup_status = SetupStatus::InProgress;
     head = tail = queued = 0;
-    rx_count = rx_dropped = rx_overflows = tx_queued = last_trec = 0U;
+    last_trec = 0U;
     last_hal_status = HAL_OK;
     last_hal_error = last_osc = last_cicon = device_id = 0U;
     HAL_GPIO_WritePin(CAN_CS_GPIO_Port, CAN_CS_Pin, GPIO_PIN_SET);
@@ -264,7 +263,6 @@ bool Send(const Frame &frame)
                 (frame.brs ? 0x40 : 0) | (frame.fd ? 0x80 : 0);
     memcpy(object + 8, frame.data, frame.length);
     if (!ramTransfer(offset, object, true) || !write8(TxCon + 1, 3U)) return false;
-    ++tx_queued; // Accepted by controller, not proof of bus delivery.
     return true;
 }
 
@@ -284,7 +282,6 @@ void Service()
         uint32_t status, offset;
         if (!read32(RxCon + 4, status)) return;
         if (status & 8U) {
-            ++rx_overflows;
             if (!write8(RxCon + 4, 0xF7U)) return;
         }
         if (!(status & 1U)) return;
@@ -304,12 +301,11 @@ void Service()
         if (!frame.fd && frame.length > 8) frame.length = 8;
         if (!frame.remote) memcpy(frame.data, object + 8, frame.length);
         if (!write8(RxCon + 1, 1U)) return; // UINC releases the hardware entry.
-        ++rx_count;
         if (queued < 8) {
             received[head] = frame;
             head = (head + 1) % 8;
             ++queued;
-        } else ++rx_dropped; // Drop newest, continue draining the hardware FIFO.
+        } // Drop newest if the software queue is full; continue draining hardware.
     }
     CAN_int_due = 1U; // Continue next loop even if INT never produces a new edge.
 }

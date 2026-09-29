@@ -71,6 +71,11 @@ void tasks(void);
 
 /* USER CODE BEGIN PV */
 
+volatile uint32_t startup_init_stage = 0U;
+volatile uint32_t startup_error_stage = 0U;
+volatile uint32_t startup_error_return_address = 0U;
+volatile uint32_t startup_error_exception = 0U;
+
 void setup();
 void tasks();
 uint32_t non_blocking_task(uint32_t last_tick, const uint32_t delay_interval) ;
@@ -118,6 +123,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+
+  startup_init_stage = 1U;
 
   /* USER CODE END 1 */
 
@@ -168,7 +175,9 @@ int main(void)
   MX_SDMMC2_SD_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
+  startup_init_stage = 30U;
   setup();
+  startup_init_stage = 31U;
 
 
   /* USER CODE END 2 */
@@ -329,6 +338,10 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+  startup_error_stage = startup_init_stage;
+  startup_error_return_address =
+      ((uint32_t)__builtin_return_address(0)) & 0xFFFFFFFEU;
+  startup_error_exception = __get_IPSR();
   __disable_irq();
   while (1)
   {

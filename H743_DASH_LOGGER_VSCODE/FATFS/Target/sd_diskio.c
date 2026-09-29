@@ -48,7 +48,8 @@
  * BSP_SD_Init() elsewhere in the application.
  */
 /* USER CODE BEGIN disableSDInit */
-#define DISABLE_SD_INIT
+/* Keep FatFs initialization enabled so mounting retries HAL_SD_Init after a
+   card is inserted. The slot currently has no separate card-detect signal. */
 /* USER CODE END disableSDInit */
 
 /* Private variables ---------------------------------------------------------*/

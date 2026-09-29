@@ -3,8 +3,6 @@
 
 extern "C" {
 
-volatile uint32_t lcd_refresh_count;
-volatile uint32_t lcd_fallback_count;
 volatile uint32_t lcd_last_refresh_ms;
 uint8_t screen_state=0;
 uint8_t screen_stateNUM=1;
@@ -153,8 +151,6 @@ void NON_BLOCKING_VSYNC()
     uint32_t now = HAL_GetTick();
     /* Restore the simple TE-driven loop, with a 33 ms missing-TE fallback. */
     if(te_due || (uint32_t)(now - last_refresh_ms) >= 33U) {
-        if(!te_due) ++lcd_fallback_count;
-        ++lcd_refresh_count;
         uint32_t before = HAL_GetTick();
         lv_display_refr_timer(NULL);
         last_refresh_ms = HAL_GetTick();

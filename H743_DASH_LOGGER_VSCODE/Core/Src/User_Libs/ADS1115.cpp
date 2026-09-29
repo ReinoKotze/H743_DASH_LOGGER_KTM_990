@@ -1,15 +1,11 @@
 #include "INCLUDES.hpp"
 
 extern "C" {
-volatile uint32_t ads1115_i2c_error_count = 0U;
-volatile uint32_t ads1115_conversion_timeout_count = 0U;
-volatile uint32_t ads1115_sample_count = 0U;
 volatile uint32_t ads1115_last_hal_status = 0U;
 volatile uint32_t ads1115_last_hal_error = 0U;
 volatile uint32_t ads1115_last_error_stage = 0U;
 volatile uint32_t ads1115_last_config_written = 0U;
 volatile uint32_t ads1115_last_config_read = 0U;
-volatile uint32_t ads1115_config_read_count = 0U;
 }
 
 namespace ADS1115 {
@@ -49,7 +45,6 @@ int indexForChannel(uint8_t channel)
 
 void recordI2cFailure(HAL_StatusTypeDef status, uint32_t stage)
 {
-    ++ads1115_i2c_error_count;
     ads1115_last_hal_status = static_cast<uint32_t>(status);
     ads1115_last_hal_error = bus != nullptr ? HAL_I2C_GetError(bus) : 0U;
     ads1115_last_error_stage = stage;
@@ -195,7 +190,6 @@ void Service()
             return;
         }
         ads1115_last_config_read = config;
-        ++ads1115_config_read_count;
         if ((config & 0x8000U) != 0U)
         {
             uint16_t raw = 0U;
@@ -212,7 +206,6 @@ void Service()
             latestMillivolts[index] = measuredMillivolts > 0 ? measuredMillivolts : 0;
             latestSampleMs[index] = HAL_GetTick();
             sampleValid[index] = true;
-            ++ads1115_sample_count;
             converting = false;
             ADS1115_alert_ready_due = 0U;
             nextChannel = activeChannel == EngineChannel ? AmbientChannel : EngineChannel;
@@ -223,7 +216,6 @@ void Service()
         {
             converting = false;
             ADS1115_alert_ready_due = 0U;
-            ++ads1115_conversion_timeout_count;
             retryAfterMs = HAL_GetTick() + ErrorBackoffMs;
         }
         return;
@@ -247,4 +239,3 @@ bool ReadMillivolts(uint8_t channel, int32_t *millivolts)
 }
 
 } // namespace ADS1115
-

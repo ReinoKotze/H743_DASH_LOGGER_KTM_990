@@ -22,11 +22,27 @@
 
 
 
-// if 1 its external sdram, 0 is internal RRAM_D2
+// 1: LVGL buffers in external SDRAM, with LCD transfers staged through
+//    an internal SRAM scanline buffer.
+// 0: LVGL buffers in internal RAM_D2 and LCD transfers directly from them.
 #if 0
+#define USE_EXTERNAL_SDRAM 1
 #define SDRAM_START_ADD 0xc0000000U
+/* CPU cycles left idle when changing the shared FMC bus between SDRAM reads
+   and LCD writes. Increase in small steps if the prototype wiring rings. */
+#define LCD_FMC_SETTLE_CYCLES 512U
+#define LCD_SDRAM_VERIFY_READS 1
+#define LCD_SDRAM_READ_RETRIES 3U
+/* Repeat each staged LCD scanline write. The final pass overwrites transient
+   corruption from an earlier pass on the long prototype wiring. */
+#define LCD_SCANLINE_WRITE_PASSES 1U
 #else
+#define USE_EXTERNAL_SDRAM 0
 #define SDRAM_START_ADD 0x30000000U
+#define LCD_FMC_SETTLE_CYCLES 0U
+#define LCD_SDRAM_VERIFY_READS 0
+#define LCD_SDRAM_READ_RETRIES 0U
+#define LCD_SCANLINE_WRITE_PASSES 1U
 #endif
 
 

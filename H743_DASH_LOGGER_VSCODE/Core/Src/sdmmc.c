@@ -22,6 +22,22 @@
 
 /* USER CODE BEGIN 0 */
 
+volatile uint32_t sdmmc2_init_status = HAL_OK;
+volatile uint32_t sdmmc2_init_error = HAL_SD_ERROR_NONE;
+volatile uint32_t sdmmc2_init_state = HAL_SD_STATE_RESET;
+
+static HAL_StatusTypeDef SDMMC2_DeferCardInit(SD_HandleTypeDef *hsd)
+{
+  sdmmc2_init_status = 0xFFFFFFFFU; /* Initialization deferred. */
+  sdmmc2_init_error = HAL_SD_ERROR_NONE;
+  sdmmc2_init_state = (uint32_t)hsd->State;
+  return HAL_OK;
+}
+
+/* Apply only to CubeMX's startup probe in this translation unit. The FatFs
+   BSP calls the real HAL_SD_Init() from bsp_driver_sd.c when mounting. */
+#define HAL_SD_Init(hsd) SDMMC2_DeferCardInit(hsd)
+
 /* USER CODE END 0 */
 
 SD_HandleTypeDef hsd2;
