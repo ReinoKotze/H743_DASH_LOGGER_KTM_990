@@ -1,7 +1,7 @@
 # H743_DASH_LOGGER_KTM_990
 This is a seprate physical display to compliment the trailtech voyger on my ktm 990 with the added ability to data log. 
 
-The controller is a STM32H743IIT6 sold online pictured below. The board has w9825g6kh SDRAM IC and an w25q128 QSPI flash IC onboard. The board also had a SD card slot and a LDTC FPC connector that is not used for this project. The display is a 3.5inch transflective LCD with a st7365p controller IC. the display is a viewe PN: UEED035HV-RX40-L001A pictured below. 
+The controller is a STM32H743IIT6 sold online pictured below. The board has w9825g6kh SDRAM IC and an w25q128 QSPI flash IC onboard. The board also had a SD card slot and a LDTC FPC connector that is not used for this project. The display is a 3.5inch transflective LCD with a st7365p controller IC. the display is a viewe PN: UEED035HV-RX40-L001A pictured below. So after some more reading, this display cannot use ltdc, which is a issue for me. 
 
 <img width="239" height="563" alt="image" src="https://github.com/user-attachments/assets/3c01f878-6cef-4ef4-bb6d-9ba9415695f1" /> <img width="555" height="369" alt="image" src="https://github.com/user-attachments/assets/bf8d4a20-dfb0-416f-af32-e9a2a94ba7d2" />
 
