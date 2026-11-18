@@ -1,7 +1,7 @@
 # H743_DASH_LOGGER_KTM_990
 
 
-Note: lots of changes to come, will soon start updating project. 
+      Note: lots of changes to come, will soon start updating project. 
 
 This is a seprate physical display to compliment the trailtech voyger on my ktm 990 with the added ability to data log. 
 
